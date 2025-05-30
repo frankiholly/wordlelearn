@@ -212,6 +212,87 @@ function App() {
       setIsGameOver(true);
     }
   }, [isCorrect, guesses.length]);
+  
+  // Handle guess submission - extracted for reuse
+  const handleSubmitGuess = useCallback(() => {
+    if (isRevealing || isGameOver) return;
+    
+    // Convert guess to uppercase for comparison
+    const formattedGuess = guess.toUpperCase();
+    
+    // Basic validation for 5-letter words
+    if (formattedGuess.length !== 5) {
+      setMessage('Please enter a 5-letter word');
+      return;
+    }
+    
+    // Check if word is in dictionary if validation is enabled
+    if (!isValidWord(formattedGuess)) {
+      setMessage('Not in word list');
+      animateInvalid(true);
+      setTimeout(() => animateInvalid(false), 600);
+      return;
+    }
+    
+    // Add the guess to the list
+    setGuesses(prev => [...prev, formattedGuess]);
+    
+    // Clear input and message
+    setGuess('');
+    setMessage('');
+    
+    // Check if correct
+    const correct = formattedGuess === targetWord;
+    if (correct) {
+      setIsCorrect(true);
+      // Update stats for win
+      setStats(prev => ({
+        ...prev,
+        gamesPlayed: prev.gamesPlayed + 1,
+        gamesWon: prev.gamesWon + 1,
+        currentStreak: prev.currentStreak + 1,
+        maxStreak: Math.max(prev.maxStreak, prev.currentStreak + 1),
+        guessDistribution: {
+          ...prev.guessDistribution,
+          [guesses.length + 1]: (prev.guessDistribution[guesses.length + 1] || 0) + 1
+        }
+      }));
+    }
+    // Check if out of attempts
+    else if (guesses.length + 1 >= MAX_ATTEMPTS) {
+      // Update stats for loss
+      setStats(prev => ({
+        ...prev,
+        gamesPlayed: prev.gamesPlayed + 1,
+        currentStreak: 0
+      }));
+    }
+    
+    // Set the UI to revealing state
+    setIsRevealing(true);
+    
+    // After revealing animation completes
+    setTimeout(() => {
+      setIsRevealing(false);
+      
+      // Update keyboard letter states
+      const evaluatedGuess = evaluateGuess(formattedGuess);
+      const newKeys = { ...usedKeys };
+      
+      evaluatedGuess.forEach(({ letter, status }) => {
+        const currentStatus = newKeys[letter];
+        
+        // Only override if current status is less precise
+        if (!currentStatus || 
+            (currentStatus !== 'correct' && status === 'correct') || 
+            (currentStatus === 'unused' && status !== 'unused')) {
+          newKeys[letter] = status;
+        }
+      });
+      
+      setUsedKeys(newKeys);
+    }, 1800); // Match this with the CSS animation duration
+  }, [guess, isRevealing, isGameOver, targetWord, guesses.length, usedKeys, evaluateGuess, isValidWord]);
 
   // Effect for keyboard support
   useEffect(() => {
@@ -369,81 +450,6 @@ function App() {
       inputRef.current.focus();
     }
   }, [guess, isGameOver, isRevealing]);
-
-  // Handle guess submission - extracted for reuse
-  const handleSubmitGuess = useCallback(() => {
-    if (isRevealing || isGameOver) return;
-    
-    // Convert guess to uppercase for comparison
-    const formattedGuess = guess.toUpperCase();
-    
-    // Basic validation for 5-letter words
-    if (formattedGuess.length !== 5) {
-      setMessage('Please enter a 5-letter word');
-      return;
-    }
-    
-    // Evaluate the guess
-    const evaluatedGuess = evaluateGuess(formattedGuess);
-    
-    // Start the revealing animation
-    setIsRevealing(true);
-    
-    // Delay adding the guess to state until animation completes
-    setTimeout(() => {
-      const newGuesses = [...guesses, evaluatedGuess];
-      setGuesses(newGuesses);
-      
-      // Update keyboard key statuses
-      const newUsedKeys = { ...usedKeys };
-      evaluatedGuess.forEach(({ letter, status }) => {
-        // Only update key status if the new status is higher priority
-        const currentStatus = newUsedKeys[letter];
-        if (!currentStatus || getStatusPriority(status) > getStatusPriority(currentStatus)) {
-          newUsedKeys[letter] = status;
-        }
-      });
-      setUsedKeys(newUsedKeys);
-      
-      // Check if the guess is correct
-      const isGuessCorrect = formattedGuess === targetWord;
-      if (isGuessCorrect) {
-        setMessage('Correct! You guessed the word!');
-        setIsCorrect(true);
-        // Update stats for win
-        localStorage.setItem(`${STORAGE_KEY}_finalized_${targetWord}`, 'true');
-        updateStats(true, newGuesses.length);
-        
-        // Announce result to screen readers
-        const announcement = document.createElement('div');
-        announcement.className = 'sr-only';
-        announcement.setAttribute('aria-live', 'assertive');
-        announcement.textContent = 'Correct! You won the game!';
-        document.body.appendChild(announcement);
-        setTimeout(() => document.body.removeChild(announcement), 1000);
-      } else if (newGuesses.length >= MAX_ATTEMPTS) {
-        setMessage(`Game over! The word was ${targetWord}.`);
-        setIsGameOver(true);
-        // Update stats for loss
-        localStorage.setItem(`${STORAGE_KEY}_finalized_${targetWord}`, 'true');
-        updateStats(false, MAX_ATTEMPTS);
-        
-        // Announce result to screen readers
-        const announcement = document.createElement('div');
-        announcement.className = 'sr-only';
-        announcement.setAttribute('aria-live', 'assertive');
-        announcement.textContent = `Game over! The word was ${targetWord}.`;
-        document.body.appendChild(announcement);
-        setTimeout(() => document.body.removeChild(announcement), 1000);
-      } else {
-        setMessage(`Not quite. Try again! ${MAX_ATTEMPTS - newGuesses.length} attempts left.`);
-      }
-      
-      // Clear the input field
-      setGuess('');
-      setIsRevealing(false);
-    }, 1500); // Time for animation to complete
-  }, [evaluateGuess, guess, guesses, isGameOver, isRevealing, targetWord, usedKeys, getStatusPriority, updateStats]);
 
   const handleGuess = useCallback((e) => {
     e.preventDefault();
