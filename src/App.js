@@ -142,6 +142,9 @@ function App() {
   // State to control showing/hiding stats modal
   const [showStats, setShowStats] = useState(false);
 
+  // State for invalid word animation
+  const [isInvalid, setIsInvalid] = useState(false);
+
   // Helper to determine priority of statuses for keyboard
   // correct > present > absent
   const getStatusPriority = useCallback((status) => {
@@ -212,6 +215,18 @@ function App() {
       setIsGameOver(true);
     }
   }, [isCorrect, guesses.length]);
+
+  // Function to check if the word is valid (in our word list)
+  const isValidWord = useCallback((word) => {
+    // In a real implementation, check against a dictionary
+    // For this example, accept all 5-letter words
+    return word.length === 5;
+  }, []);
+
+  // Function to trigger invalid word animation
+  const animateInvalid = useCallback((invalid) => {
+    setIsInvalid(invalid);
+  }, []);
   
   // Handle guess submission - extracted for reuse
   const handleSubmitGuess = useCallback(() => {
@@ -292,7 +307,7 @@ function App() {
       
       setUsedKeys(newKeys);
     }, 1800); // Match this with the CSS animation duration
-  }, [guess, isRevealing, isGameOver, targetWord, guesses.length, usedKeys, evaluateGuess, isValidWord]);
+  }, [guess, isRevealing, isGameOver, targetWord, guesses.length, usedKeys, evaluateGuess, isValidWord, animateInvalid]);
 
   // Effect for keyboard support
   useEffect(() => {
@@ -471,7 +486,7 @@ function App() {
       <a href="#game-controls" className="sr-only">Skip to game controls</a>
       
       <div id="game-controls">
-        <form onSubmit={handleGuess} aria-label="Word input form">
+        <form onSubmit={handleGuess} aria-label="Word input form" className={isInvalid ? 'shake' : ''}>
           <label htmlFor="guess-input" className="sr-only">Enter a 5-letter word</label>
           <input
             id="guess-input"
