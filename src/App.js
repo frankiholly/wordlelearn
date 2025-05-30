@@ -145,17 +145,6 @@ function App() {
   // State for invalid word animation
   const [isInvalid, setIsInvalid] = useState(false);
 
-  // Helper to determine priority of statuses for keyboard
-  // correct > present > absent
-  const getStatusPriority = useCallback((status) => {
-    switch (status) {
-      case 'correct': return 3;
-      case 'present': return 2;
-      case 'absent': return 1;
-      default: return 0;
-    }
-  }, []);
-
   // Load stats and game state from localStorage on initial render
   useEffect(() => {
     const savedData = localStorage.getItem(STORAGE_KEY);
@@ -215,6 +204,35 @@ function App() {
       setIsGameOver(true);
     }
   }, [isCorrect, guesses.length]);
+  
+  // Function to evaluate each letter of the guess (memoized for performance)
+  const evaluateGuess = useCallback((guess) => {
+    const result = [];
+    const targetLetters = targetWord.split('');
+    
+    // First pass: Mark correct positions (green)
+    for (let i = 0; i < guess.length; i++) {
+      if (guess[i] === targetLetters[i]) {
+        result[i] = { letter: guess[i], status: 'correct' };
+        targetLetters[i] = null; // Mark as used
+      }
+    }
+    
+    // Second pass: Mark present but wrong position (yellow) or absent (gray)
+    for (let i = 0; i < guess.length; i++) {
+      if (!result[i]) { // Skip already processed letters
+        const letterIndex = targetLetters.indexOf(guess[i]);
+        if (letterIndex !== -1) {
+          result[i] = { letter: guess[i], status: 'present' };
+          targetLetters[letterIndex] = null; // Mark as used
+        } else {
+          result[i] = { letter: guess[i], status: 'absent' };
+        }
+      }
+    }
+    
+    return result;
+  }, [targetWord]);
 
   // Function to check if the word is valid (in our word list)
   const isValidWord = useCallback((word) => {
@@ -355,35 +373,6 @@ function App() {
       inputRef.current.focus();
     }
   }, [isGameOver]);
-
-  // Function to evaluate each letter of the guess (memoized for performance)
-  const evaluateGuess = useCallback((guess) => {
-    const result = [];
-    const targetLetters = targetWord.split('');
-    
-    // First pass: Mark correct positions (green)
-    for (let i = 0; i < guess.length; i++) {
-      if (guess[i] === targetLetters[i]) {
-        result[i] = { letter: guess[i], status: 'correct' };
-        targetLetters[i] = null; // Mark as used
-      }
-    }
-    
-    // Second pass: Mark present but wrong position (yellow) or absent (gray)
-    for (let i = 0; i < guess.length; i++) {
-      if (!result[i]) { // Skip already processed letters
-        const letterIndex = targetLetters.indexOf(guess[i]);
-        if (letterIndex !== -1) {
-          result[i] = { letter: guess[i], status: 'present' };
-          targetLetters[letterIndex] = null; // Mark as used
-        } else {
-          result[i] = { letter: guess[i], status: 'absent' };
-        }
-      }
-    }
-    
-    return result;
-  }, [targetWord]);
 
   // Update stats based on game outcome
   const updateStats = useCallback((won, numGuesses) => {
