@@ -251,7 +251,7 @@ function App() {
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('keyup', handleKeyUp);
     };
-  }, [guess, isGameOver, isRevealing, showStats]);
+  }, [guess, isGameOver, isRevealing, showStats, handleSubmitGuess]);
 
   // Focus input when the game starts or resets
   useEffect(() => {
