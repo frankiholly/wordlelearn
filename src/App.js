@@ -629,19 +629,7 @@ function App() {
           onClose={() => setShowStats(false)} 
         />
       )}
-      
-      {/* Learning Tips for Stage 5 */}
-      <div className="learning-section">
-        <h2>Stage 5 Learning:</h2>
-        <ul>
-          <li>Animations using CSS keyframes and React state</li>
-          <li>Keyboard navigation and event handling</li>
-          <li>Accessibility features including ARIA attributes</li>
-          <li>React performance optimization with useCallback and useMemo</li>
-          <li>Responsive design for different device sizes</li>
-          <li>Component splitting for better maintainability</li>
-        </ul>
-      </div>
+
       
       {/* Hidden live region for screen reader announcements */}
       <div 
