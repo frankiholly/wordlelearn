@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wordle React Game</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+        'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+        sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      background-color: #121213;
+      color: white;
+    }
+    
+    .App {
+      text-align: center;
+      max-width: 500px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    
+    .title {
+      font-size: 2.5rem;
+      margin-bottom: 20px;
+      border-bottom: 1px solid #3a3a3c;
+      padding-bottom: 10px;
+    }
+    
+    .guess-input {
+      margin: 20px 0;
+      width: 100%;
+      padding: 10px;
+      font-size: 1rem;
+      text-transform: uppercase;
+      background-color: #121213;
+      color: white;
+      border: 2px solid #3a3a3c;
+      border-radius: 4px;
+    }
+    
+    .message {
+      font-size: 1.2rem;
+      margin: 20px 0;
+      padding: 10px;
+      border-radius: 4px;
+    }
+    
+    .success {
+      background-color: #538d4e;
+    }
+    
+    .error {
+      background-color: #3a3a3c;
+    }
+    
+    button {
+      background-color: #538d4e;
+      color: white;
+      padding: 10px 20px;
+      font-size: 1rem;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-left: 10px;
+    }
+    
+    button:disabled {
+      background-color: #3a3a3c;
+      cursor: not-allowed;
+    }
+    
+    .learning-section {
+      margin-top: 40px;
+      text-align: left;
+      background-color: #242424;
+      padding: 20px;
+      border-radius: 4px;
+    }
+    
+    .learning-section h2 {
+      margin-top: 0;
+      color: #538d4e;
+    }
+    
+    .learning-section ul {
+      padding-left: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <!-- Load React from CDN -->
+  <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <!-- React Component Script -->
+  <script type="text/babel">
+    function App() {
+      // Stage 1: MVP - Hard-coded target word and basic guess functionality
+      const targetWord = "REACT";
+      const [guess, setGuess] = React.useState('');
+      const [message, setMessage] = React.useState('');
+      const [isCorrect, setIsCorrect] = React.useState(false);
+    
+      const handleGuess = (e) => {
+        e.preventDefault();
+        
+        // Convert guess to uppercase for comparison
+        const formattedGuess = guess.toUpperCase();
+        
+        // Basic validation for 5-letter words
+        if (formattedGuess.length !== 5) {
+          setMessage('Please enter a 5-letter word');
+          return;
+        }
+        
+        // Check if the guess is correct
+        if (formattedGuess === targetWord) {
+          setMessage('Correct! You guessed the word!');
+          setIsCorrect(true);
+        } else {
+          setMessage(`Incorrect. Try again!`);
+        }
+        
+        // Clear the input field
+        setGuess('');
+      };
+    
+      return (
+        <div className="App">
+          <h1 className="title">Wordle</h1>
+          
+          <form onSubmit={handleGuess}>
+            <input
+              type="text"
+              className="guess-input"
+              value={guess}
+              onChange={(e) => setGuess(e.target.value)}
+              placeholder="Enter a 5-letter word"
+              maxLength={5}
+              disabled={isCorrect}
+            />
+            <button type="submit" disabled={isCorrect}>
+              Guess
+            </button>
+          </form>
+          
+          {message && (
+            <div className={`message ${isCorrect ? 'success' : 'error'}`}>
+              {message}
+            </div>
+          )}
+          
+          {/* Learning Tips for Stage 1 */}
+          <div className="learning-section">
+            <h2>Stage 1 Learning:</h2>
+            <ul>
+              <li>React components and structure</li>
+              <li>useState hook for managing state</li>
+              <li>Event handling with forms</li>
+              <li>Conditional rendering</li>
+            </ul>
+          </div>
+        </div>
+      );
+    }
+    
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(
+      <React.StrictMode>
+        <App />
+      </React.StrictMode>
+    );
+  </script>
+</body>
+</html>
