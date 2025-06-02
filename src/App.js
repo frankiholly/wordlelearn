@@ -267,8 +267,9 @@ function App() {
       return;
     }
     
-    // Add the guess to the list
-    setGuesses(prev => [...prev, formattedGuess]);
+    // Evaluate the guess and add it to the list with status information
+    const evaluatedGuess = evaluateGuess(formattedGuess);
+    setGuesses(prev => [...prev, evaluatedGuess]);
     
     // Clear input and message
     setGuess('');
@@ -308,8 +309,7 @@ function App() {
     setTimeout(() => {
       setIsRevealing(false);
       
-      // Update keyboard letter states
-      const evaluatedGuess = evaluateGuess(formattedGuess);
+      // Update keyboard letter states - using the same evaluatedGuess we added to the guesses array
       const newKeys = { ...usedKeys };
       
       evaluatedGuess.forEach(({ letter, status }) => {
@@ -547,15 +547,25 @@ function App() {
             role="row"
             aria-label={`Guess ${guessIndex + 1}`}
           >
-            {guess.map((letter, letterIndex) => (
-              <Tile
-                key={letterIndex}
-                letter={letter.letter}
-                status={letter.status}
-                index={letterIndex}
-                isRevealing={guessIndex === guesses.length - 1 && isRevealing}
-              />
-            ))}
+            {Array.isArray(guess) 
+              ? guess.map((letter, letterIndex) => (
+                <Tile
+                  key={letterIndex}
+                  letter={letter.letter}
+                  status={letter.status}
+                  index={letterIndex}
+                  isRevealing={guessIndex === guesses.length - 1 && isRevealing}
+                />
+              ))
+              : guess.split('').map((letter, letterIndex) => (
+                <Tile
+                  key={letterIndex}
+                  letter={letter}
+                  status={letterIndex < 5 ? 'unused' : null}
+                  index={letterIndex}
+                  isRevealing={false}
+                />
+              ))}
           </div>
         ))}
         
