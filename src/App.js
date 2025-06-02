@@ -235,11 +235,11 @@ function App() {
     return result;
   }, [targetWord]);
 
-  // State to track if we're checking a word online
-  const [isCheckingOnline, setIsCheckingOnline] = useState(false);
-  
   // State to control whether to use online dictionary
   const [useOnlineDictionary, setUseOnlineDictionary] = useState(false);
+  
+  // State to track if we're checking a word online
+  const [isCheckingOnline, setIsCheckingOnline] = useState(false);
 
   // Function to check if the word is valid (in our word list)
   const isValidWord = useCallback((word) => {
