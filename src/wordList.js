@@ -1,56 +1,7 @@
-// A list of common 5-letter words for our Wordle game
-export const WORDS = [
-  'REACT',
-  'WASTE',
-  'PRIDE',
-  'FLARE',
-  'CRANE',
-  'AUDIO',
-  'ADIEU',
-  'STARE',
-  'ROAST',
-  'SLANT',
-  'CRATE',
-  'SPARK',
-  'SLATE',
-  'BLAST',
-  'CRAMP',
-  'BOOST',
-  'BRAVE',
-  'BRICK',
-  'CLOSE',
-  'COAST',
-  'CURLS',
-  'DAILY',
-  'DAISY',
-  'DANCE',
-  'WHACK',
-  'YOUTH',
-  'ZESTY',
-  'DRIVE',
-  'EAGLE',
-  'EARTH',
-  'EVADE',
-  'FANCY',
-  'FETCH',
-  'FIELD',
-  'FLAIR',
-  'FLAME',
-  'GHOST',
-  'GLARE',
-  'GLAZE',
-  'GRAZE',
-  'GREAT',
-  'GREEN',
-  'GREET',
-  'HOUSE',
-  'JUMBO',
-  'KNACK',
-  'LABEL',
-  'LASER'
-];
+// Import the dictionary
+import { dictionary } from './data/dictionary';
 
-// Get a random word from the list
+// Get a random word from the dictionary
 export const getRandomWord = () => {
-  return WORDS[Math.floor(Math.random() * WORDS.length)];
+  return dictionary[Math.floor(Math.random() * dictionary.length)];
 };

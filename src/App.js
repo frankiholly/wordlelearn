@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { getRandomWord } from './wordList';
+import { isInDictionary } from './data/dictionary';
 import './App.css';
 
 // Component for displaying game statistics
@@ -236,9 +237,10 @@ function App() {
 
   // Function to check if the word is valid (in our word list)
   const isValidWord = useCallback((word) => {
-    // In a real implementation, check against a dictionary
-    // For this example, accept all 5-letter words
-    return word.length === 5;
+    // Check that it's 5 letters and in our dictionary
+    const isValid = word.length === 5 && isInDictionary(word);
+    console.log(`Validating word: ${word}, isValid: ${isValid}, inDictionary: ${isInDictionary(word)}`);
+    return isValid;
   }, []);
 
   // Function to trigger invalid word animation
@@ -260,12 +262,15 @@ function App() {
     }
     
     // Check if word is in dictionary if validation is enabled
+    console.log(`Checking if ${formattedGuess} is valid...`);
     if (!isValidWord(formattedGuess)) {
+      console.log(`${formattedGuess} is not in word list, rejecting`);
       setMessage('Not in word list');
       animateInvalid(true);
       setTimeout(() => animateInvalid(false), 600);
       return;
     }
+    console.log(`${formattedGuess} passed validation, continuing with guess`);
     
     // Evaluate the guess and add it to the list with status information
     const evaluatedGuess = evaluateGuess(formattedGuess);
