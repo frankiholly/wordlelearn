@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { getRandomWord } from './wordList';
-import { isInDictionary } from './data/dictionary';
+import { isInDictionary, checkWordOnline } from './data/dictionary';
 import './App.css';
 
 // Component for displaying game statistics
@@ -235,9 +235,15 @@ function App() {
     return result;
   }, [targetWord]);
 
+  // State to track if we're checking a word online
+  const [isCheckingOnline, setIsCheckingOnline] = useState(false);
+  
+  // State to control whether to use online dictionary
+  const [useOnlineDictionary, setUseOnlineDictionary] = useState(false);
+
   // Function to check if the word is valid (in our word list)
   const isValidWord = useCallback((word) => {
-    // Make sure word is 5 letters and in our dictionary
+    // Make sure word is 5 letters
     if (word.length !== 5) {
       console.log(`Word ${word} rejected: not 5 letters`);
       return false;
@@ -245,11 +251,49 @@ function App() {
     
     // Convert to uppercase for dictionary check
     const upperCaseWord = word.toUpperCase();
-    const inDict = isInDictionary(upperCaseWord);
     
-    console.log(`Dictionary validation for ${upperCaseWord}: ${inDict ? 'Valid' : 'Invalid'}`);
-    return inDict;
-  }, []);
+    // First check local dictionary
+    const inLocalDict = isInDictionary(upperCaseWord, false);
+    
+    console.log(`Local dictionary validation for ${upperCaseWord}: ${inLocalDict ? 'Valid' : 'Invalid'}`);
+    
+    // If it's in our local dictionary, we're good
+    if (inLocalDict) {
+      return true;
+    }
+    
+    // If we're using the online dictionary and not already checking online
+    if (useOnlineDictionary && !isCheckingOnline) {
+      console.log(`Starting online check for ${upperCaseWord}...`);
+      
+      // Set checking flag and start asynchronous check
+      setIsCheckingOnline(true);
+      setMessage('Checking dictionary...');
+      
+      // Start the online check
+      checkWordOnline(upperCaseWord).then(isValid => {
+        console.log(`Online check complete for ${upperCaseWord}: ${isValid ? 'Valid' : 'Invalid'}`);
+        setIsCheckingOnline(false);
+        
+        if (isValid) {
+          // Word is valid online, accept it as a guess
+          handleSubmitValidatedGuess(upperCaseWord);
+        } else {
+          // Word is invalid online too
+          setMessage('Not in dictionary');
+          animateInvalid(true);
+          setTimeout(() => animateInvalid(false), 600);
+        }
+      }).catch(error => {
+        console.error('Error in online check:', error);
+        setIsCheckingOnline(false);
+        setMessage('Dictionary check failed');
+      });
+    }
+    
+    // Return false initially, the async check will call handleSubmitValidatedGuess if needed
+    return false;
+  }, [useOnlineDictionary, isCheckingOnline]);
 
   // Function to trigger invalid word animation
   const animateInvalid = useCallback((invalid) => {
@@ -259,7 +303,7 @@ function App() {
   
   // Handle guess submission - extracted for reuse
   const handleSubmitGuess = useCallback(() => {
-    if (isRevealing || isGameOver) return;
+    if (isRevealing || isGameOver || isCheckingOnline) return;
     
     // Convert guess to uppercase for comparison
     const formattedGuess = guess.toUpperCase();
@@ -274,18 +318,30 @@ function App() {
     console.log(`[handleSubmitGuess] Validating word: ${formattedGuess}`);
     const wordIsValid = isValidWord(formattedGuess);
     
-    if (!wordIsValid) {
+    // If the word is immediately valid (in local dictionary)
+    if (wordIsValid) {
+      console.log(`[handleSubmitGuess] ACCEPTED: "${formattedGuess}" is valid in local dictionary`);
+      handleSubmitValidatedGuess(formattedGuess);
+    }
+    // If we're checking online, the isValidWord function will handle it
+    else if (!useOnlineDictionary) {
+      // Only show "not in word list" if we're not using online dictionary
+      // (otherwise this will be handled by the online checker)
       console.log(`[handleSubmitGuess] REJECTED: "${formattedGuess}" is not in word list`);
       setMessage('Not in word list');
       animateInvalid(true);
       setTimeout(() => animateInvalid(false), 600);
-      return;
     }
+  }, [guess, isRevealing, isGameOver, isCheckingOnline, useOnlineDictionary, isValidWord, animateInvalid, handleSubmitValidatedGuess]);
+
+  // Function to handle submission after a word has been validated
+  const handleSubmitValidatedGuess = useCallback((validatedWord) => {
+    if (isRevealing || isGameOver) return;
     
-    console.log(`[handleSubmitGuess] ACCEPTED: "${formattedGuess}" is valid`);
+    console.log(`[handleSubmitValidatedGuess] Processing validated word: ${validatedWord}`);
     
     // Evaluate the guess and add it to the list with status information
-    const evaluatedGuess = evaluateGuess(formattedGuess);
+    const evaluatedGuess = evaluateGuess(validatedWord);
     setGuesses(prev => [...prev, evaluatedGuess]);
     
     // Clear input and message
@@ -293,7 +349,7 @@ function App() {
     setMessage('');
     
     // Check if correct
-    const correct = formattedGuess === targetWord;
+    const correct = validatedWord === targetWord;
     if (correct) {
       setIsCorrect(true);
       // Update stats for win
@@ -342,7 +398,7 @@ function App() {
       
       setUsedKeys(newKeys);
     }, 1800); // Match this with the CSS animation duration
-  }, [guess, isRevealing, isGameOver, targetWord, guesses.length, usedKeys, evaluateGuess, isValidWord, animateInvalid]);
+  }, [isRevealing, isGameOver, targetWord, guesses.length, usedKeys, evaluateGuess]);
 
   // Effect for keyboard support
   useEffect(() => {
@@ -487,7 +543,21 @@ function App() {
   return (
     <div className="App">
       <h1 className="title">Wordle</h1>
-      <div className="version-info">v2.0 - June 2</div>
+      <div className="version-info">v2.1 - June 2 - Online Dictionary</div>
+      
+      {/* Dictionary Toggle */}
+      <div className="dictionary-toggle">
+        <label>
+          <input 
+            type="checkbox" 
+            checked={useOnlineDictionary} 
+            onChange={(e) => setUseOnlineDictionary(e.target.checked)}
+            disabled={isCheckingOnline}
+          />
+          Use Online Dictionary
+        </label>
+        {isCheckingOnline && <span className="loading-spinner"></span>}
+      </div>
       
       {/* Accessibility skiplink */}
       <a href="#game-controls" className="sr-only">Skip to game controls</a>

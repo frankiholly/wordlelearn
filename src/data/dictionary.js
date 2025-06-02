@@ -35,18 +35,59 @@ export const dictionary = [
  * @param {string} word - The word to check
  * @returns {boolean} - True if the word is in the dictionary, false otherwise
  */
-export function isInDictionary(word) {
-  // Ensure word is uppercase for dictionary comparison
+// Local dictionary check
+function isInLocalDictionary(word) {
+  const upperCaseWord = word.toUpperCase();
+  return dictionary.includes(upperCaseWord);
+}
+
+// Function to check if a word exists in Dictionary.com
+// This returns a Promise that resolves to true if the word exists, false otherwise
+export async function checkWordOnline(word) {
+  try {
+    const response = await fetch(`https://www.dictionary.com/browse/${word.toLowerCase()}`);
+    
+    // If we get a 200 status and not a "no result" page, the word exists
+    if (response.ok) {
+      const html = await response.text();
+      // If the page contains "No results found", then the word doesn't exist
+      const wordExists = !html.includes('No results found');
+      console.log(`Online dictionary check for '${word}': Found=${wordExists}`);
+      return wordExists;
+    }
+    return false;
+  } catch (error) {
+    console.error('Error checking word online:', error);
+    // Fall back to local dictionary in case of error
+    return isInLocalDictionary(word);
+  }
+}
+
+// Main dictionary function that first checks local dictionary,
+// then optionally checks online dictionary
+export function isInDictionary(word, checkOnline = false) {
+  // Ensure word is uppercase for local dictionary comparison
   const upperCaseWord = word.toUpperCase();
   
-  // Check if the word is in our dictionary
-  const isInDict = dictionary.includes(upperCaseWord);
+  // First check our local dictionary (fast)
+  const isInLocal = isInLocalDictionary(upperCaseWord);
   
-  // Debug information
-  console.log(`Dictionary check for '${upperCaseWord}': Found=${isInDict}`);
-  if (!isInDict) {
-    console.log(`Word '${upperCaseWord}' is not in the dictionary of ${dictionary.length} words`);
+  console.log(`Local dictionary check for '${upperCaseWord}': Found=${isInLocal}`);
+  
+  // If the word is in our local dictionary, we're good
+  if (isInLocal) {
+    return true;
   }
   
-  return isInDict;
+  // If not in local dictionary and online checking is enabled, 
+  // fall back to synchronous return for now (we'll make this async later)
+  if (checkOnline) {
+    console.log(`Word '${upperCaseWord}' not found locally, will check online dictionary`);
+    // Note: This will trigger an online check, but we can't wait for the result here
+    // since isInDictionary needs to return synchronously
+    return false;
+  }
+  
+  console.log(`Word '${upperCaseWord}' is not in the local dictionary of ${dictionary.length} words`);
+  return false;
 }
