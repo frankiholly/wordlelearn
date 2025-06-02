@@ -487,6 +487,7 @@ function App() {
   return (
     <div className="App">
       <h1 className="title">Wordle</h1>
+      <div className="version-info">v2.0 - June 2</div>
       
       {/* Accessibility skiplink */}
       <a href="#game-controls" className="sr-only">Skip to game controls</a>

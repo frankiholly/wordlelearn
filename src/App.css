@@ -315,6 +315,13 @@ button:disabled {
   background-color: #538d4e;
 }
 
+.version-info {
+  font-size: 0.75rem;
+  color: #888;
+  margin-top: -15px;
+  margin-bottom: 15px;
+}
+
 @keyframes flipTile {
   0% {
     transform: rotateX(0deg);
