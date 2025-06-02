@@ -237,14 +237,23 @@ function App() {
 
   // Function to check if the word is valid (in our word list)
   const isValidWord = useCallback((word) => {
-    // Check that it's 5 letters and in our dictionary
-    const isValid = word.length === 5 && isInDictionary(word);
-    console.log(`Validating word: ${word}, isValid: ${isValid}, inDictionary: ${isInDictionary(word)}`);
-    return isValid;
+    // Make sure word is 5 letters and in our dictionary
+    if (word.length !== 5) {
+      console.log(`Word ${word} rejected: not 5 letters`);
+      return false;
+    }
+    
+    // Convert to uppercase for dictionary check
+    const upperCaseWord = word.toUpperCase();
+    const inDict = isInDictionary(upperCaseWord);
+    
+    console.log(`Dictionary validation for ${upperCaseWord}: ${inDict ? 'Valid' : 'Invalid'}`);
+    return inDict;
   }, []);
 
   // Function to trigger invalid word animation
   const animateInvalid = useCallback((invalid) => {
+    console.log(`[Animation] Setting invalid state to: ${invalid}`);
     setIsInvalid(invalid);
   }, []);
   
@@ -261,16 +270,19 @@ function App() {
       return;
     }
     
-    // Check if word is in dictionary if validation is enabled
-    console.log(`Checking if ${formattedGuess} is valid...`);
-    if (!isValidWord(formattedGuess)) {
-      console.log(`${formattedGuess} is not in word list, rejecting`);
+    // Check if word is in dictionary
+    console.log(`[handleSubmitGuess] Validating word: ${formattedGuess}`);
+    const wordIsValid = isValidWord(formattedGuess);
+    
+    if (!wordIsValid) {
+      console.log(`[handleSubmitGuess] REJECTED: "${formattedGuess}" is not in word list`);
       setMessage('Not in word list');
       animateInvalid(true);
       setTimeout(() => animateInvalid(false), 600);
       return;
     }
-    console.log(`${formattedGuess} passed validation, continuing with guess`);
+    
+    console.log(`[handleSubmitGuess] ACCEPTED: "${formattedGuess}" is valid`);
     
     // Evaluate the guess and add it to the list with status information
     const evaluatedGuess = evaluateGuess(formattedGuess);

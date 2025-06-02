@@ -36,8 +36,17 @@ export const dictionary = [
  * @returns {boolean} - True if the word is in the dictionary, false otherwise
  */
 export function isInDictionary(word) {
+  // Ensure word is uppercase for dictionary comparison
   const upperCaseWord = word.toUpperCase();
+  
+  // Check if the word is in our dictionary
   const isInDict = dictionary.includes(upperCaseWord);
-  console.log(`Dictionary check: ${upperCaseWord}, result: ${isInDict}`);
+  
+  // Debug information
+  console.log(`Dictionary check for '${upperCaseWord}': Found=${isInDict}`);
+  if (!isInDict) {
+    console.log(`Word '${upperCaseWord}' is not in the dictionary of ${dictionary.length} words`);
+  }
+  
   return isInDict;
 }
