@@ -24,6 +24,16 @@
   border-radius: 4px;
 }
 
+.mobile-input {
+  position: fixed;
+  opacity: 0;
+  height: 0;
+  width: 0;
+  z-index: -1;
+  pointer-events: none;
+  font-size: 16px; /* Prevents zoom on iOS */
+}
+
 button {
   background-color: #538d4e;
   color: white;
@@ -114,29 +124,55 @@ button:disabled {
   border: 2px solid #3a3a3c;
   color: white;
   position: relative;
-}
-
-.letter-tile.flip-in {
-  animation: flipIn 0.5s ease forwards;
+  transform-style: flat;
+  backface-visibility: hidden;
+  perspective: 800px;
 }
 
 .correct {
   background-color: #538d4e; /* Green */
   border-color: #538d4e;
-  animation: flipTile 0.5s ease forwards;
 }
 
 .present {
   background-color: #b59f3b; /* Yellow */
   border-color: #b59f3b;
-  animation: flipTile 0.5s ease forwards;
-  animation-delay: 0.1s;
 }
 
 .absent {
   background-color: #3a3a3c; /* Dark Gray */
   border-color: #3a3a3c;
+}
+
+.letter-tile.revealing {
+  transform-style: preserve-3d;
+}
+
+.letter-tile.revealing.correct {
   animation: flipTile 0.5s ease forwards;
+}
+
+.letter-tile.revealing.correct .letter-content {
+  animation: showLetterAfterFlip 0.5s ease forwards;
+}
+
+.letter-tile.revealing.present {
+  animation: flipTile 0.5s ease forwards;
+  animation-delay: 0.1s;
+}
+
+.letter-tile.revealing.present .letter-content {
+  animation: showLetterAfterFlip 0.5s ease forwards;
+  animation-delay: 0.1s;
+}
+
+.letter-tile.revealing.absent {
+  animation: flipTile 0.5s ease forwards;
+  animation-delay: 0.2s;
+}
+
+.letter-tile.revealing.absent .letter-content {
+  animation: showLetterAfterFlip 0.5s ease forwards;
   animation-delay: 0.2s;
 }
 
@@ -211,6 +247,12 @@ button:disabled {
   border-color: #3a3a3c;
 }
 
+.keyboard-key.special-key {
+  background-color: #565758;
+  border-color: #565758;
+  min-width: 65px;
+}
+
 .game-over {
   background-color: #8b0000;
 }
@@ -226,6 +268,10 @@ button:disabled {
   background-color: #538d4e;
   border-radius: 4px;
   font-weight: bold;
+  color: white;
+  display: inline-block;
+  min-height: 0;
+  min-width: 0;
 }
 
 .stats-modal {
@@ -344,12 +390,171 @@ button:disabled {
 
 .loading-spinner {
   display: inline-block;
-  width: 16px;
-  height: 16px;
-  border: 2px solid rgba(255, 255, 255, 0.3);
+  margin-left: 5px;
+  font-size: 12px;
+  color: #2196f3;
+  animation: pulse 1.5s infinite;
+}
+
+.online-badge {
+  display: inline-block;
+  background-color: #4caf50;
+  color: white;
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 10px;
+  margin-left: 5px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: bold;
+}
+
+/* Game Mode Toggle */
+.game-mode-toggle {
+  margin-bottom: 15px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.mode-toggle-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  border: none;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s, color 0.3s;
+  position: relative;
+  min-width: 100px;
+  justify-content: space-between;
+}
+
+.mode-toggle-button.normal {
+  background-color: #4caf50;
+  color: white;
+}
+
+.mode-toggle-button.extreme {
+  background-color: #f44336;
+  color: white;
+}
+
+.mode-indicator {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
-  border-top-color: #888;
-  animation: spin 1s ease-in-out infinite;
+}
+
+.mode-indicator.normal {
+  background-color: #fff;
+}
+
+.mode-indicator.extreme {
+  background-color: #fff;
+}
+
+.extreme-rules {
+  background-color: rgba(244, 67, 54, 0.1);
+  border-left: 3px solid #f44336;
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  text-align: left;
+  margin-top: 5px;
+  max-width: 280px;
+  transition: all 0.3s;
+}
+
+.extreme-rules ul {
+  margin: 0;
+  padding-left: 20px;
+  list-style-type: disc;
+}
+
+.extreme-rules li {
+  margin: 4px 0;
+}
+
+.extreme-requirements {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px dashed rgba(244, 67, 54, 0.3);
+  font-size: 0.8rem;
+  background-color: rgba(244, 67, 54, 0.05);
+  padding: 8px;
+  border-radius: 4px;
+}
+
+.required-letters,
+.fixed-positions {
+  margin: 4px 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  align-items: center;
+}
+
+.required-letters strong,
+.fixed-positions strong {
+  color: #f44336;
+  margin-right: 4px;
+}
+
+.required-letter-badge {
+  display: inline-block;
+  background-color: #f44336;
+  color: white;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  font-weight: bold;
+  line-height: 24px;
+  text-align: center;
+  margin: 0 2px;
+}
+
+.fixed-position-badge {
+  display: inline-block;
+  background-color: #3d673d;
+  color: white;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: bold;
+  font-size: 0.75rem;
+  margin: 0 2px;
+}
+
+.game-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin: 15px 0;
+}
+
+/* Instructions for clicking on the active row */
+.active-row-instructions {
+  font-size: 0.8rem;
+  color: #aaa;
+  margin-bottom: 10px;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.3;
+  }
 }
 
 @keyframes spin {
@@ -359,11 +564,9 @@ button:disabled {
 @keyframes flipTile {
   0% {
     transform: rotateX(0deg);
-    background-color: transparent;
   }
   50% {
     transform: rotateX(90deg);
-    background-color: transparent;
   }
   100% {
     transform: rotateX(0deg);
@@ -489,4 +692,57 @@ button:disabled {
   80% { transform: translateX(5px); }
   90% { transform: translateX(-5px); }
   100% { transform: translateX(0); }
+}
+
+.active-row {
+  cursor: pointer;
+}
+
+.letter-tile.active {
+  cursor: pointer;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.2);
+}
+
+.letter-tile.active:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  transform: translateY(-1px);
+  transition: all 0.2s ease;
+}
+
+.letter-tile.active:empty::before {
+  content: "";
+  display: block;
+  width: 70%;
+  height: 4px;
+  background-color: rgba(255, 255, 255, 0.3);
+  position: absolute;
+  top: 50%;
+  left: 15%;
+  border-radius: 2px;
+}
+
+.letter-content {
+  transition: opacity 0.1s;
+}
+
+/* For tiles that are animating */
+.letter-tile.revealing .letter-content {
+  opacity: 0;
+}
+
+/* Letter content will be hidden at the start of animation 
+   and will be revealed after the flip reaches halfway point */
+@keyframes showLetterAfterFlip {
+  0% {
+    opacity: 0;
+  }
+  49% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
 }
