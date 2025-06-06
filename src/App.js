@@ -358,10 +358,20 @@ function App() {
     // Convert to uppercase for dictionary check
     const upperCaseWord = word.toUpperCase();
     
+    console.log(`[DEBUG] isValidWord called for word: ${upperCaseWord}`);
+    console.log(`[DEBUG] useOnlineDictionary: ${useOnlineDictionary}, isCheckingOnline: ${isCheckingOnline}`);
+    
     // First check local dictionary
     const inLocalDict = isInDictionary(upperCaseWord, false);
     
     console.log(`Local dictionary validation for ${upperCaseWord}: ${inLocalDict ? 'Valid' : 'Invalid'}`);
+    console.log(`[DEBUG] Dictionary size: ${dictionary.length} words`);
+    
+    // Debug check - verify the word in dictionary
+    if (upperCaseWord === 'HOUSE') {
+      console.log(`[DEBUG] Testing 'HOUSE' in dictionary: ${dictionary.includes('HOUSE')}`);
+      console.log(`[DEBUG] Testing 'GIANT' in dictionary: ${dictionary.includes('GIANT')}`);
+    }
     
     // If it's in our local dictionary, we're good
     if (inLocalDict) {
@@ -506,10 +516,13 @@ function App() {
       console.log(`[handleSubmitGuess] ACCEPTED: "${formattedGuess}" is valid in local dictionary`);
       handleSubmitValidatedGuess(formattedGuess);
     }
-    // If we're checking online, the isValidWord function will handle it
-    else if (!useOnlineDictionary) {
-      // Only show "not in word list" if we're not using online dictionary
-      // (otherwise this will be handled by the online checker)
+    // If we're using online dictionary, isValidWord will handle the async check
+    else if (useOnlineDictionary) {
+      console.log(`[handleSubmitGuess] Word not in local dictionary, online check in progress...`);
+      // The async check in isValidWord will handle showing messages and submitting if valid
+    }
+    // Not valid in local dictionary and not using online dictionary
+    else {
       console.log(`[handleSubmitGuess] REJECTED: "${formattedGuess}" is not in word list`);
       setMessage('Not in word list');
       animateInvalid(true);
