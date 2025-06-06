@@ -12,46 +12,84 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
-    <!-- Force cache refresh with random query parameter -->
+    <!-- Super aggressive cache refresh -->
     <script>
       // Add random cache-busting query string to CSS and JS files
       (function() {
-        const cacheBuster = Date.now();
-        const links = document.getElementsByTagName('link');
-        const scripts = document.getElementsByTagName('script');
+        // Force a hard reload if it's been more than 1 minute since last visit
+        const lastVisit = localStorage.getItem('lastVisit');
+        const now = Date.now();
+        localStorage.setItem('lastVisit', now);
         
-        function addCacheBuster(elem) {
-          if (elem.rel === 'stylesheet' || elem.src) {
-            const attr = elem.href ? 'href' : 'src';
-            const uri = elem[attr];
-            if (uri && !uri.includes('?')) {
-              elem[attr] = uri + '?v=' + cacheBuster;
-            }
-          }
+        if (lastVisit && (now - parseInt(lastVisit)) > 60000) {
+          localStorage.setItem('forceCacheRefresh', 'true');
+          // This is an extremely aggressive cache-busting approach
+          location.reload(true);
         }
         
-        // Add to existing elements
-        for (let i = 0; i < links.length; i++) addCacheBuster(links[i]);
-        for (let i = 0; i < scripts.length; i++) addCacheBuster(scripts[i]);
-        
-        // Watch for new elements
-        const observer = new MutationObserver(function(mutations) {
-          mutations.forEach(function(mutation) {
-            if (mutation.addedNodes) {
-              mutation.addedNodes.forEach(function(node) {
-                if (node.tagName === 'LINK' || node.tagName === 'SCRIPT') {
-                  addCacheBuster(node);
-                }
-              });
+        if (localStorage.getItem('forceCacheRefresh') === 'true') {
+          localStorage.removeItem('forceCacheRefresh');
+          
+          // Clear application cache
+          if ('caches' in window) {
+            caches.keys().then(function(keyList) {
+              return Promise.all(keyList.map(function(key) {
+                return caches.delete(key);
+              }));
+            });
+          }
+          
+          // Append timestamp to all resource URLs
+          const cacheBuster = Date.now();
+          const links = document.getElementsByTagName('link');
+          const scripts = document.getElementsByTagName('script');
+          
+          function addCacheBuster(elem) {
+            if (elem.rel === 'stylesheet' || elem.src) {
+              const attr = elem.href ? 'href' : 'src';
+              const uri = elem[attr];
+              if (uri) {
+                // Remove any existing cache buster
+                const cleanUri = uri.split('?')[0];
+                elem[attr] = cleanUri + '?v=' + cacheBuster;
+              }
             }
+          }
+          
+          // Add to existing elements
+          for (let i = 0; i < links.length; i++) addCacheBuster(links[i]);
+          for (let i = 0; i < scripts.length; i++) addCacheBuster(scripts[i]);
+          
+          // Watch for new elements
+          const observer = new MutationObserver(function(mutations) {
+            mutations.forEach(function(mutation) {
+              if (mutation.addedNodes) {
+                mutation.addedNodes.forEach(function(node) {
+                  if (node.tagName === 'LINK' || node.tagName === 'SCRIPT') {
+                    addCacheBuster(node);
+                  }
+                });
+              }
+            });
           });
-        });
-        
-        observer.observe(document.documentElement, {
-          childList: true,
-          subtree: true
-        });
+          
+          observer.observe(document.documentElement, {
+            childList: true,
+            subtree: true
+          });
+        }
       })();
+    </script>
+    
+    <!-- Immediate action script to prevent caching -->
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        // Add version display with exact timestamp to verify latest version
+        const versionInfo = document.querySelector('.version-info');
+        if (versionInfo) {
+          versionInfo.innerHTML += '<br><small>Loaded: ' + new Date().toISOString() + '</small>';
+        }
+      });
     </script>
     <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
     <!--

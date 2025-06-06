@@ -708,7 +708,7 @@ function App() {
   return (
     <div className="App">
       <h1 className="title">Wordle</h1>
-      <div className="version-info">v3.0.0 - Removed iPhone keyboard - Virtual keyboard only ({buildTimestamp.slice(0, 10)})</div>
+      <div className="version-info">v3.1.0 - Word validation fixed - {buildTimestamp}</div>
       
       {/* Dictionary Toggle */}
       <div className="dictionary-toggle">
