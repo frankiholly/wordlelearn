@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wordle Version Checker</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .version-box {
+            background-color: #f44336;
+            color: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        .info-box {
+            background-color: #f0f0f0;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Wordle Version Checker</h1>
+    
+    <div class="version-box">
+        <h2>Current Version: v3.1.1-URGENT</h2>
+        <p>Build Time: <span id="buildTime"></span></p>
+        <p>Page Load Time: <span id="loadTime"></span></p>
+    </div>
+    
+    <div class="info-box">
+        <h3>Cache Information</h3>
+        <p>If you're seeing an old version of the Wordle app, it may be due to browser caching.</p>
+        <button onclick="clearCache()">Clear Cache & Reload</button>
+        <button onclick="window.location.href='index.html?nocache=' + Date.now()">Go to Wordle (Force Reload)</button>
+    </div>
+    
+    <div class="info-box">
+        <h3>Browser Cache Status</h3>
+        <div id="cacheStatus"></div>
+    </div>
+    
+    <div class="info-box">
+        <h3>Deployment Info</h3>
+        <p>Latest Commit: 24d1eb6</p>
+        <p>Deployment Date: June 5, 2025</p>
+        <p>Repository: https://github.com/frankiholly/wordlelearn</p>
+    </div>
+
+    <script>
+        // Show build and load times
+        document.getElementById('buildTime').textContent = new Date().toISOString();
+        document.getElementById('loadTime').textContent = new Date().toISOString();
+        
+        // Function to clear cache and reload
+        async function clearCache() {
+            const statusDiv = document.getElementById('cacheStatus');
+            
+            try {
+                statusDiv.innerHTML = '<p>Attempting to clear cache...</p>';
+                
+                // Clear Application Cache (deprecated but still used in some browsers)
+                if (window.applicationCache) {
+                    window.applicationCache.update();
+                }
+                
+                // Clear Service Worker Cache if available
+                if ('serviceWorker' in navigator) {
+                    const registrations = await navigator.serviceWorker.getRegistrations();
+                    for (let registration of registrations) {
+                        await registration.unregister();
+                        statusDiv.innerHTML += '<p>Unregistered a service worker</p>';
+                    }
+                }
+                
+                // Clear Cache API if available
+                if ('caches' in window) {
+                    const cacheNames = await window.caches.keys();
+                    await Promise.all(
+                        cacheNames.map(cacheName => {
+                            statusDiv.innerHTML += `<p>Deleting cache: ${cacheName}</p>`;
+                            return caches.delete(cacheName);
+                        })
+                    );
+                }
+                
+                // Show success and reload
+                statusDiv.innerHTML += '<p>Cache cleared! Reloading in 2 seconds...</p>';
+                setTimeout(() => {
+                    window.location.reload(true);
+                }, 2000);
+                
+            } catch (error) {
+                statusDiv.innerHTML += `<p>Error clearing cache: ${error.message}</p>`;
+                console.error('Cache clearing error:', error);
+            }
+        }
+        
+        // Check cache status on load
+        async function checkCacheStatus() {
+            const statusDiv = document.getElementById('cacheStatus');
+            statusDiv.innerHTML = '<p>Checking cache status...</p>';
+            
+            try {
+                if ('caches' in window) {
+                    const cacheNames = await window.caches.keys();
+                    if (cacheNames.length > 0) {
+                        statusDiv.innerHTML += '<p>Found the following caches:</p><ul>';
+                        for (let name of cacheNames) {
+                            statusDiv.innerHTML += `<li>${name}</li>`;
+                        }
+                        statusDiv.innerHTML += '</ul>';
+                    } else {
+                        statusDiv.innerHTML += '<p>No caches found.</p>';
+                    }
+                } else {
+                    statusDiv.innerHTML += '<p>Cache API not available in this browser.</p>';
+                }
+                
+                // Check for service workers
+                if ('serviceWorker' in navigator) {
+                    const registrations = await navigator.serviceWorker.getRegistrations();
+                    if (registrations.length > 0) {
+                        statusDiv.innerHTML += `<p>Found ${registrations.length} service worker registrations.</p>`;
+                    } else {
+                        statusDiv.innerHTML += '<p>No service workers registered.</p>';
+                    }
+                } else {
+                    statusDiv.innerHTML += '<p>Service Worker API not available in this browser.</p>';
+                }
+                
+            } catch (error) {
+                statusDiv.innerHTML += `<p>Error checking cache: ${error.message}</p>`;
+                console.error('Cache check error:', error);
+            }
+        }
+        
+        // Run cache check on page load
+        window.addEventListener('load', checkCacheStatus);
+    </script>
+</body>
+</html>
