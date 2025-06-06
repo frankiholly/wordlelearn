@@ -12,6 +12,47 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
+    <!-- Force cache refresh with random query parameter -->
+    <script>
+      // Add random cache-busting query string to CSS and JS files
+      (function() {
+        const cacheBuster = Date.now();
+        const links = document.getElementsByTagName('link');
+        const scripts = document.getElementsByTagName('script');
+        
+        function addCacheBuster(elem) {
+          if (elem.rel === 'stylesheet' || elem.src) {
+            const attr = elem.href ? 'href' : 'src';
+            const uri = elem[attr];
+            if (uri && !uri.includes('?')) {
+              elem[attr] = uri + '?v=' + cacheBuster;
+            }
+          }
+        }
+        
+        // Add to existing elements
+        for (let i = 0; i < links.length; i++) addCacheBuster(links[i]);
+        for (let i = 0; i < scripts.length; i++) addCacheBuster(scripts[i]);
+        
+        // Watch for new elements
+        const observer = new MutationObserver(function(mutations) {
+          mutations.forEach(function(mutation) {
+            if (mutation.addedNodes) {
+              mutation.addedNodes.forEach(function(node) {
+                if (node.tagName === 'LINK' || node.tagName === 'SCRIPT') {
+                  addCacheBuster(node);
+                }
+              });
+            }
+          });
+        });
+        
+        observer.observe(document.documentElement, {
+          childList: true,
+          subtree: true
+        });
+      })();
+    </script>
     <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
     <!--
       manifest.json provides metadata used when your web app is installed on a

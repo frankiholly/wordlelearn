@@ -657,10 +657,13 @@ function App() {
 
 
 
+  // Add timestamp to ensure cache refresh
+  const buildTimestamp = new Date().toISOString();
+
   return (
     <div className="App">
       <h1 className="title">Wordle</h1>
-      <div className="version-info">v3.0.0 - Removed iPhone keyboard - Virtual keyboard only</div>
+      <div className="version-info">v3.0.0 - Removed iPhone keyboard - Virtual keyboard only ({buildTimestamp.slice(0, 10)})</div>
       
       {/* Dictionary Toggle */}
       <div className="dictionary-toggle">
