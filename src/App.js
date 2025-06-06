@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { getRandomWord } from './wordList';
-import { isInDictionary, checkWordOnline } from './data/dictionary';
+import { isInDictionary, checkWordOnline, dictionary } from './data/dictionary';
 import './App.css';
 
 // Component for displaying game statistics
@@ -706,20 +706,50 @@ function App() {
   const buildTimestamp = new Date().toISOString();
   const randomMarker = Math.random().toString(36).substring(2, 6);
 
+  // Emergency links for testing
+  const emergencyLinks = [
+    {name: 'test.html', label: 'Simple Test Page'},
+    {name: 'direct.html', label: 'Direct HTML Test'},
+    {name: 'test.txt', label: 'Test Text File'},
+    {name: 'emergency.html', label: 'Emergency Page'},
+    {name: 'version-info.txt', label: 'Version Info'},
+  ];
+
   return (
     <div className="App">
       <h1 className="title">Wordle</h1>
+      
+      {/* Emergency version box */}
       <div 
-        className="version-info" 
         style={{
           background: 'red', 
           color: 'white', 
           padding: '10px', 
           fontWeight: 'bold', 
-          marginBottom: '20px'
+          marginBottom: '20px',
+          fontSize: '18px',
+          borderRadius: '8px',
+          border: '3px solid black'
         }}
       >
-        v3.1.1-URGENT [{randomMarker}] - FIXED - {buildTimestamp}
+        <div>VERSION 3.2.1-EMERGENCY [{randomMarker}]</div>
+        <div>Time: {buildTimestamp}</div>
+        <div style={{marginTop: '10px', fontSize: '14px'}}>
+          Test links: 
+          {emergencyLinks.map((link, i) => (
+            <span key={i} style={{margin: '0 5px'}}>
+              <a 
+                href={link.name} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                style={{color: 'yellow', textDecoration: 'underline'}}
+              >
+                {link.label}
+              </a>
+              {i < emergencyLinks.length - 1 ? ' | ' : ''}
+            </span>
+          ))}
+        </div>
       </div>
       
       {/* Dictionary Toggle */}

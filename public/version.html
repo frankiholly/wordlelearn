@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wordle Version</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #121213;
+            color: white;
+            text-align: center;
+        }
+        .version-marker {
+            background-color: #f44336;
+            padding: 20px;
+            margin: 20px auto;
+            max-width: 500px;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .link {
+            margin: 20px;
+        }
+        .link a {
+            background-color: #538d4e;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>Wordle Version Check</h1>
+    
+    <div class="version-marker">
+        Current Version: v3.2.1-EMERGENCY<br>
+        Build Date: <!-- Auto-replaced by deploy script -->
+        Build Time: <!-- Time will be auto-updated -->
+        <br>
+        Fixed dictionary imports and ESLint errors
+    </div>
+    
+    <div class="link">
+        <a href="index.html?nocache=3.2.1-EMERGENCY">Go to Wordle (Force No Cache)</a>
+    </div>
+    
+    <div>
+        <p>If you're seeing an old version, clear your browser cache:</p>
+        <ul style="display: inline-block; text-align: left;">
+            <li>Chrome/Edge: Press Ctrl+Shift+Del (or Cmd+Shift+Del on Mac)</li>
+            <li>Firefox: Press Ctrl+Shift+Del (or Cmd+Shift+Del on Mac)</li>
+            <li>Safari: Press Option+Cmd+E</li>
+        </ul>
+        <p>Then select "Cached images and files" and clear them.</p>
+    </div>
+</body>
+</html>
