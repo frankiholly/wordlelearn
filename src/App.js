@@ -364,16 +364,19 @@ function App() {
     // First check local dictionary
     const inLocalDict = isInDictionary(upperCaseWord, false);
     
+    // Access imported dictionary variable
+    const dictionaryRef = dictionary;
+    
     console.log(`Local dictionary validation for ${upperCaseWord}: ${inLocalDict ? 'Valid' : 'Invalid'}`);
-    console.log(`[DEBUG] Dictionary size: ${dictionary.length} words`);
+    console.log(`[DEBUG] Dictionary size: ${dictionaryRef.length} words`);
     
     // For certain test words, perform additional checks
     const commonTestWords = ["HOUSE", "WATER", "APPLE", "WORLD", "BRAIN"];
     if (commonTestWords.includes(upperCaseWord)) {
-      console.log(`[DEBUG] Testing '${upperCaseWord}' in dictionary: ${dictionary.includes(upperCaseWord)}`);
+      console.log(`[DEBUG] Testing '${upperCaseWord}' in dictionary: ${dictionaryRef.includes(upperCaseWord)}`);
       // Check for other common words
       for (let testWord of commonTestWords) {
-        console.log(`[DEBUG] Testing '${testWord}' in dictionary: ${dictionary.includes(testWord)}`);
+        console.log(`[DEBUG] Testing '${testWord}' in dictionary: ${dictionaryRef.includes(testWord)}`);
       }
     }
     
@@ -437,7 +440,7 @@ function App() {
     
     // Return false initially, the async check will call handleSubmitValidatedGuess if needed
     return false;
-  }, [useOnlineDictionary, isCheckingOnline, handleSubmitValidatedGuess, animateInvalid, dictionary]);
+  }, [useOnlineDictionary, isCheckingOnline, handleSubmitValidatedGuess, animateInvalid]);
   
   // Function to check if a guess follows extreme mode rules
   const validateExtremeMode = useCallback((newGuess) => {
