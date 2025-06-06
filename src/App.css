@@ -24,15 +24,7 @@
   border-radius: 4px;
 }
 
-.mobile-input {
-  position: fixed;
-  opacity: 0;
-  height: 0;
-  width: 0;
-  z-index: -1;
-  pointer-events: none;
-  font-size: 16px; /* Prevents zoom on iOS */
-}
+
 
 button {
   background-color: #538d4e;

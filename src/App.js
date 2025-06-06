@@ -520,9 +520,6 @@ function App() {
   // Effect for keyboard support
   useEffect(() => {
     const handleKeyDown = (e) => {
-      // If the event came from the mobile input, ignore it to prevent double input
-      if (e.target.id === 'mobile-input') return;
-      
       if (isGameOver || isRevealing || showStats) return;
       
       const key = e.key.toUpperCase();
@@ -560,13 +557,7 @@ function App() {
     };
   }, [guess, isGameOver, isRevealing, showStats, handleSubmitGuess]);
 
-  // Focus mobile input when the game starts or resets on mobile devices
-  useEffect(() => {
-    if (!isGameOver && 'ontouchstart' in window) {
-      const mobileInput = document.getElementById('mobile-input');
-      if (mobileInput) mobileInput.focus();
-    }
-  }, [isGameOver]);
+
 
   // Update stats based on game outcome
   const updateStats = useCallback((won, numGuesses) => {
@@ -630,11 +621,7 @@ function App() {
     
     localStorage.setItem(STORAGE_KEY, JSON.stringify(gameData));
     
-    // Focus on the mobile input field if on mobile
-    const mobileInput = document.getElementById('mobile-input');
-    if (mobileInput && 'ontouchstart' in window) {
-      mobileInput.focus();
-    }
+
   }, [isGameOver, targetWord, isCorrect, guesses.length, updateStats, stats, extremeMode]);
 
   // Handle on-screen keyboard clicks
@@ -656,11 +643,7 @@ function App() {
       setGuess(prev => prev + key);
     }
     
-    // Keep mobile input focused on mobile devices
-    const mobileInput = document.getElementById('mobile-input');
-    if (mobileInput && 'ontouchstart' in window) {
-      mobileInput.focus();
-    }
+
   }, [guess, isGameOver, isRevealing, handleSubmitGuess]);
 
   // We've removed the handleGuess function since we're now directly using handleSubmitGuess
@@ -672,19 +655,12 @@ function App() {
     ['ENTER', 'Z', 'X', 'C', 'V', 'B', 'N', 'M', 'DELETE']
   ], []);
 
-  // Handle clicking on the active row
-  const handleActiveTileClick = useCallback(() => {
-    // Focus the hidden mobile input to show keyboard on mobile
-    const mobileInput = document.getElementById('mobile-input');
-    if (mobileInput) {
-      mobileInput.focus();
-    }
-  }, []);
+
 
   return (
     <div className="App">
       <h1 className="title">Wordle</h1>
-      <div className="version-info">v2.9.1 - June 4 - Fixed Tile Animation</div>
+      <div className="version-info">v3.0.0 - Removed iPhone keyboard - Virtual keyboard only</div>
       
       {/* Dictionary Toggle */}
       <div className="dictionary-toggle">
@@ -755,40 +731,6 @@ function App() {
       <a href="#game-controls" className="sr-only">Skip to game controls</a>
       
       <div id="game-controls" className={isInvalid ? 'shake' : ''}>
-        {/* Hidden input for mobile devices to enable keyboard */}
-        <input
-          id="mobile-input"
-          type="text"
-          className="mobile-input"
-          autoCapitalize="characters"
-          autoComplete="off"
-          autoCorrect="off"
-          spellCheck="false"
-          aria-hidden="true"
-          onInput={(e) => {
-            // Process the current value of the input
-            const value = e.target.value;
-            if (value) {
-              const lastChar = value.charAt(value.length - 1).toUpperCase();
-              if (/^[A-Z]$/.test(lastChar) && guess.length < 5) {
-                setGuess(prev => prev + lastChar);
-              }
-              // Clear the input after processing
-              e.target.value = '';
-            }
-          }}
-          onKeyDown={(e) => {
-            // Handle special keys
-            if (e.key === 'Backspace') {
-              setGuess(prev => prev.slice(0, -1));
-              e.preventDefault(); // Prevent default to avoid deleting in the hidden input
-            } else if (e.key === 'Enter' && guess.length === 5) {
-              handleSubmitGuess();
-              e.preventDefault();
-            }
-          }}
-        />
-        
         <div className="game-buttons">
           <button 
             type="button"
@@ -883,7 +825,6 @@ function App() {
             className="guess-row"
             role="row"
             aria-label={`Current guess, attempt ${guesses.length + 1}`}
-            onClick={handleActiveTileClick}
           >
             {Array.from({ length: 5 }).map((_, i) => (
               <Tile
