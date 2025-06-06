@@ -26,6 +26,13 @@ jobs:
       - name: Install and Build 🔧
         run: |
           npm ci
+          # Add a build timestamp
+          echo "BUILD_TIMESTAMP=$(date)" >> $GITHUB_ENV
+          echo "CACHE_BUSTER=$(date +%s)" >> $GITHUB_ENV
+          echo "BUILD_TIMESTAMP=${{ env.BUILD_TIMESTAMP }}" > public/build-info.txt
+          echo "CACHE_BUSTER=${{ env.CACHE_BUSTER }}" >> public/build-info.txt
+          # Add the timestamp to the index.html
+          sed -i "s/<title>React App<\/title>/<title>Wordle v3.1.1-URGENT<\/title>/" public/index.html
           npm run build
         env:
           CI: false
@@ -35,3 +42,7 @@ jobs:
         with:
           branch: gh-pages
           folder: build
+          clean: true  # Cleans existing files in the branch
+          clean-exclude: |
+            .nojekyll
+            CNAME

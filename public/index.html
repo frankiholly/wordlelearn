@@ -12,6 +12,11 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
+    
+    <!-- Direct version marker in index.html -->
+    <meta name="version" content="3.1.1-URGENT" />
+    <meta name="timestamp" content="${new Date().toISOString()}" />
+    <meta name="build-marker" content="ED00455-${Math.random().toString(36).substring(2, 10)}" />
     <!-- Super aggressive cache refresh -->
     <script>
       // Add random cache-busting query string to CSS and JS files
@@ -110,6 +115,10 @@
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
+    <!-- Version marker that will show before React loads -->
+    <div id="version-marker" style="position: fixed; top: 0; left: 0; background: red; color: white; padding: 5px; z-index: 9999; font-size: 12px;">
+      v3.1.1-URGENT Loading...
+    </div>
     <div id="root"></div>
     <!--
       This HTML file is a template.

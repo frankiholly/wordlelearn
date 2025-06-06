@@ -704,11 +704,23 @@ function App() {
 
   // Add timestamp to ensure cache refresh
   const buildTimestamp = new Date().toISOString();
+  const randomMarker = Math.random().toString(36).substring(2, 6);
 
   return (
     <div className="App">
       <h1 className="title">Wordle</h1>
-      <div className="version-info">v3.1.0 - Word validation fixed - {buildTimestamp}</div>
+      <div 
+        className="version-info" 
+        style={{
+          background: 'red', 
+          color: 'white', 
+          padding: '10px', 
+          fontWeight: 'bold', 
+          marginBottom: '20px'
+        }}
+      >
+        v3.1.1-URGENT [{randomMarker}] - FIXED - {buildTimestamp}
+      </div>
       
       {/* Dictionary Toggle */}
       <div className="dictionary-toggle">
