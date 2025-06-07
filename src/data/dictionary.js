@@ -24,7 +24,14 @@ export async function checkWordOnline(word) {
   try {
     console.log(`Checking online dictionary for word: ${word}`);
     
-    const upperCaseWord = word.toUpperCase();
+    // Set a timeout for the entire check process
+    const timeoutPromise = new Promise((_, reject) => {
+      setTimeout(() => reject(new Error('Dictionary check timed out')), 5000); // 5-second total timeout
+    });
+    
+    // Create a promise that will be resolved by our actual check
+    const checkPromise = new Promise(async (resolve) => {
+      const upperCaseWord = word.toUpperCase();
     
     // Common 5-letter English words that should always be valid
     // This serves as both a first check and a fallback if APIs fail
@@ -50,7 +57,28 @@ export async function checkWordOnline(word) {
     // Try the Free Dictionary API (this is our primary online check)
     try {
       console.log(`Checking API for word: ${word}`);
-      const response = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${word.toLowerCase()}`);
+      
+      // Add a timeout to the fetch to prevent hanging
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 3000); // 3-second timeout
+      
+      const response = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${word.toLowerCase()}`, {
+        signal: controller.signal
+      }).catch(err => {
+        console.log('Fetch operation aborted or failed:', err);
+        clearTimeout(timeoutId);
+        // If the fetch fails with AbortError, it's likely a timeout issue
+        if (err.name === 'AbortError') {
+          console.log('Fetch operation timed out - falling back to dictionary lookup');
+          // Accept common words to improve UX
+          if (minimumDictionary.includes(upperCaseWord)) {
+            return { ok: true, status: 200, statusText: 'Timeout fallback accepted' };
+          }
+        }
+        return { ok: false, status: 0, statusText: 'Network error or timeout' };
+      });
+      
+      clearTimeout(timeoutId);
       
       // If the response is OK (200-299), the word exists
       if (response.ok) {
@@ -86,15 +114,24 @@ export async function checkWordOnline(word) {
       return true;
     }
     
-    // If all checks fail, the word isn't valid
-    console.log(`Word '${upperCaseWord}' not found in any dictionary check`);
-    return false;
+      // If all checks fail, the word isn't valid
+      console.log(`Word '${upperCaseWord}' not found in any dictionary check`);
+      resolve(false);
+      
+    });
     
+    try {
+      // Race between our check and the timeout
+      return await Promise.race([checkPromise, timeoutPromise]);
+    } catch (error) {
+      console.error('Error in overall online check process:', error);
+      // As a fallback, accept the word if it has vowels (very permissive fallback)
+      const hasVowels = /[AEIOU]/.test(word.toUpperCase());
+      return hasVowels;
+    }
   } catch (error) {
-    console.error('Error in overall online check process:', error);
-    // As a fallback, accept the word if it has vowels (very permissive fallback)
-    const hasVowels = /[AEIOU]/.test(word.toUpperCase());
-    return hasVowels;
+    console.error('Unexpected error in dictionary check:', error);
+    return true; // Accept the word in case of unexpected errors to avoid blocking UI
   }
 }
 

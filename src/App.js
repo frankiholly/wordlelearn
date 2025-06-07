@@ -401,9 +401,19 @@ function App() {
       setIsCheckingOnline(true);
       setMessage('Checking dictionary...');
       
+      // Add safety timeout to ensure UI never gets stuck
+      const safetyTimeoutId = setTimeout(() => {
+        console.log(`SAFETY TIMEOUT: Online check taking too long for ${upperCaseWord}`);
+        setIsCheckingOnline(false);
+        setMessage('');
+        // Accept the word if timeout occurs to prevent UI from getting stuck
+        handleSubmitValidatedGuess(upperCaseWord);
+      }, 8000);
+        
       // Start the online check
       checkWordOnline(upperCaseWord).then(isValid => {
         console.log(`Online check complete for ${upperCaseWord}: ${isValid ? 'Valid' : 'Invalid'}`);
+        clearTimeout(safetyTimeoutId); // Clear safety timeout
         setIsCheckingOnline(false);
         
         if (isValid) {
@@ -413,11 +423,16 @@ function App() {
           // Word is invalid online too
           setMessage('Not in dictionary');
           animateInvalid(true);
-          setTimeout(() => animateInvalid(false), 600);
+          setTimeout(() => {
+            animateInvalid(false);
+            setMessage('');
+          }, 1000);
         }
       }).catch(error => {
+        clearTimeout(safetyTimeoutId); // Clear safety timeout
         console.error('Error in online check:', error);
         setIsCheckingOnline(false);
+        setMessage('');
         // Fallback - accept the word anyway on error
         console.log(`[ERROR FALLBACK] Accepting word after API error: ${upperCaseWord}`);
         handleSubmitValidatedGuess(upperCaseWord);
@@ -718,7 +733,14 @@ function App() {
       
       {/* Online Dictionary Status */}
       <div className="dictionary-status">
-        {isCheckingOnline && <span className="loading-spinner">Checking Dictionary...</span>}
+        {isCheckingOnline && (
+          <span className="loading-spinner">
+            Checking Dictionary...
+            <span className="dots" style={{display: 'inline-block', width: '24px', textAlign: 'left'}}>
+              <span className="dot-animation">.</span>
+            </span>
+          </span>
+        )}
       </div>
       
       {/* Game Mode Toggle */}
