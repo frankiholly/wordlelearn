@@ -172,8 +172,9 @@ function App() {
   const [isInvalid, setIsInvalid] = useState(false);
 
   // Online dictionary is now the primary method (always enabled by default)
-  // Online dictionary is prioritized for best validation (strongly recommended)
-  const [useOnlineDictionary, setUseOnlineDictionary] = useState(true);
+  // Online dictionary is always used for best validation
+  // No longer toggleable, always set to true
+  const useOnlineDictionary = true;
   
   // State to track if we're checking a word online
   const [isCheckingOnline, setIsCheckingOnline] = useState(false);
@@ -691,69 +692,33 @@ function App() {
 
 
   // Add timestamp to ensure cache refresh
-  const buildTimestamp = new Date().toISOString();
-  const randomMarker = Math.random().toString(36).substring(2, 6);
+  // Version is now simplified, no longer need random markers
 
   // Emergency links for testing
-  const emergencyLinks = [
-    {name: 'test.html', label: 'Simple Test Page'},
-    {name: 'direct.html', label: 'Direct HTML Test'},
-    {name: 'test.txt', label: 'Test Text File'},
-    {name: 'emergency.html', label: 'Emergency Page'},
-    {name: 'version-info.txt', label: 'Version Info'},
-  ];
+  // No longer used - version display is now simplified
 
   return (
     <div className="App">
       <h1 className="title">Wordle</h1>
       
-      {/* Emergency version box */}
+      {/* Version indicator - subtle */}
       <div 
         style={{
-          background: 'red', 
-          color: 'white', 
-          padding: '10px', 
-          fontWeight: 'bold', 
+          background: 'rgba(50, 50, 50, 0.7)', 
+          color: '#aaaaaa', 
+          padding: '5px 8px', 
+          fontWeight: 'normal', 
           marginBottom: '20px',
-          fontSize: '18px',
-          borderRadius: '8px',
-          border: '3px solid black'
+          fontSize: '11px',
+          borderRadius: '4px',
         }}
       >
-        <div>VERSION 3.2.1-EMERGENCY [{randomMarker}]</div>
-        <div>Time: {buildTimestamp}</div>
-        <div style={{marginTop: '10px', fontSize: '14px'}}>
-          Test links: 
-          {emergencyLinks.map((link, i) => (
-            <span key={i} style={{margin: '0 5px'}}>
-              <a 
-                href={link.name} 
-                target="_blank" 
-                rel="noopener noreferrer"
-                style={{color: 'yellow', textDecoration: 'underline'}}
-              >
-                {link.label}
-              </a>
-              {i < emergencyLinks.length - 1 ? ' | ' : ''}
-            </span>
-          ))}
-        </div>
+        <div>v3.3.0</div>
       </div>
       
-      {/* Dictionary Toggle */}
-      <div className="dictionary-toggle">
-        <label>
-          <input 
-            type="checkbox" 
-            checked={useOnlineDictionary} 
-            onChange={(e) => setUseOnlineDictionary(e.target.checked)}
-            disabled={isCheckingOnline}
-            id="online-dict-toggle"
-          />
-          Use Online Dictionary (Recommended)
-          {useOnlineDictionary && <span className="online-badge">Online</span>}
-        </label>
-        {isCheckingOnline && <span className="loading-spinner">Checking...</span>}
+      {/* Online Dictionary Status */}
+      <div className="dictionary-status">
+        {isCheckingOnline && <span className="loading-spinner">Checking Dictionary...</span>}
       </div>
       
       {/* Game Mode Toggle */}
