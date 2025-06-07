@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { getRandomWord } from './wordList';
-import { isInDictionary, checkWordOnline } from './data/dictionary';
+import { isInDictionary, checkWordOnline, dictionary } from './data/dictionary';
 import './App.css';
 
 // Component for displaying game statistics

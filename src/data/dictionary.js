@@ -1,4 +1,8 @@
 // Minimal dictionary for essential fallback only (online is preferred)
+// Export an empty dictionary to satisfy any imports
+export const dictionary = [];
+
+// Internal dictionary for fallback when online is not available
 const minimumDictionary = [
   // Most common 5-letter words that should always be accepted even without online check
   "ABOUT", "ABOVE", "ACTOR", "ADULT", "AFTER", "AGAIN", "AGREE", "AHEAD", 
