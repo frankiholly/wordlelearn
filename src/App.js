@@ -174,7 +174,7 @@ function App() {
   // Online dictionary is now the primary method (always enabled by default)
   // Online dictionary is always used for best validation
   // No longer toggleable, always set to true
-  const useOnlineDictionary = true;
+  // We always use the online dictionary (no local fallback)
   
   // State to track if we're checking a word online
   const [isCheckingOnline, setIsCheckingOnline] = useState(false);
@@ -362,11 +362,11 @@ function App() {
     const upperCaseWord = word.toUpperCase();
     
     console.log(`[DEBUG] isValidWord called for word: ${upperCaseWord}`);
-    console.log(`[DEBUG] useOnlineDictionary: ${useOnlineDictionary}, isCheckingOnline: ${isCheckingOnline}`);
+    console.log(`[DEBUG] Always using online dictionary, isCheckingOnline: ${isCheckingOnline}`);
     
     // Use our primary dictionary check method (dictionary.js does local+online logic)
     // This will either return true for an accepted word, or false to trigger online check
-    const result = isInDictionary(upperCaseWord, useOnlineDictionary);
+    const result = isInDictionary(upperCaseWord, true); // Always check online
     console.log(`Dictionary check for ${upperCaseWord}: ${result ? 'Valid locally' : 'Needs online check (preferred)'}`);
     
     // If the word is valid according to our dictionary check, accept it
@@ -394,55 +394,40 @@ function App() {
       return true;
     }
     
-    // If we're using the online dictionary and not already checking online
-    if (useOnlineDictionary && !isCheckingOnline) {
+    // Always use online dictionary (no local fallback)
+    if (!isCheckingOnline) {
       console.log(`Starting online check for ${upperCaseWord}...`);
       
       // Set checking flag and start asynchronous check
       setIsCheckingOnline(true);
       setMessage('Checking dictionary...');
       
-      // First safety timeout - shorter, to ensure UI never gets stuck
-      const quickSafetyTimeoutId = setTimeout(() => {
-        console.log(`QUICK SAFETY: Online check taking too long for ${upperCaseWord}`);
-        // Only for PIANO - special case for the problem word
-        if (upperCaseWord === 'PIANO') {
-          console.log(`Special handling for known problematic word: ${upperCaseWord}`);
-          setIsCheckingOnline(false);
-          setMessage('');
-          handleSubmitValidatedGuess(upperCaseWord);
-        }
-      }, 1000);
-      
-      // Main safety timeout to ensure UI never gets stuck
+      // Single safety timeout to ensure UI never gets stuck
       const safetyTimeoutId = setTimeout(() => {
-        console.log(`SAFETY TIMEOUT: Online check taking too long for ${upperCaseWord}`);
+        console.log(`SAFETY TIMEOUT: Online check taking too long for ${upperCaseWord} - rejecting word`);
         setIsCheckingOnline(false);
-        setMessage('');
-        // Accept the word if timeout occurs to prevent UI from getting stuck
-        handleSubmitValidatedGuess(upperCaseWord);
-      }, 4000); // Reduced from 8 seconds to 4 seconds
+        setMessage('Dictionary check timed out');
+        animateInvalid(true);
+        setTimeout(() => {
+          animateInvalid(false);
+          setMessage('');
+        }, 1000);
+      }, 5000); // 5-second safety timeout
       
-      // Call the checkWordOnline function directly 
+      // Perform the online check
       checkWordOnline(upperCaseWord)
         .then(isValid => {
-          console.log(`Online check returned for ${upperCaseWord}:`, isValid);
-          
-          // Clear safety timeouts
-          clearTimeout(quickSafetyTimeoutId);
           clearTimeout(safetyTimeoutId);
-          
-          // Update UI state
           setIsCheckingOnline(false);
-          setMessage('');
+          
+          console.log(`Online check complete for ${upperCaseWord}: ${isValid ? 'Valid' : 'Invalid'}`);
           
           if (isValid) {
             // Word is valid online, accept it as a guess
-            console.log(`Online check complete for ${upperCaseWord}: Valid - accepting word`);
+            setMessage('');
             handleSubmitValidatedGuess(upperCaseWord);
           } else {
             // Word is invalid online
-            console.log(`Online check complete for ${upperCaseWord}: Invalid - rejecting word`);
             setMessage('Not in dictionary');
             animateInvalid(true);
             setTimeout(() => {
@@ -452,38 +437,21 @@ function App() {
           }
         })
         .catch(error => {
-          // Clear safety timeouts
-          clearTimeout(quickSafetyTimeoutId);
-          clearTimeout(safetyTimeoutId);
-          
-          if (isValid) {
-            // Word is valid online, accept it as a guess
-            handleSubmitValidatedGuess(upperCaseWord);
-          } else {
-            // Word is invalid online too
-            setMessage('Not in dictionary');
-            animateInvalid(true);
-            setTimeout(() => {
-              animateInvalid(false);
-              setMessage('');
-            }, 1000);
-          }
-        })
-        .catch(error => {
-          clearTimeout(quickSafetyTimeoutId);
           clearTimeout(safetyTimeoutId);
           console.error('Error in online check:', error);
           setIsCheckingOnline(false);
-          setMessage('');
-          // Fallback - accept the word anyway on error
-          console.log(`[ERROR FALLBACK] Accepting word after API error: ${upperCaseWord}`);
-          handleSubmitValidatedGuess(upperCaseWord);
+          setMessage('Dictionary check failed');
+          animateInvalid(true);
+          setTimeout(() => {
+            animateInvalid(false);
+            setMessage('');
+          }, 1000);
         });
     }
     
     // Return false initially, the async check will call handleSubmitValidatedGuess if needed
     return false;
-  }, [useOnlineDictionary, isCheckingOnline, handleSubmitValidatedGuess, animateInvalid]);
+  }, [isCheckingOnline, handleSubmitValidatedGuess, animateInvalid]);
   
   // Function to check if a guess follows extreme mode rules
   const validateExtremeMode = useCallback((newGuess) => {
@@ -583,30 +551,18 @@ function App() {
     
     // Check if word is in dictionary
     console.log(`[handleSubmitGuess] Validating word: ${formattedGuess}`);
-    console.log(`[handleSubmitGuess] State: useOnlineDictionary=${useOnlineDictionary}, isCheckingOnline=${isCheckingOnline}`);
+    console.log(`[handleSubmitGuess] State: always using online dictionary, isCheckingOnline=${isCheckingOnline}`);
     
     const wordIsValid = isValidWord(formattedGuess);
     console.log(`[handleSubmitGuess] isValidWord returned: ${wordIsValid}`);
     
-    // If the word is immediately valid (in local dictionary)
-    if (wordIsValid) {
-      console.log(`[handleSubmitGuess] ACCEPTED: "${formattedGuess}" is valid in local dictionary`);
-      handleSubmitValidatedGuess(formattedGuess);
-    }
-    // If we're using online dictionary, isValidWord will handle the async check
-    else if (useOnlineDictionary) {
-      console.log(`[handleSubmitGuess] Word not in local dictionary, online check in progress...`);
+    // Since we always use online dictionary, isValidWord will handle the async check
+    if (!wordIsValid) {
+      console.log(`[handleSubmitGuess] Word validation in progress or failed...`);
       // The async check in isValidWord will handle showing messages and submitting if valid
       // No need to do anything here as the async check will call handleSubmitValidatedGuess if valid
     }
-    // Not valid in local dictionary and not using online dictionary
-    else {
-      console.log(`[handleSubmitGuess] REJECTED: "${formattedGuess}" is not in word list`);
-      setMessage('Not in word list');
-      animateInvalid(true);
-      setTimeout(() => animateInvalid(false), 600);
-    }
-  }, [guess, isRevealing, isGameOver, isCheckingOnline, useOnlineDictionary, isValidWord, animateInvalid, handleSubmitValidatedGuess, extremeMode, validateExtremeMode, guesses.length]);
+  }, [guess, isRevealing, isGameOver, isCheckingOnline, isValidWord, animateInvalid, handleSubmitValidatedGuess, extremeMode, validateExtremeMode, guesses.length]);
 
   // Effect for keyboard support
   useEffect(() => {

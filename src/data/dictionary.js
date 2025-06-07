@@ -28,72 +28,55 @@ export async function checkWordOnline(word) {
       return true;
     }
     
-    // Try the Free Dictionary API (this is our primary online check)
+    // Try the Free Dictionary API with a simple timeout
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => {
+      console.log(`API fetch timeout triggered for word: ${word}`);
+      controller.abort();
+    }, 3000); // 3-second timeout
+    
     try {
-      console.log(`Checking API for word: ${word}`);
+      const response = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${word.toLowerCase()}`, {
+        signal: controller.signal
+      });
       
-      // Add a timeout to the fetch to prevent hanging
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => {
-        console.log(`API fetch timeout triggered for word: ${word}`);
-        controller.abort();
-      }, 2000); // Reduced to 2-second timeout for faster response
+      clearTimeout(timeoutId);
       
-      try {
-        // Create a promise race between the fetch and a timeout
-        const fetchPromise = fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${word.toLowerCase()}`, {
-          signal: controller.signal
-        });
-        
-        // Add a direct timeout promise to ensure we don't wait too long
-        const timeoutPromise = new Promise((_, reject) => {
-          setTimeout(() => reject(new Error('Timeout exceeded')), 2500);
-        });
-        
-        // Race the fetch against the timeout promise
-        const response = await Promise.race([fetchPromise, timeoutPromise]);
-        
-        clearTimeout(timeoutId);
-        
-        // If the response is OK (200-299), the word exists
-        if (response.ok) {
-          console.log(`Online dictionary API check for '${word}': Valid`);
-          return true;
-        }
-        
-        // If we get a 404, the word doesn't exist in the dictionary
-        if (response.status === 404) {
-          console.log(`Online dictionary API check for '${word}': Invalid`);
-          // Don't return false yet, try the backup methods
-        } else {
-          console.log(`API check failed with status ${response.status}, trying fallbacks`);
-        }
-      } catch (fetchError) {
-        clearTimeout(timeoutId);
-        console.log('Fetch operation failed or timed out:', fetchError);
-        
-        // If the fetch fails with AbortError, it's likely a timeout issue
-        if (fetchError.name === 'AbortError' || fetchError.message === 'Timeout exceeded') {
-          console.log('Fetch operation timed out - falling back to dictionary lookup');
-        }
-        // Continue to fallbacks
+      // If the response is OK (200-299), the word exists
+      if (response.ok) {
+        console.log(`Online dictionary API check for '${word}': Valid`);
+        return true;
       }
-    } catch (apiError) {
-      console.error('Error with online dictionary API:', apiError);
-      console.log('Falling back to alternative methods...');
+      
+      // If we get a 404, the word doesn't exist in the dictionary
+      if (response.status === 404) {
+        console.log(`Online dictionary API check for '${word}': Invalid`);
+        return false;
+      }
+      
+      // For other status codes, log and return false
+      console.log(`API check failed with status ${response.status} for word '${word}'`);
+      return false;
+      
+    } catch (fetchError) {
+      clearTimeout(timeoutId);
+      console.log('Fetch operation failed or timed out:', fetchError);
+      
+      // If the fetch fails with AbortError, it's likely a timeout issue
+      if (fetchError.name === 'AbortError') {
+        console.log(`Fetch operation timed out for word '${word}' - rejecting word`);
+        return false;
+      }
+      
+      // For other errors, also reject the word
+      console.log(`Fetch operation failed for word '${word}' - rejecting word`);
+      return false;
     }
     
-    // As a fallback, check only the emergency list
-    if (emergencyWordList.includes(upperCaseWord)) {
-      console.log(`Word '${upperCaseWord}' found in emergency list during API failure`);
-      return true;
-    }
-    
-    console.log(`API check failed and word '${upperCaseWord}' not in emergency list`);
-    return false;
   } catch (error) {
     console.error('Unexpected error in dictionary check:', error);
-    return true; // Accept the word in case of unexpected errors to avoid blocking UI
+    // In case of unexpected errors, reject the word to be safe
+    return false;
   }
 }
 
@@ -110,14 +93,6 @@ export function isInDictionary(word, checkOnline = true) {
   const upperCaseWord = word.toUpperCase();
   
   console.log(`[isInDictionary] Checking if '${upperCaseWord}' is valid`);
-  
-  // Special case handling for known problematic API calls
-  // This prevents API hanging on known words like PIANO
-  if (upperCaseWord === 'HOUSE' || upperCaseWord === 'GIANT' || upperCaseWord === 'WATER' || 
-      upperCaseWord === 'BRAIN' || upperCaseWord === 'PIANO') {
-    console.log(`[isInDictionary] Known word that causes API issues, bypassing check`);
-    return true; // Skip online check for these special cases
-  }
   
   // Always return false to trigger online check
   console.log(`[isInDictionary] Word '${upperCaseWord}' will be checked online`);

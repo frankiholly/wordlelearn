@@ -1,0 +1,22 @@
+# Node.js Compatibility Status for Wordle Extreme
+# This file tracks Node.js version requirements and compatibility
+
+PROJECT_NAME="Wordle Extreme"
+REQUIRED_NODE_VERSION=">=18.0.0"
+PREFERRED_NODE_VERSION="22"
+NVM_REQUIRED=true
+
+# Scripts available for Node.js compatibility:
+# - run-with-nvm.sh: General purpose runner that ensures correct Node version
+# - build-with-nvm.sh: Build script with Node version management
+# - deploy-with-nvm.sh: Deploy script with Node version management
+
+# Always use these scripts instead of direct npm commands to avoid version conflicts
+
+# Known issues:
+# - Project may fail with newer Node.js versions due to React dependencies
+# - Always use LTS Node.js version (22) via NVM
+# - Direct npm commands may fail - use run-with-nvm.sh wrapper
+
+LAST_WORKING_NODE_VERSION="22.x LTS"
+LAST_VERIFIED_DATE="2025-06-07"

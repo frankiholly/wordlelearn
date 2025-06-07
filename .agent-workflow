@@ -1,0 +1,37 @@
+# AGENT WORKFLOW CHECKLIST
+# Use this checklist EVERY TIME before running Node.js/npm commands
+
+## PRE-FLIGHT CHECKS (MANDATORY)
+1. ✓ Check Node.js compatibility: `./check-node.sh`
+2. ✓ Use wrapper scripts for all Node.js operations:
+   - `./run-with-nvm.sh npm start` (instead of `npm start`)
+   - `./run-with-nvm.sh npm test` (instead of `npm test`)
+   - `./run-with-nvm.sh npm install` (instead of `npm install`)
+   - `./build-with-nvm.sh` (for building)
+   - `./deploy-with-nvm.sh` (for deployment)
+
+## AVAILABLE SCRIPTS
+- `check-node.sh`: Check and setup Node.js environment
+- `run-with-nvm.sh <command>`: Run any npm/node command with correct version
+- `build-with-nvm.sh`: Build the project with correct Node version
+- `deploy-with-nvm.sh`: Deploy to GitHub Pages with correct Node version
+
+## CRITICAL RULES
+- NEVER run `npm` commands directly
+- ALWAYS use the wrapper scripts
+- ALWAYS check Node.js compatibility first
+- Project requires Node.js 22 LTS
+
+## CURRENT PROJECT STATUS
+- Project: Wordle Extreme (React-based Wordle clone)
+- Node.js requirement: v22 LTS
+- Main issue being worked on: Online dictionary validation
+- Status: Testing and debugging online dictionary function
+
+## DEBUGGING WORKFLOW
+1. Run `./check-node.sh` first
+2. Use `./run-with-nvm.sh npm start` to start dev server
+3. Test online dictionary function in browser
+4. Check browser console for errors
+5. Make code changes as needed
+6. Use `./run-with-nvm.sh npm test` for testing
