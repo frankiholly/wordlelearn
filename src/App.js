@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { getRandomWord } from './wordList';
-import { isInDictionary, checkWordOnline, dictionary } from './data/dictionary';
+import { isInDictionary, checkWordOnline } from './data/dictionary';
 import './App.css';
 
 // Component for displaying game statistics
@@ -171,7 +171,8 @@ function App() {
   // State for invalid word animation
   const [isInvalid, setIsInvalid] = useState(false);
 
-  // State to control whether to use online dictionary (enabled by default)
+  // Online dictionary is now the primary method (always enabled by default)
+  // Online dictionary is prioritized for best validation (strongly recommended)
   const [useOnlineDictionary, setUseOnlineDictionary] = useState(true);
   
   // State to track if we're checking a word online
@@ -361,47 +362,31 @@ function App() {
     console.log(`[DEBUG] isValidWord called for word: ${upperCaseWord}`);
     console.log(`[DEBUG] useOnlineDictionary: ${useOnlineDictionary}, isCheckingOnline: ${isCheckingOnline}`);
     
-    // First check local dictionary
-    const inLocalDict = isInDictionary(upperCaseWord, false);
+    // Use our primary dictionary check method (dictionary.js does local+online logic)
+    // This will either return true for an accepted word, or false to trigger online check
+    const result = isInDictionary(upperCaseWord, useOnlineDictionary);
+    console.log(`Dictionary check for ${upperCaseWord}: ${result ? 'Valid locally' : 'Needs online check (preferred)'}`);
     
-    // Access imported dictionary variable
-    const dictionaryRef = dictionary;
-    
-    console.log(`Local dictionary validation for ${upperCaseWord}: ${inLocalDict ? 'Valid' : 'Invalid'}`);
-    console.log(`[DEBUG] Dictionary size: ${dictionaryRef.length} words`);
-    
-    // For certain test words, perform additional checks
-    const commonTestWords = ["HOUSE", "WATER", "APPLE", "WORLD", "BRAIN"];
-    if (commonTestWords.includes(upperCaseWord)) {
-      console.log(`[DEBUG] Testing '${upperCaseWord}' in dictionary: ${dictionaryRef.includes(upperCaseWord)}`);
-      // Check for other common words
-      for (let testWord of commonTestWords) {
-        console.log(`[DEBUG] Testing '${testWord}' in dictionary: ${dictionaryRef.includes(testWord)}`);
-      }
-    }
-    
-    // If it's in our local dictionary, we're good
-    if (inLocalDict) {
-      console.log(`[isValidWord] Word '${upperCaseWord}' found in local dictionary, ACCEPTING`);
+    // If the word is valid according to our dictionary check, accept it
+    if (result) {
+      console.log(`[isValidWord] Word '${upperCaseWord}' is valid, ACCEPTING`);
       return true;
     }
     
-    // Temporary override to improve gameplay while fixing dictionary issues
-    // Accept common English words that should be valid
+    // Common English words that should always be valid regardless of dictionary
+    // This is a fallback if the dictionary check fails
     const commonEnglishWords = [
       "HOUSE", "WATER", "APPLE", "WORLD", "BRAIN", "LIGHT", "HEART",
       "MUSIC", "MONEY", "EARTH", "TIGER", "PLANT", "BEACH", "CLOUD"
     ];
     
     if (commonEnglishWords.includes(upperCaseWord)) {
-      console.log(`[OVERRIDE] Accepting common English word: ${upperCaseWord}`);
+      console.log(`[FALLBACK] Accepting common English word: ${upperCaseWord}`);
       return true;
     }
     
-    // TEMPORARY: Accept all 5-letter inputs while we debug
-    // This ensures users can play without frustration
-    // Set to false to disable this workaround
-    const debugModeAcceptAll = true;
+    // Debug mode option - can be turned off when dictionary is working reliably
+    const debugModeAcceptAll = false; // Set to true to bypass all dictionary checks
     if (debugModeAcceptAll) {
       console.log(`[DEBUG MODE] Temporarily accepting all 5-letter words: ${upperCaseWord}`);
       return true;
@@ -765,7 +750,7 @@ function App() {
             disabled={isCheckingOnline}
             id="online-dict-toggle"
           />
-          Use Online Dictionary
+          Use Online Dictionary (Recommended)
           {useOnlineDictionary && <span className="online-badge">Online</span>}
         </label>
         {isCheckingOnline && <span className="loading-spinner">Checking...</span>}
