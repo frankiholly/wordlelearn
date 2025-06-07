@@ -34,7 +34,7 @@ jobs:
           # Update the title in index.html
           sed -i "s/<title>React App<\/title>/<title>Wordle Extreme<\/title>/" public/index.html
           # Create simple version test file
-          echo "<html><body><h1>Version Test Page</h1><p>Version: 3.3.0</p><p>Build time: $(date)</p></body></html>" > public/version-test.html
+          echo "<html><body><h1>Version Test Page</h1><p>Version: 3.4.0</p><p>Build time: $(date)</p></body></html>" > public/version-test.html
           npm run build
           # Create files directly in the build folder to bypass React build process
           echo "<html><body><h1>DIRECT TEST PAGE</h1><p>Build time: $(date)</p><p><a href='index.html?nocache=$(date +%s)'>Go to app</a></p></body></html>" > build/direct.html
