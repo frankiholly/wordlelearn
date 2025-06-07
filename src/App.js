@@ -423,30 +423,38 @@ function App() {
         handleSubmitValidatedGuess(upperCaseWord);
       }, 4000); // Reduced from 8 seconds to 4 seconds
       
-      // Create a Promise.race between the online check and a 3-second timeout
-      const onlineCheckPromise = checkWordOnline(upperCaseWord);
-      const timeoutPromise = new Promise((resolve) => {
-        setTimeout(() => resolve({ timedOut: true }), 3000);
-      });
-      
-      Promise.race([onlineCheckPromise, timeoutPromise])
-        .then(result => {
+      // Call the checkWordOnline function directly 
+      checkWordOnline(upperCaseWord)
+        .then(isValid => {
+          console.log(`Online check returned for ${upperCaseWord}:`, isValid);
+          
+          // Clear safety timeouts
           clearTimeout(quickSafetyTimeoutId);
           clearTimeout(safetyTimeoutId);
           
-          // Check if this was a timeout result
-          if (result && result.timedOut) {
-            console.log(`Online check timed out for ${upperCaseWord} - accepting word`);
-            setIsCheckingOnline(false);
-            setMessage('');
-            handleSubmitValidatedGuess(upperCaseWord);
-            return;
-          }
-          
-          // This is the actual API result
-          const isValid = Boolean(result);
-          console.log(`Online check complete for ${upperCaseWord}: ${isValid ? 'Valid' : 'Invalid'}`);
+          // Update UI state
           setIsCheckingOnline(false);
+          setMessage('');
+          
+          if (isValid) {
+            // Word is valid online, accept it as a guess
+            console.log(`Online check complete for ${upperCaseWord}: Valid - accepting word`);
+            handleSubmitValidatedGuess(upperCaseWord);
+          } else {
+            // Word is invalid online
+            console.log(`Online check complete for ${upperCaseWord}: Invalid - rejecting word`);
+            setMessage('Not in dictionary');
+            animateInvalid(true);
+            setTimeout(() => {
+              animateInvalid(false);
+              setMessage('');
+            }, 1000);
+          }
+        })
+        .catch(error => {
+          // Clear safety timeouts
+          clearTimeout(quickSafetyTimeoutId);
+          clearTimeout(safetyTimeoutId);
           
           if (isValid) {
             // Word is valid online, accept it as a guess
