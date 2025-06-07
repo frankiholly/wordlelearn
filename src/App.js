@@ -749,7 +749,7 @@ function App() {
           borderRadius: '4px',
         }}
       >
-        <div>v3.3.0</div>
+        <div>v3.4.1</div>
       </div>
       
       {/* Online Dictionary Status */}

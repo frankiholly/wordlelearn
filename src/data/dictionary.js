@@ -1,17 +1,11 @@
 // This file only provides online dictionary validation
-// We no longer use a local dictionary at all
+// No local dictionary or emergency lists - purely online only
 // Export an empty array to satisfy any imports
 export const dictionary = [];
 
-// Emergency list for handling API failures only
-// Only used when online check completely fails
-const emergencyWordList = [
-  "HOUSE", "WATER", "PIANO", "BRAIN", "WORLD"
-];
-
 /**
  * Check if a word is in the online dictionary.
- * This is the preferred method for validating words.
+ * This is the only method for validating words - purely online.
  * 
  * @param {string} word - The word to check
  * @returns {Promise<boolean>} - Whether the word is valid
@@ -19,14 +13,6 @@ const emergencyWordList = [
 export async function checkWordOnline(word) {
   try {
     console.log(`Checking online dictionary for word: ${word}`);
-    
-    const upperCaseWord = word.toUpperCase();
-    
-    // Direct emergency bypass for specific words that might cause API issues
-    if (emergencyWordList.includes(upperCaseWord)) {
-      console.log(`Word '${upperCaseWord}' is in emergency list, accepting without API call`);
-      return true;
-    }
     
     // Try the Free Dictionary API with a simple timeout
     const controller = new AbortController();
