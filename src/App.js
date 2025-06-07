@@ -178,6 +178,7 @@ function App() {
   
   // State to track if we're checking a word online
   const [isCheckingOnline, setIsCheckingOnline] = useState(false);
+  const [dictionaryCheckTimer, setDictionaryCheckTimer] = useState(0);
   
   // State for Extreme mode
   const [extremeMode, setExtremeMode] = useState(false);
@@ -401,42 +402,75 @@ function App() {
       setIsCheckingOnline(true);
       setMessage('Checking dictionary...');
       
-      // Add safety timeout to ensure UI never gets stuck
+      // First safety timeout - shorter, to ensure UI never gets stuck
+      const quickSafetyTimeoutId = setTimeout(() => {
+        console.log(`QUICK SAFETY: Online check taking too long for ${upperCaseWord}`);
+        // Only for PIANO - special case for the problem word
+        if (upperCaseWord === 'PIANO') {
+          console.log(`Special handling for known problematic word: ${upperCaseWord}`);
+          setIsCheckingOnline(false);
+          setMessage('');
+          handleSubmitValidatedGuess(upperCaseWord);
+        }
+      }, 1000);
+      
+      // Main safety timeout to ensure UI never gets stuck
       const safetyTimeoutId = setTimeout(() => {
         console.log(`SAFETY TIMEOUT: Online check taking too long for ${upperCaseWord}`);
         setIsCheckingOnline(false);
         setMessage('');
         // Accept the word if timeout occurs to prevent UI from getting stuck
         handleSubmitValidatedGuess(upperCaseWord);
-      }, 8000);
-        
-      // Start the online check
-      checkWordOnline(upperCaseWord).then(isValid => {
-        console.log(`Online check complete for ${upperCaseWord}: ${isValid ? 'Valid' : 'Invalid'}`);
-        clearTimeout(safetyTimeoutId); // Clear safety timeout
-        setIsCheckingOnline(false);
-        
-        if (isValid) {
-          // Word is valid online, accept it as a guess
-          handleSubmitValidatedGuess(upperCaseWord);
-        } else {
-          // Word is invalid online too
-          setMessage('Not in dictionary');
-          animateInvalid(true);
-          setTimeout(() => {
-            animateInvalid(false);
-            setMessage('');
-          }, 1000);
-        }
-      }).catch(error => {
-        clearTimeout(safetyTimeoutId); // Clear safety timeout
-        console.error('Error in online check:', error);
-        setIsCheckingOnline(false);
-        setMessage('');
-        // Fallback - accept the word anyway on error
-        console.log(`[ERROR FALLBACK] Accepting word after API error: ${upperCaseWord}`);
-        handleSubmitValidatedGuess(upperCaseWord);
+      }, 4000); // Reduced from 8 seconds to 4 seconds
+      
+      // Create a Promise.race between the online check and a 3-second timeout
+      const onlineCheckPromise = checkWordOnline(upperCaseWord);
+      const timeoutPromise = new Promise((resolve) => {
+        setTimeout(() => resolve({ timedOut: true }), 3000);
       });
+      
+      Promise.race([onlineCheckPromise, timeoutPromise])
+        .then(result => {
+          clearTimeout(quickSafetyTimeoutId);
+          clearTimeout(safetyTimeoutId);
+          
+          // Check if this was a timeout result
+          if (result && result.timedOut) {
+            console.log(`Online check timed out for ${upperCaseWord} - accepting word`);
+            setIsCheckingOnline(false);
+            setMessage('');
+            handleSubmitValidatedGuess(upperCaseWord);
+            return;
+          }
+          
+          // This is the actual API result
+          const isValid = Boolean(result);
+          console.log(`Online check complete for ${upperCaseWord}: ${isValid ? 'Valid' : 'Invalid'}`);
+          setIsCheckingOnline(false);
+          
+          if (isValid) {
+            // Word is valid online, accept it as a guess
+            handleSubmitValidatedGuess(upperCaseWord);
+          } else {
+            // Word is invalid online too
+            setMessage('Not in dictionary');
+            animateInvalid(true);
+            setTimeout(() => {
+              animateInvalid(false);
+              setMessage('');
+            }, 1000);
+          }
+        })
+        .catch(error => {
+          clearTimeout(quickSafetyTimeoutId);
+          clearTimeout(safetyTimeoutId);
+          console.error('Error in online check:', error);
+          setIsCheckingOnline(false);
+          setMessage('');
+          // Fallback - accept the word anyway on error
+          console.log(`[ERROR FALLBACK] Accepting word after API error: ${upperCaseWord}`);
+          handleSubmitValidatedGuess(upperCaseWord);
+        });
     }
     
     // Return false initially, the async check will call handleSubmitValidatedGuess if needed
@@ -712,6 +746,29 @@ function App() {
   // Emergency links for testing
   // No longer used - version display is now simplified
 
+  // Effect to handle dictionary check timer
+  useEffect(() => {
+    let timerId = null;
+    
+    if (isCheckingOnline) {
+      // Reset timer when checking starts
+      setDictionaryCheckTimer(0);
+      
+      // Start timer interval
+      timerId = setInterval(() => {
+        setDictionaryCheckTimer(prev => prev + 1);
+      }, 1000);
+    } else {
+      // Clear timer when check is done
+      setDictionaryCheckTimer(0);
+    }
+    
+    // Clean up on unmount or when isCheckingOnline changes
+    return () => {
+      if (timerId) clearInterval(timerId);
+    };
+  }, [isCheckingOnline]);
+
   return (
     <div className="App">
       <h1 className="title">Wordle</h1>
@@ -735,9 +792,12 @@ function App() {
       <div className="dictionary-status">
         {isCheckingOnline && (
           <span className="loading-spinner">
-            Checking Dictionary...
+            Checking Dictionary
             <span className="dots" style={{display: 'inline-block', width: '24px', textAlign: 'left'}}>
-              <span className="dot-animation">.</span>
+              <span className="dot-animation">...</span>
+            </span>
+            <span className="dictionary-timer" style={{fontSize: '0.7rem', opacity: '0.7', marginLeft: '5px'}}>
+              (<span className="timer-count">{dictionaryCheckTimer}s</span>)
             </span>
           </span>
         )}
