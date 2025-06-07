@@ -1,3 +1,3 @@
-Version: 3.4.0
+Version: 3.4.1
 Timestamp: ${new Date().toISOString()}
-Commit: online_dictionary_optimized
+Commit: pure_online_dictionary
