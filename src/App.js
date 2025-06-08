@@ -286,15 +286,29 @@ function App() {
 
   // Function to handle submission after a word has been validated
   const handleSubmitValidatedGuess = useCallback((validatedWord) => {
-    if (isRevealing || isGameOver) return;
+    console.log(`[handleSubmitValidatedGuess] Called with word: ${validatedWord}`);
+    console.log(`[handleSubmitValidatedGuess] Current state - isRevealing: ${isRevealing}, isGameOver: ${isGameOver}`);
+    
+    if (isRevealing || isGameOver) {
+      console.log(`[handleSubmitValidatedGuess] Exiting early - isRevealing: ${isRevealing}, isGameOver: ${isGameOver}`);
+      return;
+    }
     
     console.log(`[handleSubmitValidatedGuess] Processing validated word: ${validatedWord}`);
+    console.log(`[handleSubmitValidatedGuess] Current guesses count: ${guesses.length}`);
+    console.log(`[handleSubmitValidatedGuess] Target word: ${targetWord}`);
     
     // Evaluate the guess and add it to the list with status information
     const evaluatedGuess = evaluateGuess(validatedWord);
-    setGuesses(prev => [...prev, evaluatedGuess]);
+    console.log(`[handleSubmitValidatedGuess] Evaluated guess:`, evaluatedGuess);
+    
+    setGuesses(prev => {
+      console.log(`[handleSubmitValidatedGuess] Adding guess to list, previous count: ${prev.length}`);
+      return [...prev, evaluatedGuess];
+    });
     
     // Clear input and message
+    console.log(`[handleSubmitValidatedGuess] Clearing input and message`);
     setGuess('');
     setMessage('');
     
@@ -397,6 +411,8 @@ function App() {
     // Always use online dictionary (no local fallback)
     if (!isCheckingOnline) {
       console.log(`Starting online check for ${upperCaseWord}...`);
+      console.log(`checkWordOnline function type:`, typeof checkWordOnline);
+      console.log(`checkWordOnline function:`, checkWordOnline);
       
       // Set checking flag and start asynchronous check
       setIsCheckingOnline(true);
@@ -415,8 +431,13 @@ function App() {
       }, 5000); // 5-second safety timeout
       
       // Perform the online check
-      checkWordOnline(upperCaseWord)
+      console.log(`About to call checkWordOnline with: ${upperCaseWord}`);
+      const checkPromise = checkWordOnline(upperCaseWord);
+      console.log(`checkWordOnline returned:`, checkPromise);
+      
+      checkPromise
         .then(isValid => {
+          console.log(`[isValidWord ASYNC] Online check promise resolved for ${upperCaseWord}: ${isValid}`);
           clearTimeout(safetyTimeoutId);
           setIsCheckingOnline(false);
           
@@ -424,10 +445,13 @@ function App() {
           
           if (isValid) {
             // Word is valid online, accept it as a guess
+            console.log(`[isValidWord ASYNC] Word is valid, calling handleSubmitValidatedGuess with: ${upperCaseWord}`);
             setMessage('');
             handleSubmitValidatedGuess(upperCaseWord);
+            console.log(`[isValidWord ASYNC] handleSubmitValidatedGuess call completed`);
           } else {
             // Word is invalid online
+            console.log(`[isValidWord ASYNC] Word is invalid, showing error message`);
             setMessage('Not in dictionary');
             animateInvalid(true);
             setTimeout(() => {
@@ -447,9 +471,14 @@ function App() {
             setMessage('');
           }, 1000);
         });
+      
+      // Return true to indicate we started an async check (don't block handleSubmitGuess)
+      console.log(`[isValidWord] Returning true - async check started for ${upperCaseWord}`);
+      return true;
     }
     
-    // Return false initially, the async check will call handleSubmitValidatedGuess if needed
+    // If already checking online, return false to prevent multiple simultaneous checks
+    console.log(`[isValidWord] Already checking online, returning false for ${upperCaseWord}`);
     return false;
   }, [isCheckingOnline, handleSubmitValidatedGuess, animateInvalid]);
   
@@ -527,13 +556,21 @@ function App() {
 
   // Handle guess submission - extracted for reuse
   const handleSubmitGuess = useCallback(() => {
-    if (isRevealing || isGameOver || isCheckingOnline) return;
+    console.log(`[handleSubmitGuess] Called with guess: "${guess}"`);
+    console.log(`[handleSubmitGuess] Current state - isRevealing: ${isRevealing}, isGameOver: ${isGameOver}, isCheckingOnline: ${isCheckingOnline}`);
+    
+    if (isRevealing || isGameOver || isCheckingOnline) {
+      console.log(`[handleSubmitGuess] Early return - isRevealing: ${isRevealing}, isGameOver: ${isGameOver}, isCheckingOnline: ${isCheckingOnline}`);
+      return;
+    }
     
     // Convert guess to uppercase for comparison
     const formattedGuess = guess.toUpperCase();
+    console.log(`[handleSubmitGuess] Formatted guess: "${formattedGuess}"`);
     
     // Basic validation for 5-letter words
     if (formattedGuess.length !== 5) {
+      console.log(`[handleSubmitGuess] Invalid length: ${formattedGuess.length}`);
       setMessage('Please enter a 5-letter word');
       return;
     }
@@ -558,10 +595,17 @@ function App() {
     
     // Since we always use online dictionary, isValidWord will handle the async check
     if (!wordIsValid) {
-      console.log(`[handleSubmitGuess] Word validation in progress or failed...`);
-      // The async check in isValidWord will handle showing messages and submitting if valid
-      // No need to do anything here as the async check will call handleSubmitValidatedGuess if valid
+      console.log(`[handleSubmitGuess] Word validation rejected or already checking...`);
+      // Either the word was rejected immediately, or we're already checking online
+      // In either case, don't proceed with submission
+      return;
     }
+    
+    console.log(`[handleSubmitGuess] Word validation successful or async check started`);
+    // If we get here, either:
+    // 1. The word was valid locally and we can proceed immediately, OR
+    // 2. An async online check was started and it will call handleSubmitValidatedGuess if valid
+    // In both cases, we let the process continue
   }, [guess, isRevealing, isGameOver, isCheckingOnline, isValidWord, animateInvalid, handleSubmitValidatedGuess, extremeMode, validateExtremeMode, guesses.length]);
 
   // Effect for keyboard support
@@ -733,6 +777,28 @@ function App() {
     };
   }, [isCheckingOnline]);
 
+  // Debug function - expose for browser console testing
+  useEffect(() => {
+    window.debugTestPiano = async () => {
+      console.log('=== DEBUG: Testing PIANO from browser console ===');
+      try {
+        const result = await checkWordOnline('PIANO');
+        console.log('checkWordOnline("PIANO") result:', result);
+        return result;
+      } catch (error) {
+        console.error('Error in checkWordOnline:', error);
+        return false;
+      }
+    };
+    
+    window.debugValidateWord = (word) => {
+      console.log(`=== DEBUG: Testing isValidWord("${word}") ===`);
+      return isValidWord(word);
+    };
+    
+    console.log('Debug functions available: window.debugTestPiano() and window.debugValidateWord(word)');
+  }, [isValidWord]);
+
   return (
     <div className="App">
       <h1 className="title">Wordle</h1>
@@ -749,7 +815,7 @@ function App() {
           borderRadius: '4px',
         }}
       >
-        <div>v3.4.1</div>
+        <div>v3.4.2</div>
       </div>
       
       {/* Online Dictionary Status */}

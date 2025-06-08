@@ -20,3 +20,8 @@ NVM_REQUIRED=true
 
 LAST_WORKING_NODE_VERSION="22.x LTS"
 LAST_VERIFIED_DATE="2025-06-07"
+
+# Current Status:
+# - Pure online dictionary implemented (no emergency lists)
+# - PIANO validation fixed
+# - Version 3.4.1 deployed
