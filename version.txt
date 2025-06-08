@@ -1,3 +1,3 @@
-Version: 3.4.1
+Version: 3.4.2
 Timestamp: ${new Date().toISOString()}
-Commit: pure_online_dictionary
+Commit: piano_validation_fixed
