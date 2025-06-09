@@ -794,7 +794,7 @@ function App() {
           borderRadius: '4px',
         }}
       >
-        <div>v3.4.4 (Cache: {Date.now()})</div>
+        <div>v3.4.4 (Build: {new Date().toLocaleString()})</div>
       </div>
       
       {/* Online Dictionary Status */}
