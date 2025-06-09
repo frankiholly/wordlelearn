@@ -179,6 +179,7 @@ function App() {
   // State to track if we're checking a word online
   const [isCheckingOnline, setIsCheckingOnline] = useState(false);
   const [dictionaryCheckTimer, setDictionaryCheckTimer] = useState(0);
+  const [validatedWord, setValidatedWord] = useState('');
   
   // State for Extreme mode
   const [extremeMode, setExtremeMode] = useState(false);
@@ -364,6 +365,15 @@ function App() {
     }, 1500); // Adjusted to better match the tile animations
   }, [isRevealing, isGameOver, targetWord, guesses.length, usedKeys, evaluateGuess]);
 
+  // Handle validated word submission
+  useEffect(() => {
+    if (validatedWord && !isRevealing && !isGameOver) {
+      console.log(`[VALIDATED WORD EFFECT] Processing validated word: ${validatedWord}`);
+      handleSubmitValidatedGuess(validatedWord);
+      setValidatedWord(''); // Clear after processing
+    }
+  }, [validatedWord, isRevealing, isGameOver, handleSubmitValidatedGuess]);
+
   // Function to check if the word is valid (in our word list)
   const isValidWord = useCallback((word) => {
     // Make sure word is 5 letters
@@ -420,10 +430,12 @@ function App() {
         
         if (isValid) {
           // Word is valid online, accept it as a guess
-          console.log(`[isValidWord ASYNC] Word is valid, calling handleSubmitValidatedGuess with: ${upperCaseWord}`);
+          console.log(`[isValidWord ASYNC] Word is valid, will call handleSubmitValidatedGuess with: ${upperCaseWord}`);
           setMessage('');
-          handleSubmitValidatedGuess(upperCaseWord);
-          console.log(`[isValidWord ASYNC] handleSubmitValidatedGuess call completed`);
+          
+          // Set the validated word state to trigger submission
+          setValidatedWord(upperCaseWord);
+          
         } else {
           // Word is invalid online
           console.log(`[isValidWord ASYNC] Word is invalid, showing error message`);
@@ -450,7 +462,7 @@ function App() {
     // Return false to indicate async check started - don't proceed with submission yet
     console.log(`[isValidWord] Returning false - async check started for ${upperCaseWord}, wait for completion`);
     return false;
-  }, [isCheckingOnline, handleSubmitValidatedGuess, animateInvalid]);
+  }, [isCheckingOnline, animateInvalid]);
   
   // Function to check if a guess follows extreme mode rules
   const validateExtremeMode = useCallback((newGuess) => {
@@ -782,7 +794,7 @@ function App() {
           borderRadius: '4px',
         }}
       >
-        <div>v3.4.3 (Cache: {Date.now()})</div>
+        <div>v3.4.4 (Cache: {Date.now()})</div>
       </div>
       
       {/* Online Dictionary Status */}
