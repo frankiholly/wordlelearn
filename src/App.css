@@ -136,12 +136,36 @@ button:disabled {
   border-color: #3a3a3c;
 }
 
+/* Hide colors during flip animation - only show original tile colors */
+.letter-tile.revealing.correct,
+.letter-tile.revealing.present,
+.letter-tile.revealing.absent {
+  background-color: var(--tile-bg-color, #121213); /* Use original tile color during animation */
+  border-color: var(--tile-border-color, #3a3a3c);
+}
+
+/* Set CSS variables for each status */
+.letter-tile.revealing.correct {
+  --status-bg-color: #538d4e;
+  --status-border-color: #538d4e;
+}
+
+.letter-tile.revealing.present {
+  --status-bg-color: #b59f3b;
+  --status-border-color: #b59f3b;
+}
+
+.letter-tile.revealing.absent {
+  --status-bg-color: #3a3a3c;
+  --status-border-color: #3a3a3c;
+}
+
 .letter-tile.revealing {
   transform-style: preserve-3d;
 }
 
 .letter-tile.revealing.correct {
-  animation: flipTile 0.5s ease forwards;
+  animation: flipTileAndRevealColor 0.5s ease forwards;
 }
 
 .letter-tile.revealing.correct .letter-content {
@@ -149,7 +173,7 @@ button:disabled {
 }
 
 .letter-tile.revealing.present {
-  animation: flipTile 0.5s ease forwards;
+  animation: flipTileAndRevealColor 0.5s ease forwards;
   animation-delay: 0.1s;
 }
 
@@ -159,7 +183,7 @@ button:disabled {
 }
 
 .letter-tile.revealing.absent {
-  animation: flipTile 0.5s ease forwards;
+  animation: flipTileAndRevealColor 0.5s ease forwards;
   animation-delay: 0.2s;
 }
 
@@ -576,6 +600,30 @@ button:disabled {
   }
   100% {
     transform: rotateX(0deg);
+  }
+}
+
+/* Animation that flips tile and reveals color at the right moment */
+@keyframes flipTileAndRevealColor {
+  0% {
+    transform: rotateX(0deg);
+    background-color: var(--tile-bg-color, #121213);
+    border-color: var(--tile-border-color, #3a3a3c);
+  }
+  49% {
+    transform: rotateX(90deg);
+    background-color: var(--tile-bg-color, #121213);
+    border-color: var(--tile-border-color, #3a3a3c);
+  }
+  50% {
+    transform: rotateX(90deg);
+    background-color: var(--status-bg-color);
+    border-color: var(--status-border-color);
+  }
+  100% {
+    transform: rotateX(0deg);
+    background-color: var(--status-bg-color);
+    border-color: var(--status-border-color);
   }
 }
 
