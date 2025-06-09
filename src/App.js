@@ -378,107 +378,77 @@ function App() {
     console.log(`[DEBUG] isValidWord called for word: ${upperCaseWord}`);
     console.log(`[DEBUG] Always using online dictionary, isCheckingOnline: ${isCheckingOnline}`);
     
-    // Use our primary dictionary check method (dictionary.js does local+online logic)
-    // This will either return true for an accepted word, or false to trigger online check
-    const result = isInDictionary(upperCaseWord, true); // Always check online
-    console.log(`Dictionary check for ${upperCaseWord}: ${result ? 'Valid locally' : 'Needs online check (preferred)'}`);
-    
-    // If the word is valid according to our dictionary check, accept it
-    if (result) {
-      console.log(`[isValidWord] Word '${upperCaseWord}' is valid, ACCEPTING`);
-      return true;
+    // If we're already checking online, don't start another check
+    if (isCheckingOnline) {
+      console.log(`[isValidWord] Already checking online, returning false for ${upperCaseWord}`);
+      return false;
     }
     
-    // Common English words that should always be valid regardless of dictionary
-    // This is a fallback if the dictionary check fails
-    const commonEnglishWords = [
-      "HOUSE", "WATER", "APPLE", "WORLD", "BRAIN", "LIGHT", "HEART",
-      "MUSIC", "MONEY", "EARTH", "TIGER", "PLANT", "BEACH", "CLOUD"
-    ];
+    // Start online check immediately - no local fallback
+    console.log(`Starting online check for ${upperCaseWord}...`);
+    console.log(`checkWordOnline function type:`, typeof checkWordOnline);
+    console.log(`checkWordOnline function:`, checkWordOnline);
     
-    if (commonEnglishWords.includes(upperCaseWord)) {
-      console.log(`[FALLBACK] Accepting common English word: ${upperCaseWord}`);
-      return true;
-    }
+    // Set checking flag and start asynchronous check
+    setIsCheckingOnline(true);
+    setMessage('Checking dictionary...');
     
-    // Debug mode option - can be turned off when dictionary is working reliably
-    const debugModeAcceptAll = false; // Set to true to bypass all dictionary checks
-    if (debugModeAcceptAll) {
-      console.log(`[DEBUG MODE] Temporarily accepting all 5-letter words: ${upperCaseWord}`);
-      return true;
-    }
+    // Single safety timeout to ensure UI never gets stuck
+    const safetyTimeoutId = setTimeout(() => {
+      console.log(`SAFETY TIMEOUT: Online check taking too long for ${upperCaseWord} - rejecting word`);
+      setIsCheckingOnline(false);
+      setMessage('Dictionary check timed out');
+      animateInvalid(true);
+      setTimeout(() => {
+        animateInvalid(false);
+        setMessage('');
+      }, 1000);
+    }, 5000); // 5-second safety timeout
     
-    // Always use online dictionary (no local fallback)
-    if (!isCheckingOnline) {
-      console.log(`Starting online check for ${upperCaseWord}...`);
-      console.log(`checkWordOnline function type:`, typeof checkWordOnline);
-      console.log(`checkWordOnline function:`, checkWordOnline);
-      
-      // Set checking flag and start asynchronous check
-      setIsCheckingOnline(true);
-      setMessage('Checking dictionary...');
-      
-      // Single safety timeout to ensure UI never gets stuck
-      const safetyTimeoutId = setTimeout(() => {
-        console.log(`SAFETY TIMEOUT: Online check taking too long for ${upperCaseWord} - rejecting word`);
+    // Perform the online check
+    console.log(`About to call checkWordOnline with: ${upperCaseWord}`);
+    const checkPromise = checkWordOnline(upperCaseWord);
+    console.log(`checkWordOnline returned:`, checkPromise);
+    
+    checkPromise
+      .then(isValid => {
+        console.log(`[isValidWord ASYNC] Online check promise resolved for ${upperCaseWord}: ${isValid}`);
+        clearTimeout(safetyTimeoutId);
         setIsCheckingOnline(false);
-        setMessage('Dictionary check timed out');
-        animateInvalid(true);
-        setTimeout(() => {
-          animateInvalid(false);
+        
+        console.log(`Online check complete for ${upperCaseWord}: ${isValid ? 'Valid' : 'Invalid'}`);
+        
+        if (isValid) {
+          // Word is valid online, accept it as a guess
+          console.log(`[isValidWord ASYNC] Word is valid, calling handleSubmitValidatedGuess with: ${upperCaseWord}`);
           setMessage('');
-        }, 1000);
-      }, 5000); // 5-second safety timeout
-      
-      // Perform the online check
-      console.log(`About to call checkWordOnline with: ${upperCaseWord}`);
-      const checkPromise = checkWordOnline(upperCaseWord);
-      console.log(`checkWordOnline returned:`, checkPromise);
-      
-      checkPromise
-        .then(isValid => {
-          console.log(`[isValidWord ASYNC] Online check promise resolved for ${upperCaseWord}: ${isValid}`);
-          clearTimeout(safetyTimeoutId);
-          setIsCheckingOnline(false);
-          
-          console.log(`Online check complete for ${upperCaseWord}: ${isValid ? 'Valid' : 'Invalid'}`);
-          
-          if (isValid) {
-            // Word is valid online, accept it as a guess
-            console.log(`[isValidWord ASYNC] Word is valid, calling handleSubmitValidatedGuess with: ${upperCaseWord}`);
-            setMessage('');
-            handleSubmitValidatedGuess(upperCaseWord);
-            console.log(`[isValidWord ASYNC] handleSubmitValidatedGuess call completed`);
-          } else {
-            // Word is invalid online
-            console.log(`[isValidWord ASYNC] Word is invalid, showing error message`);
-            setMessage('Not in dictionary');
-            animateInvalid(true);
-            setTimeout(() => {
-              animateInvalid(false);
-              setMessage('');
-            }, 1000);
-          }
-        })
-        .catch(error => {
-          clearTimeout(safetyTimeoutId);
-          console.error('Error in online check:', error);
-          setIsCheckingOnline(false);
-          setMessage('Dictionary check failed');
+          handleSubmitValidatedGuess(upperCaseWord);
+          console.log(`[isValidWord ASYNC] handleSubmitValidatedGuess call completed`);
+        } else {
+          // Word is invalid online
+          console.log(`[isValidWord ASYNC] Word is invalid, showing error message`);
+          setMessage('Not in dictionary');
           animateInvalid(true);
           setTimeout(() => {
             animateInvalid(false);
             setMessage('');
           }, 1000);
-        });
-      
-      // Return true to indicate we started an async check (don't block handleSubmitGuess)
-      console.log(`[isValidWord] Returning true - async check started for ${upperCaseWord}`);
-      return true;
-    }
+        }
+      })
+      .catch(error => {
+        clearTimeout(safetyTimeoutId);
+        console.error('Error in online check:', error);
+        setIsCheckingOnline(false);
+        setMessage('Dictionary check failed');
+        animateInvalid(true);
+        setTimeout(() => {
+          animateInvalid(false);
+          setMessage('');
+        }, 1000);
+      });
     
-    // If already checking online, return false to prevent multiple simultaneous checks
-    console.log(`[isValidWord] Already checking online, returning false for ${upperCaseWord}`);
+    // Return false to indicate async check started - don't proceed with submission yet
+    console.log(`[isValidWord] Returning false - async check started for ${upperCaseWord}, wait for completion`);
     return false;
   }, [isCheckingOnline, handleSubmitValidatedGuess, animateInvalid]);
   
@@ -586,26 +556,23 @@ function App() {
       }
     }
     
-    // Check if word is in dictionary
+    // Check if word is in dictionary - this will start async validation
     console.log(`[handleSubmitGuess] Validating word: ${formattedGuess}`);
     console.log(`[handleSubmitGuess] State: always using online dictionary, isCheckingOnline=${isCheckingOnline}`);
     
     const wordIsValid = isValidWord(formattedGuess);
     console.log(`[handleSubmitGuess] isValidWord returned: ${wordIsValid}`);
     
-    // Since we always use online dictionary, isValidWord will handle the async check
+    // isValidWord now returns false when starting async check, so we should not proceed
     if (!wordIsValid) {
-      console.log(`[handleSubmitGuess] Word validation rejected or already checking...`);
-      // Either the word was rejected immediately, or we're already checking online
-      // In either case, don't proceed with submission
+      console.log(`[handleSubmitGuess] Word validation failed or async check started - not proceeding with submission`);
+      // Either the word was rejected immediately, or async check was started
+      // If async check was started, it will call handleSubmitValidatedGuess when complete
       return;
     }
     
-    console.log(`[handleSubmitGuess] Word validation successful or async check started`);
-    // If we get here, either:
-    // 1. The word was valid locally and we can proceed immediately, OR
-    // 2. An async online check was started and it will call handleSubmitValidatedGuess if valid
-    // In both cases, we let the process continue
+    // This should not happen with current logic, but just in case
+    console.log(`[handleSubmitGuess] WARNING: Unexpected case - isValidWord returned true`);
   }, [guess, isRevealing, isGameOver, isCheckingOnline, isValidWord, animateInvalid, handleSubmitValidatedGuess, extremeMode, validateExtremeMode, guesses.length]);
 
   // Effect for keyboard support
@@ -815,7 +782,7 @@ function App() {
           borderRadius: '4px',
         }}
       >
-        <div>v3.4.2</div>
+        <div>v3.4.3</div>
       </div>
       
       {/* Online Dictionary Status */}
