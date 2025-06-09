@@ -20,7 +20,11 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "predeploy": "npm run build",
-    "deploy": "gh-pages -d build"
+    "deploy": "gh-pages -d build",
+    "test-dictionary": "node tests/scripts/test-dictionary.js",
+    "test-piano": "node tests/scripts/test-piano.js",
+    "test-simple": "node tests/scripts/simple-test.js",
+    "test-pure-online": "node tests/scripts/test-pure-online.js"
   },
   "eslintConfig": {
     "extends": [

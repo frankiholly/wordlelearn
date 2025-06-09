@@ -1,5 +1,5 @@
 // Simple Node.js test for online dictionary API
-// Run with: node simple-test.js
+// Run with: node tests/scripts/simple-test.js
 
 const https = require('https');
 
