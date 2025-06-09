@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>PIANO Debug Test - v3.4.3</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background: #121213; color: white; }
+        .result { margin: 10px 0; padding: 10px; border: 1px solid #333; }
+        .success { background: #1a4b1a; }
+        .error { background: #4b1a1a; }
+        button { padding: 10px 20px; margin: 5px; background: #538d4e; color: white; border: none; cursor: pointer; }
+        button:hover { background: #6aaa64; }
+    </style>
+</head>
+<body>
+    <h1>PIANO Debug Test - v3.4.3</h1>
+    <p>Testing if PIANO can be validated through the online dictionary API</p>
+    
+    <button onclick="testPiano()">Test PIANO</button>
+    <button onclick="testHouse()">Test HOUSE</button>
+    <button onclick="testInvalid()">Test INVALID</button>
+    <button onclick="clearResults()">Clear Results</button>
+    
+    <div id="results"></div>
+    
+    <script>
+        // Copy the checkWordOnline function from the main app
+        async function checkWordOnline(word) {
+            try {
+                console.log(`Checking online dictionary for word: ${word}`);
+                
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => {
+                    console.log(`API fetch timeout triggered for word: ${word}`);
+                    controller.abort();
+                }, 3000);
+                
+                try {
+                    const response = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${word.toLowerCase()}`, {
+                        signal: controller.signal
+                    });
+                    
+                    clearTimeout(timeoutId);
+                    
+                    if (response.ok) {
+                        console.log(`Online dictionary API check for '${word}': Valid`);
+                        return true;
+                    }
+                    
+                    if (response.status === 404) {
+                        console.log(`Online dictionary API check for '${word}': Invalid`);
+                        return false;
+                    }
+                    
+                    console.log(`API check failed with status ${response.status} for word '${word}'`);
+                    return false;
+                    
+                } catch (fetchError) {
+                    clearTimeout(timeoutId);
+                    console.log('Fetch operation failed or timed out:', fetchError);
+                    
+                    if (fetchError.name === 'AbortError') {
+                        console.log(`Fetch operation timed out for word '${word}' - rejecting word`);
+                        return false;
+                    }
+                    
+                    console.log(`Fetch operation failed for word '${word}' - rejecting word`);
+                    return false;
+                }
+                
+            } catch (error) {
+                console.error('Unexpected error in dictionary check:', error);
+                return false;
+            }
+        }
+        
+        function addResult(message, isSuccess = true) {
+            const results = document.getElementById('results');
+            const div = document.createElement('div');
+            div.className = 'result ' + (isSuccess ? 'success' : 'error');
+            div.innerHTML = `<strong>${new Date().toLocaleTimeString()}</strong> - ${message}`;
+            results.appendChild(div);
+        }
+        
+        async function testWord(word) {
+            addResult(`Testing word: ${word}...`);
+            try {
+                const result = await checkWordOnline(word);
+                addResult(`${word} → ${result ? 'VALID ✅' : 'INVALID ❌'}`, result);
+                return result;
+            } catch (error) {
+                addResult(`${word} → ERROR: ${error.message}`, false);
+                return false;
+            }
+        }
+        
+        async function testPiano() {
+            await testWord('PIANO');
+        }
+        
+        async function testHouse() {
+            await testWord('HOUSE');
+        }
+        
+        async function testInvalid() {
+            await testWord('ZZZZZ');
+        }
+        
+        function clearResults() {
+            document.getElementById('results').innerHTML = '';
+        }
+        
+        // Auto-test on load
+        window.onload = function() {
+            addResult('Page loaded - ready to test dictionary API');
+        };
+    </script>
+</body>
+</html>
