@@ -2,6 +2,64 @@
 
 This project is an iterative implementation of a Wordle-like game built with React. The development follows a step-by-step approach, starting with a simple MVP and progressively adding features to learn React concepts.
 
+## Development Environment Setup
+
+This project uses Node.js and includes several NVM (Node Version Manager) scripts to ensure consistent Node.js versions across different environments.
+
+### Prerequisites
+
+- **Node.js**: LTS version (recommended via NVM)
+- **NVM**: For Node.js version management
+- **Git**: For version control
+
+### Node.js Version Management
+
+The project includes several scripts to manage Node.js versions automatically:
+
+#### Core NVM Scripts
+
+- **`./start-with-nvm.sh`** - Start the development server with correct Node.js version
+- **`./build-with-nvm.sh`** - Build the production app with correct Node.js version  
+- **`./deploy-with-nvm.sh`** - Build and deploy to GitHub Pages
+- **`./run-with-nvm.sh <command>`** - Run any npm/node command with correct version
+- **`./check-node.sh`** - Validate and setup Node.js environment
+
+#### Quick Start
+
+```bash
+# Start development server
+./start-with-nvm.sh
+
+# Or use the generic runner for any command
+./run-with-nvm.sh npm start
+./run-with-nvm.sh npm test
+./run-with-nvm.sh npm run build
+```
+
+#### Production Deployment
+
+```bash
+# Build and deploy to GitHub Pages
+./deploy-with-nvm.sh
+```
+
+### Testing
+
+The project includes comprehensive tests organized in the `tests/` directory:
+
+```bash
+# Run dictionary API tests
+npm run test-dictionary
+npm run test-piano
+npm run test-simple
+npm run test-pure-online
+
+# Or use the NVM runner
+./run-with-nvm.sh npm run test-dictionary
+```
+
+See `tests/README.md` for detailed information about all available tests.
+
 ## Available Scripts
 
 In the project directory, you can run:
@@ -40,6 +98,31 @@ Instead, it will copy all the configuration files and the transitive dependencie
 You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
 
 ## Project Overview
+
+This Wordle clone is developed in stages, with each stage adding new features and teaching new React concepts.
+
+### Current Version: v3.4.4
+
+**Key Features:**
+- Online dictionary validation (no local word lists)
+- 5-letter word guessing game with 6 attempts
+- Real-time feedback with colored tiles
+- Virtual keyboard with state tracking
+- Game statistics and persistence
+- Responsive design and accessibility features
+- Animations and polish
+
+**Live Demo:** [https://frankiholly.github.io/wordlelearn](https://frankiholly.github.io/wordlelearn)
+
+### Word Validation System
+
+The game uses **online-only dictionary validation** via the [Dictionary API](https://api.dictionaryapi.dev/):
+- No local word lists or fallbacks
+- Real-time validation of user guesses
+- Supports all valid English words
+- Robust error handling with timeout protection
+
+### Development Stages
 
 This Wordle clone is developed in stages, with each stage adding new features and teaching new React concepts:
 
@@ -113,6 +196,67 @@ This Wordle clone is developed in stages, with each stage adding new features an
 - React performance optimization with useCallback and useMemo
 - Responsive design for different device sizes
 - Component splitting for better maintainability
+
+## Project Structure
+
+```
+wordlelearn/
+├── src/                          # React source code
+│   ├── App.js                   # Main application component
+│   ├── data/dictionary.js       # Online dictionary validation
+│   └── ...                     # Other React components and assets
+├── public/                      # Static assets and HTML
+├── tests/                       # Test suite (organized separately)
+│   ├── scripts/                 # JavaScript test scripts
+│   ├── html/                    # HTML test pages
+│   ├── manual/                  # Manual testing instructions
+│   └── README.md               # Test documentation
+├── .github/workflows/           # GitHub Actions for deployment
+├── *-with-nvm.sh               # Node.js version management scripts
+└── README.md                   # This file
+```
+
+## Recent Bug Fixes (v3.4.4)
+
+**Fixed: Valid words like "PIANO" not being accepted**
+- Root cause: React useCallback dependency issues causing stale closures
+- Solution: Refactored async validation logic with proper state management
+- Added comprehensive test suite to prevent regression
+- Improved error handling and debug logging
+
+All word validation now works correctly with the online dictionary API.
+
+## Troubleshooting
+
+### Node.js Version Issues
+If you encounter Node.js version conflicts:
+```bash
+# Check your current setup
+./check-node.sh
+
+# Use NVM scripts for all operations
+./start-with-nvm.sh
+./run-with-nvm.sh npm install
+```
+
+### Dictionary API Issues
+If word validation isn't working:
+```bash
+# Test the dictionary API
+npm run test-dictionary
+npm run test-piano
+
+# Check browser console for detailed logs
+```
+
+### Deployment Issues
+For GitHub Pages deployment problems:
+```bash
+# Use the deployment script
+./deploy-with-nvm.sh
+
+# Or check the GitHub Actions workflow
+```
 
 ## Learn More
 
