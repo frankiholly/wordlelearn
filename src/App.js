@@ -1,6 +1,9 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { getRandomWord } from './wordList';
 import { isInDictionary, checkWordOnline, dictionary } from './data/dictionary';
+import { getDailyWord, getDayString, getDayNumber } from './utils/dailyWord';
+import { saveDailyProgress, loadDailyProgress, isDailyWordCompleted } from './utils/dailyProgress';
+import DailyStatsModal from './components/DailyStatsModal';
 import './App.css';
 
 // Component for displaying game statistics
@@ -141,6 +144,14 @@ function App() {
   const MAX_ATTEMPTS = 6;
   const STORAGE_KEY = 'wordleReactGame';
   
+  // Daily word state
+  const [gameMode, setGameMode] = useState('daily'); // 'daily' or 'practice'
+  const [dailyWord, setDailyWord] = useState('');
+  const [dayString, setDayString] = useState('');
+  const [dayNumber, setDayNumber] = useState(0);
+  const [dailyCompleted, setDailyCompleted] = useState(false);
+  const [showDailyStats, setShowDailyStats] = useState(false);
+  
   // State to track the current game
   const [targetWord, setTargetWord] = useState('');
   const [guess, setGuess] = useState('');
@@ -221,6 +232,54 @@ function App() {
       setTargetWord(getRandomWord());
     }
   }, []);
+
+  // Initialize daily word and check completion status
+  useEffect(() => {
+    const today = getDayString();
+    const todayNumber = getDayNumber();
+    const todayWord = getDailyWord();
+    
+    setDayString(today);
+    setDayNumber(todayNumber);
+    setDailyWord(todayWord);
+    
+    // Check if daily word is already completed
+    const completed = isDailyWordCompleted(today);
+    setDailyCompleted(completed);
+    
+    if (completed && gameMode === 'daily') {
+      // Load completed daily game
+      const progress = loadDailyProgress(today);
+      if (progress) {
+        setTargetWord(progress.word);
+        setGuesses(progress.guesses);
+        setUsedKeys(progress.usedKeys);
+        setIsGameOver(progress.isGameOver);
+        setIsCorrect(progress.isWinner);
+        setMessage(progress.isWinner ? 'Congratulations!' : `The word was ${progress.word}`);
+      }
+    } else if (gameMode === 'daily') {
+      // Start new daily game
+      setTargetWord(todayWord);
+    }
+  }, [gameMode]);
+
+  // Save daily progress when game state changes
+  useEffect(() => {
+    if (gameMode === 'daily' && targetWord && targetWord === dailyWord) {
+      saveDailyProgress(dayString, {
+        targetWord,
+        guesses,
+        isGameOver,
+        isWinner: isCorrect,
+        usedKeys
+      });
+      
+      if (isGameOver && !dailyCompleted) {
+        setDailyCompleted(true);
+      }
+    }
+  }, [gameMode, targetWord, dailyWord, dayString, guesses, isGameOver, isCorrect, usedKeys, dailyCompleted]);
 
   // Save game state to localStorage whenever it changes
   useEffect(() => {
@@ -657,8 +716,8 @@ function App() {
       localStorage.setItem(`${STORAGE_KEY}_finalized_${targetWord}`, 'true');
     }
     
-    // Start a new game
-    const newTargetWord = getRandomWord();
+    // Start a new game - choose word based on game mode
+    const newTargetWord = gameMode === 'daily' ? dailyWord : getRandomWord();
     setTargetWord(newTargetWord);
     setGuess('');
     setGuesses([]);
@@ -666,6 +725,7 @@ function App() {
     setIsCorrect(false);
     setIsGameOver(false);
     setUsedKeys({});
+    setValidatedWord('');
     
     // Announce to screen readers
     const announcement = document.createElement('div');
@@ -692,7 +752,38 @@ function App() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(gameData));
     
 
-  }, [isGameOver, targetWord, isCorrect, guesses.length, updateStats, stats, extremeMode]);
+  }, [isGameOver, targetWord, isCorrect, guesses.length, updateStats, stats, extremeMode, gameMode, dailyWord]);
+
+  // Game mode switching functions
+  const startDailyMode = useCallback(() => {
+    setGameMode('daily');
+    const completed = isDailyWordCompleted(dayString);
+    
+    if (completed) {
+      // Load completed daily game
+      const progress = loadDailyProgress(dayString);
+      if (progress) {
+        setTargetWord(progress.word);
+        setGuesses(progress.guesses);
+        setUsedKeys(progress.usedKeys);
+        setIsGameOver(progress.isGameOver);
+        setIsCorrect(progress.isWinner);
+        setMessage(progress.isWinner ? 'Congratulations!' : `The word was ${progress.word}`);
+      }
+    } else {
+      // Start new daily game
+      resetGame();
+    }
+  }, [dayString, resetGame]);
+
+  const startPracticeMode = useCallback(() => {
+    setGameMode('practice');
+    resetGame();
+  }, [resetGame]);
+
+  const showDailyStatsModal = useCallback(() => {
+    setShowDailyStats(true);
+  }, []);
 
   // Handle on-screen keyboard clicks
   const handleKeyClick = useCallback((key) => {
@@ -794,8 +885,46 @@ function App() {
           borderRadius: '4px',
         }}
       >
-        <div>v3.4.4 (Build: {new Date().toLocaleString()})</div>
+        <div>v3.5.0 (Build: {new Date().toLocaleString()})</div>
       </div>
+
+      {/* Game Mode Selection */}
+      <div className="game-mode-selector">
+        <button 
+          className={`mode-button ${gameMode === 'daily' ? 'active' : ''}`}
+          onClick={startDailyMode}
+        >
+          Daily Word #{dayNumber}
+        </button>
+        <button 
+          className={`mode-button ${gameMode === 'practice' ? 'active' : ''}`}
+          onClick={startPracticeMode}
+        >
+          Practice
+        </button>
+        {gameMode === 'daily' && (
+          <button className="stats-button" onClick={showDailyStatsModal}>
+            📊 Stats
+          </button>
+        )}
+      </div>
+
+      {/* Daily Word Header */}
+      {gameMode === 'daily' && (
+        <div className="daily-header">
+          <div className="daily-info">
+            Daily Word #{dayNumber} - {dayString}
+          </div>
+          {dailyCompleted && (
+            <div className="daily-completed">
+              ✅ Completed! 
+              <button onClick={startPracticeMode} className="continue-button">
+                Continue Playing
+              </button>
+            </div>
+          )}
+        </div>
+      )}
       
       {/* Online Dictionary Status */}
       <div className="dictionary-status">
@@ -1066,6 +1195,11 @@ function App() {
           stats={stats} 
           onClose={() => setShowStats(false)} 
         />
+      )}
+
+      {/* Daily Stats Modal */}
+      {showDailyStats && (
+        <DailyStatsModal onClose={() => setShowDailyStats(false)} />
       )}
 
       

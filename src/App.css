@@ -649,38 +649,259 @@ button:disabled {
   }
 }
 
+.active-row {
+  cursor: pointer;
+}
+
+/* Daily Mode Styles */
+.game-mode-selector {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin: 20px 0;
+  flex-wrap: wrap;
+}
+
+.mode-button {
+  padding: 12px 20px;
+  border: 2px solid #3a3a3c;
+  background: transparent;
+  color: #818384;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+}
+
+.mode-button:hover {
+  border-color: #565758;
+  color: white;
+}
+
+.mode-button.active {
+  border-color: #538d4e;
+  background: #538d4e;
+  color: white;
+}
+
+.stats-button {
+  padding: 8px 16px;
+  border: 1px solid #3a3a3c;
+  background: transparent;
+  color: #818384;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.8rem;
+}
+
+.stats-button:hover {
+  color: white;
+  border-color: #565758;
+}
+
+.daily-header {
+  text-align: center;
+  margin: 15px 0;
+  padding: 15px;
+  background: #1a1a1b;
+  border-radius: 8px;
+  border: 1px solid #3a3a3c;
+}
+
+.daily-info {
+  color: white;
+  font-weight: bold;
+  font-size: 1.1rem;
+  margin-bottom: 8px;
+}
+
+.daily-completed {
+  color: #538d4e;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.continue-button {
+  padding: 6px 12px;
+  background: #538d4e;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.8rem;
+}
+
+.continue-button:hover {
+  background: #6aaa64;
+}
+
+/* Daily Stats Modal Styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: #1a1a1b;
+  border-radius: 8px;
+  padding: 24px;
+  max-width: 400px;
+  width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+  border: 1px solid #3a3a3c;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.modal-header h2 {
+  margin: 0;
+  color: white;
+  font-size: 1.5rem;
+}
+
+.close-button {
+  background: none;
+  border: none;
+  color: #818384;
+  font-size: 2rem;
+  cursor: pointer;
+  padding: 0;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.close-button:hover {
+  color: white;
+}
+
+.stats-summary {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.stat-item {
+  text-align: center;
+}
+
+.stat-number {
+  font-size: 2rem;
+  font-weight: bold;
+  color: white;
+  margin-bottom: 4px;
+}
+
+.stat-label {
+  font-size: 0.875rem;
+  color: #818384;
+  text-transform: uppercase;
+}
+
+.guess-distribution {
+  margin-bottom: 24px;
+}
+
+.guess-distribution h3 {
+  color: white;
+  margin-bottom: 16px;
+  font-size: 1.1rem;
+}
+
+.distribution-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.guess-number {
+  width: 20px;
+  color: white;
+  font-weight: bold;
+}
+
+.distribution-bar {
+  flex: 1;
+  height: 20px;
+  background: #3a3a3c;
+  margin-left: 8px;
+  border-radius: 2px;
+  position: relative;
+}
+
+.bar-fill {
+  height: 100%;
+  background: #538d4e;
+  border-radius: 2px;
+  min-width: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 4px;
+  transition: width 0.3s ease;
+}
+
+.bar-count {
+  color: white;
+  font-size: 0.875rem;
+  font-weight: bold;
+}
+
+.modal-footer {
+  text-align: center;
+}
+
+.share-button {
+  background: #538d4e;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 1rem;
+}
+
+.share-button:hover {
+  background: #6aaa64;
+}
+
+/* Responsive adjustments */
 @media (max-width: 480px) {
-  .App {
-    padding: 10px;
+  .game-mode-selector {
+    flex-direction: column;
+    align-items: center;
   }
   
-  .title {
-    font-size: 2rem;
+  .mode-button {
+    width: 200px;
   }
   
-  .letter-tile {
-    width: 50px;
-    height: 50px;
-    font-size: 1.5rem;
-  }
-  
-  .keyboard-key {
-    width: 28px;
-    height: 40px;
-    font-size: 0.9rem;
-  }
-  
-  button {
-    padding: 8px 12px;
-    font-size: 0.9rem;
-  }
-  
-  .guess-input {
-    font-size: 1.2rem;
-  }
-  
-  .stats-grid {
-    grid-template-columns: repeat(2, 1fr);
+  .daily-completed {
+    flex-direction: column;
+    gap: 8px;
   }
 }
 
