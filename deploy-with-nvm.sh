@@ -8,6 +8,9 @@ export NVM_DIR="$HOME/.nvm"
 echo "Switching to LTS Node.js version..."
 nvm use --lts
 
+echo "Updating version files..."
+./scripts/update-version.sh
+
 echo "Building the application..."
 npm run build
 

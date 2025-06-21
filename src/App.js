@@ -4,6 +4,7 @@ import { isInDictionary, checkWordOnline, dictionary } from './data/dictionary';
 import { getDailyWord, getDayString, getDayNumber } from './utils/dailyWord';
 import { saveDailyProgress, loadDailyProgress, isDailyWordCompleted, getCurrentDailyProgress, shouldStartNewDaily } from './utils/dailyProgress';
 import DailyStatsModal from './components/DailyStatsModal';
+import VERSION_CONFIG from './config/version';
 import './App.css';
 
 // Component for displaying game statistics
@@ -889,7 +890,7 @@ function App() {
           borderRadius: '4px',
         }}
       >
-        <div>v3.5.0 (Build: {new Date().toLocaleString()})</div>
+        <div>{VERSION_CONFIG.getDisplayVersion()}</div>
       </div>
 
       {/* Game Mode Selection */}
