@@ -36,9 +36,10 @@ export function loadDailyProgress(dayString) {
   return null;
 }
 
-export function isDailyWordCompleted(dayString) {
+export function isDailyWordCompleted(dayString, expectedWord) {
   const progress = loadDailyProgress(dayString);
-  return progress && progress.isGameOver;
+  // Check that progress exists, game is over, AND the stored word matches the expected word
+  return progress && progress.isGameOver && progress.word === expectedWord;
 }
 
 export function getDailyStats() {

@@ -243,24 +243,34 @@ function App() {
     setDayNumber(todayNumber);
     setDailyWord(todayWord);
     
-    // Check if daily word is already completed
-    const completed = isDailyWordCompleted(today);
+    // Check if daily word is already completed for today's specific word
+    const completed = isDailyWordCompleted(today, todayWord);
     setDailyCompleted(completed);
     
     if (completed && gameMode === 'daily') {
       // Load completed daily game
       const progress = loadDailyProgress(today);
-      if (progress) {
+      if (progress && progress.word === todayWord) {
         setTargetWord(progress.word);
         setGuesses(progress.guesses);
         setUsedKeys(progress.usedKeys);
         setIsGameOver(progress.isGameOver);
         setIsCorrect(progress.isWinner);
         setMessage(progress.isWinner ? 'Congratulations!' : `The word was ${progress.word}`);
+        setGuess(''); // Clear current guess when loading completed game
+        setValidatedWord('');
+      } else {
+        // Progress exists but for different word, start fresh
+        setDailyCompleted(false);
+        setTargetWord(todayWord);
+        setGuess('');
+        setValidatedWord('');
       }
     } else if (gameMode === 'daily') {
       // Start new daily game
       setTargetWord(todayWord);
+      setGuess(''); // Clear current guess when starting new daily game
+      setValidatedWord('');
     }
   }, [gameMode]);
 
@@ -346,29 +356,20 @@ function App() {
 
   // Function to handle submission after a word has been validated
   const handleSubmitValidatedGuess = useCallback((validatedWord) => {
-    console.log(`[handleSubmitValidatedGuess] Called with word: ${validatedWord}`);
-    console.log(`[handleSubmitValidatedGuess] Current state - isRevealing: ${isRevealing}, isGameOver: ${isGameOver}`);
-    
     if (isRevealing || isGameOver) {
-      console.log(`[handleSubmitValidatedGuess] Exiting early - isRevealing: ${isRevealing}, isGameOver: ${isGameOver}`);
       return;
     }
     
-    console.log(`[handleSubmitValidatedGuess] Processing validated word: ${validatedWord}`);
-    console.log(`[handleSubmitValidatedGuess] Current guesses count: ${guesses.length}`);
-    console.log(`[handleSubmitValidatedGuess] Target word: ${targetWord}`);
-    
     // Evaluate the guess and add it to the list with status information
     const evaluatedGuess = evaluateGuess(validatedWord);
-    console.log(`[handleSubmitValidatedGuess] Evaluated guess:`, evaluatedGuess);
     
-    setGuesses(prev => {
-      console.log(`[handleSubmitValidatedGuess] Adding guess to list, previous count: ${prev.length}`);
-      return [...prev, evaluatedGuess];
-    });
+    // Get the current guess count before updating
+    const currentGuessCount = guesses.length;
+    const nextGuessNumber = currentGuessCount + 1;
+    
+    setGuesses(prev => [...prev, evaluatedGuess]);
     
     // Clear input and message
-    console.log(`[handleSubmitValidatedGuess] Clearing input and message`);
     setGuess('');
     setMessage('');
     
@@ -385,12 +386,12 @@ function App() {
         maxStreak: Math.max(prev.maxStreak, prev.currentStreak + 1),
         guessDistribution: {
           ...prev.guessDistribution,
-          [guesses.length + 1]: (prev.guessDistribution[guesses.length + 1] || 0) + 1
+          [nextGuessNumber]: (prev.guessDistribution[nextGuessNumber] || 0) + 1
         }
       }));
     }
     // Check if out of attempts
-    else if (guesses.length + 1 >= MAX_ATTEMPTS) {
+    else if (nextGuessNumber >= MAX_ATTEMPTS) {
       // Update stats for loss
       setStats(prev => ({
         ...prev,
@@ -406,7 +407,7 @@ function App() {
     setTimeout(() => {
       setIsRevealing(false);
       
-      // Update keyboard letter states - using the same evaluatedGuess we added to the guesses array
+      // Update keyboard letter states
       const newKeys = { ...usedKeys };
       
       evaluatedGuess.forEach(({ letter, status }) => {
@@ -421,8 +422,8 @@ function App() {
       });
       
       setUsedKeys(newKeys);
-    }, 1500); // Adjusted to better match the tile animations
-  }, [isRevealing, isGameOver, targetWord, guesses.length, usedKeys, evaluateGuess]);
+    }, 1500);
+  }, [isRevealing, isGameOver, targetWord, guesses, usedKeys, evaluateGuess]);
 
   // Handle validated word submission
   useEffect(() => {
@@ -757,24 +758,27 @@ function App() {
   // Game mode switching functions
   const startDailyMode = useCallback(() => {
     setGameMode('daily');
-    const completed = isDailyWordCompleted(dayString);
+    const completed = isDailyWordCompleted(dayString, dailyWord);
     
     if (completed) {
       // Load completed daily game
       const progress = loadDailyProgress(dayString);
-      if (progress) {
+      if (progress && progress.word === dailyWord) {
         setTargetWord(progress.word);
         setGuesses(progress.guesses);
         setUsedKeys(progress.usedKeys);
         setIsGameOver(progress.isGameOver);
         setIsCorrect(progress.isWinner);
         setMessage(progress.isWinner ? 'Congratulations!' : `The word was ${progress.word}`);
+      } else {
+        // Progress exists but for different word, start fresh
+        resetGame();
       }
     } else {
       // Start new daily game
       resetGame();
     }
-  }, [dayString, resetGame]);
+  }, [dayString, dailyWord, resetGame]);
 
   const startPracticeMode = useCallback(() => {
     setGameMode('practice');
@@ -1055,7 +1059,7 @@ function App() {
         {/* Render completed guess rows */}
         {guesses.map((guess, guessIndex) => (
           <div 
-            key={guessIndex} 
+            key={`completed-guess-${guessIndex}`} 
             className="guess-row"
             role="row"
             aria-label={`Guess ${guessIndex + 1}`}
@@ -1063,7 +1067,7 @@ function App() {
             {Array.isArray(guess) 
               ? guess.map((letter, letterIndex) => (
                 <Tile
-                  key={letterIndex}
+                  key={`guess-${guessIndex}-letter-${letterIndex}`}
                   letter={letter.letter}
                   status={letter.status}
                   index={letterIndex}
@@ -1072,7 +1076,7 @@ function App() {
               ))
               : guess.split('').map((letter, letterIndex) => (
                 <Tile
-                  key={letterIndex}
+                  key={`guess-${guessIndex}-letter-${letterIndex}`}
                   letter={letter}
                   status={letterIndex < 5 ? 'unused' : null}
                   index={letterIndex}
