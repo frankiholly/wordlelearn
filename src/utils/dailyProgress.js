@@ -42,6 +42,55 @@ export function isDailyWordCompleted(dayString, expectedWord) {
   return progress && progress.isGameOver && progress.word === expectedWord;
 }
 
+export function getCurrentDailyProgress(dayString, expectedWord) {
+  const progress = loadDailyProgress(dayString);
+  
+  // If no progress exists, return null (new day)
+  if (!progress) {
+    return null;
+  }
+  
+  // If progress exists but for a different word, return null (new word available)
+  if (progress.word !== expectedWord) {
+    return null;
+  }
+  
+  // Return the progress for the current word
+  return progress;
+}
+
+export function shouldStartNewDaily(dayString, expectedWord) {
+  const progress = loadDailyProgress(dayString);
+  
+  // If no progress exists, start new
+  if (!progress) {
+    return true;
+  }
+  
+  // If progress is for a different word, start new
+  if (progress.word !== expectedWord) {
+    return true;
+  }
+  
+  // If progress exists for same word and game is over, don't start new
+  if (progress.isGameOver) {
+    return false;
+  }
+  
+  // If progress exists for same word but game not over, continue existing
+  return false;
+}
+
+export function clearDailyProgress(dayString) {
+  const progressKey = `wordle-daily-${dayString}`;
+  try {
+    localStorage.removeItem(progressKey);
+    console.log(`Daily progress cleared for ${dayString}`);
+  } catch (error) {
+    console.error('Failed to clear daily progress:', error);
+  }
+}
+
 export function getDailyStats() {
   const stats = {
     totalDaysPlayed: 0,

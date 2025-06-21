@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import { getRandomWord } from './wordList';
 import { isInDictionary, checkWordOnline, dictionary } from './data/dictionary';
 import { getDailyWord, getDayString, getDayNumber } from './utils/dailyWord';
-import { saveDailyProgress, loadDailyProgress, isDailyWordCompleted } from './utils/dailyProgress';
+import { saveDailyProgress, loadDailyProgress, isDailyWordCompleted, getCurrentDailyProgress, shouldStartNewDaily } from './utils/dailyProgress';
 import DailyStatsModal from './components/DailyStatsModal';
 import './App.css';
 
@@ -243,38 +243,37 @@ function App() {
     setDayNumber(todayNumber);
     setDailyWord(todayWord);
     
-    // Check if daily word is already completed for today's specific word
-    const completed = isDailyWordCompleted(today, todayWord);
-    setDailyCompleted(completed);
+    // Get current daily progress for today's word
+    const currentProgress = getCurrentDailyProgress(today, todayWord);
     
-    if (completed && gameMode === 'daily') {
-      // Load completed daily game
-      const progress = loadDailyProgress(today);
-      if (progress && progress.word === todayWord) {
-        setTargetWord(progress.word);
-        setGuesses(progress.guesses);
-        setUsedKeys(progress.usedKeys);
-        setIsGameOver(progress.isGameOver);
-        setIsCorrect(progress.isWinner);
-        setMessage(progress.isWinner ? 'Congratulations!' : `The word was ${progress.word}`);
-        setGuess(''); // Clear current guess when loading completed game
-        setValidatedWord('');
-      } else {
-        // Progress exists but for different word, start fresh
-        setDailyCompleted(false);
-        setTargetWord(todayWord);
-        setGuess('');
-        setValidatedWord('');
+    if (currentProgress) {
+      // Progress exists for today's word - load it
+      setDailyCompleted(currentProgress.isGameOver);
+      setTargetWord(currentProgress.word);
+      setGuesses(currentProgress.guesses);
+      setUsedKeys(currentProgress.usedKeys);
+      setIsGameOver(currentProgress.isGameOver);
+      setIsCorrect(currentProgress.isWinner);
+      if (currentProgress.isGameOver) {
+        setMessage(currentProgress.isWinner ? 'Congratulations!' : `The word was ${currentProgress.word}`);
       }
-    } else if (gameMode === 'daily') {
-      // Start new daily game
+      setGuess(''); // Clear current guess
+      setValidatedWord('');
+    } else {
+      // No progress for today's word or new word available - start fresh
+      setDailyCompleted(false);
       setTargetWord(todayWord);
-      setGuess(''); // Clear current guess when starting new daily game
+      setGuesses([]);
+      setUsedKeys({});
+      setIsGameOver(false);
+      setIsCorrect(false);
+      setMessage('');
+      setGuess('');
       setValidatedWord('');
     }
   }, [gameMode]);
 
-  // Save daily progress when game state changes
+  // Save daily progress when game state changes (including incomplete games)
   useEffect(() => {
     if (gameMode === 'daily' && targetWord && targetWord === dailyWord) {
       saveDailyProgress(dayString, {
@@ -758,24 +757,25 @@ function App() {
   // Game mode switching functions
   const startDailyMode = useCallback(() => {
     setGameMode('daily');
-    const completed = isDailyWordCompleted(dayString, dailyWord);
     
-    if (completed) {
-      // Load completed daily game
-      const progress = loadDailyProgress(dayString);
-      if (progress && progress.word === dailyWord) {
-        setTargetWord(progress.word);
-        setGuesses(progress.guesses);
-        setUsedKeys(progress.usedKeys);
-        setIsGameOver(progress.isGameOver);
-        setIsCorrect(progress.isWinner);
-        setMessage(progress.isWinner ? 'Congratulations!' : `The word was ${progress.word}`);
+    // Get current daily progress for today's word
+    const currentProgress = getCurrentDailyProgress(dayString, dailyWord);
+    
+    if (currentProgress) {
+      // Progress exists for today's word - load it
+      setTargetWord(currentProgress.word);
+      setGuesses(currentProgress.guesses);
+      setUsedKeys(currentProgress.usedKeys);
+      setIsGameOver(currentProgress.isGameOver);
+      setIsCorrect(currentProgress.isWinner);
+      setDailyCompleted(currentProgress.isGameOver);
+      if (currentProgress.isGameOver) {
+        setMessage(currentProgress.isWinner ? 'Congratulations!' : `The word was ${currentProgress.word}`);
       } else {
-        // Progress exists but for different word, start fresh
-        resetGame();
+        setMessage('');
       }
     } else {
-      // Start new daily game
+      // No progress for today's word or new word available - start fresh
       resetGame();
     }
   }, [dayString, dailyWord, resetGame]);
