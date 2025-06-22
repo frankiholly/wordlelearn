@@ -733,7 +733,7 @@ function App() {
     });
   }, []);
 
-  // Reset game to play again
+  // Reset game to play again - Always creates a practice game with random word
   const resetGame = useCallback(() => {
     // Save final stats of current game if it's game over
     if (isGameOver && !localStorage.getItem(`${STORAGE_KEY}_finalized_${targetWord}`)) {
@@ -742,61 +742,35 @@ function App() {
       localStorage.setItem(`${STORAGE_KEY}_finalized_${targetWord}`, 'true');
     }
     
-    if (gameMode === 'practice') {
-      // Clear the completed practice game
-      clearPracticeProgress();
-      
-      // Start a new practice game with a random word
-      const newTargetWord = getRandomWord();
-      setTargetWord(newTargetWord);
-      setGuess('');
-      setGuesses([]);
-      setMessage('');
-      setIsCorrect(false);
-      setIsGameOver(false);
-      setUsedKeys({});
-      setValidatedWord('');
-      
-      // Save the new practice game state
-      savePracticeProgress(newTargetWord, [], {}, false, false);
-    } else {
-      // Daily mode - choose daily word
-      const newTargetWord = dailyWord;
-      setTargetWord(newTargetWord);
-      setGuess('');
-      setGuesses([]);
-      setMessage('');
-      setIsCorrect(false);
-      setIsGameOver(false);
-      setUsedKeys({});
-      setValidatedWord('');
-      
-      // Save the new daily game state
-      const gameData = {
-        savedStats: stats,
-        savedGame: {
-          targetWord: newTargetWord,
-          guesses: [],
-          isCorrect: false,
-          isGameOver: false,
-          usedKeys: {},
-          extremeMode,
-          inProgress: true
-        }
-      };
-      
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(gameData));
-    }
+    // Always create a practice game with a random word (regardless of current mode)
+    setGameMode('practice');
+    
+    // Clear any existing practice progress
+    clearPracticeProgress();
+    
+    // Generate a new random word for practice
+    const newTargetWord = getRandomWord();
+    setTargetWord(newTargetWord);
+    setGuess('');
+    setGuesses([]);
+    setMessage('');
+    setIsCorrect(false);
+    setIsGameOver(false);
+    setUsedKeys({});
+    setValidatedWord('');
+    
+    // Save the new practice game state
+    savePracticeProgress(newTargetWord, [], {}, false, false);
     
     // Announce to screen readers
     const announcement = document.createElement('div');
     announcement.className = 'sr-only';
     announcement.setAttribute('aria-live', 'assertive');
-    announcement.textContent = 'New game started';
+    announcement.textContent = 'New practice game started';
     document.body.appendChild(announcement);
     setTimeout(() => document.body.removeChild(announcement), 1000);
 
-  }, [isGameOver, targetWord, isCorrect, guesses.length, updateStats, stats, extremeMode, gameMode, dailyWord]);
+  }, [isGameOver, targetWord, isCorrect, guesses.length, updateStats]);
 
   // Game mode switching functions
   const startDailyMode = useCallback(() => {
@@ -813,16 +787,29 @@ function App() {
       setIsGameOver(currentProgress.isGameOver);
       setIsCorrect(currentProgress.isWinner);
       setDailyCompleted(currentProgress.isGameOver);
+      
       if (currentProgress.isGameOver) {
-        setMessage(currentProgress.isWinner ? 'Congratulations!' : `The word was ${currentProgress.word}`);
+        // Show completion message for finished daily game
+        setMessage(currentProgress.isWinner 
+          ? `Daily word completed! You got it in ${currentProgress.guesses.length} guesses.` 
+          : `Daily word completed. The word was ${currentProgress.word}.`);
       } else {
-        setMessage('');
+        // Clear message for in-progress daily game
+        setMessage('Continue your daily word...');
       }
     } else {
-      // No progress for today's word or new word available - start fresh
-      resetGame();
+      // No progress for today's word - start fresh daily game
+      setTargetWord(dailyWord);
+      setGuess('');
+      setGuesses([]);
+      setMessage('Starting today\'s daily word...');
+      setIsCorrect(false);
+      setIsGameOver(false);
+      setUsedKeys({});
+      setValidatedWord('');
+      setDailyCompleted(false);
     }
-  }, [dayString, dailyWord, resetGame]);
+  }, [dayString, dailyWord]);
 
   const startPracticeMode = useCallback(() => {
     setGameMode('practice');
@@ -1073,7 +1060,7 @@ function App() {
               type="button" 
               onClick={resetGame} 
               className="reset-button"
-              aria-label="Start a new game"
+              aria-label="Start a new practice game"
             >
               New Game
             </button>
