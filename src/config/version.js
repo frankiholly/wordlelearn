@@ -2,15 +2,15 @@
 // This is the SINGLE source of truth for version information
 
 export const VERSION_CONFIG = {
-  version: '3.5.1',
-  buildId: 'enhanced_daily_tracking',
+  version: '3.6.0',
+  buildId: 'simplified_ui_single_button',
   buildDate: new Date().toISOString(),
   
   // Helper methods
   getFullVersion: () => `v${VERSION_CONFIG.version}`,
   getBuildInfo: () => `${VERSION_CONFIG.version} (Build: ${VERSION_CONFIG.buildId})`,
   getCacheParam: () => VERSION_CONFIG.version,
-  getDisplayVersion: () => `v${VERSION_CONFIG.version} (Build: ${new Date().toLocaleString()})`
+  getDisplayVersion: () => `(Build: v${VERSION_CONFIG.version} )`
 };
 
 // Default export for convenience

@@ -3,6 +3,7 @@ import { getRandomWord } from './wordList';
 import { isInDictionary, checkWordOnline, dictionary } from './data/dictionary';
 import { getDailyWord, getDayString, getDayNumber } from './utils/dailyWord';
 import { saveDailyProgress, loadDailyProgress, isDailyWordCompleted, getCurrentDailyProgress, shouldStartNewDaily } from './utils/dailyProgress';
+import { savePracticeProgress, loadPracticeProgress, isPracticeGameInProgress, canStartNewPracticeGame, clearPracticeProgress } from './utils/practiceProgress';
 import DailyStatsModal from './components/DailyStatsModal';
 import VERSION_CONFIG from './config/version';
 import './App.css';
@@ -225,14 +226,27 @@ function App() {
             : `Game over! The word was ${savedGame.targetWord}.`);
         }
       } else {
-        // Start a new game
-        setTargetWord(getRandomWord());
+        // Check for practice game in progress
+        const practiceProgress = loadPracticeProgress();
+        if (practiceProgress && gameMode === 'practice') {
+          setTargetWord(practiceProgress.word);
+          setGuesses(practiceProgress.guesses);
+          setUsedKeys(practiceProgress.usedKeys);
+          setIsGameOver(practiceProgress.isGameOver);
+          setIsCorrect(practiceProgress.isWinner);
+          if (practiceProgress.isGameOver) {
+            setMessage(practiceProgress.isWinner ? 'Correct! You guessed the word!' : `Game over! The word was ${practiceProgress.word}.`);
+          }
+        } else {
+          // Start a new game
+          setTargetWord(getRandomWord());
+        }
       }
     } else {
       // First time playing - start a new game
       setTargetWord(getRandomWord());
     }
-  }, []);
+  }, [gameMode]);
 
   // Initialize daily word and check completion status
   useEffect(() => {
@@ -294,22 +308,33 @@ function App() {
   // Save game state to localStorage whenever it changes
   useEffect(() => {
     if (targetWord) { // Only save once targetWord is initialized
-      const gameData = {
-        savedStats: stats,
-        savedGame: {
-          targetWord,
-          guesses,
-          isCorrect,
-          isGameOver,
-          usedKeys,
-          extremeMode,
-          inProgress: true
-        }
-      };
-      
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(gameData));
+      if (gameMode === 'daily') {
+        const gameData = {
+          savedStats: stats,
+          savedGame: {
+            targetWord,
+            guesses,
+            isCorrect,
+            isGameOver,
+            usedKeys,
+            extremeMode,
+            inProgress: true
+          }
+        };
+        
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(gameData));
+      } else if (gameMode === 'practice') {
+        // Save practice game progress
+        savePracticeProgress(targetWord, guesses, usedKeys, isGameOver, isCorrect);
+        
+        // Also save stats for practice mode
+        const gameData = {
+          savedStats: stats
+        };
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(gameData));
+      }
     }
-  }, [targetWord, guesses, isCorrect, isGameOver, usedKeys, stats, extremeMode]);
+  }, [targetWord, guesses, isCorrect, isGameOver, usedKeys, stats, extremeMode, gameMode]);
 
   // Use effect to check for game over conditions
   useEffect(() => {
@@ -717,16 +742,51 @@ function App() {
       localStorage.setItem(`${STORAGE_KEY}_finalized_${targetWord}`, 'true');
     }
     
-    // Start a new game - choose word based on game mode
-    const newTargetWord = gameMode === 'daily' ? dailyWord : getRandomWord();
-    setTargetWord(newTargetWord);
-    setGuess('');
-    setGuesses([]);
-    setMessage('');
-    setIsCorrect(false);
-    setIsGameOver(false);
-    setUsedKeys({});
-    setValidatedWord('');
+    if (gameMode === 'practice') {
+      // Clear the completed practice game
+      clearPracticeProgress();
+      
+      // Start a new practice game with a random word
+      const newTargetWord = getRandomWord();
+      setTargetWord(newTargetWord);
+      setGuess('');
+      setGuesses([]);
+      setMessage('');
+      setIsCorrect(false);
+      setIsGameOver(false);
+      setUsedKeys({});
+      setValidatedWord('');
+      
+      // Save the new practice game state
+      savePracticeProgress(newTargetWord, [], {}, false, false);
+    } else {
+      // Daily mode - choose daily word
+      const newTargetWord = dailyWord;
+      setTargetWord(newTargetWord);
+      setGuess('');
+      setGuesses([]);
+      setMessage('');
+      setIsCorrect(false);
+      setIsGameOver(false);
+      setUsedKeys({});
+      setValidatedWord('');
+      
+      // Save the new daily game state
+      const gameData = {
+        savedStats: stats,
+        savedGame: {
+          targetWord: newTargetWord,
+          guesses: [],
+          isCorrect: false,
+          isGameOver: false,
+          usedKeys: {},
+          extremeMode,
+          inProgress: true
+        }
+      };
+      
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(gameData));
+    }
     
     // Announce to screen readers
     const announcement = document.createElement('div');
@@ -735,23 +795,6 @@ function App() {
     announcement.textContent = 'New game started';
     document.body.appendChild(announcement);
     setTimeout(() => document.body.removeChild(announcement), 1000);
-    
-    // Save the new game state with a fresh target word
-    const gameData = {
-      savedStats: stats,
-      savedGame: {
-        targetWord: newTargetWord,
-        guesses: [],
-        isCorrect: false,
-        isGameOver: false,
-        usedKeys: {},
-        extremeMode,
-        inProgress: true
-      }
-    };
-    
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(gameData));
-    
 
   }, [isGameOver, targetWord, isCorrect, guesses.length, updateStats, stats, extremeMode, gameMode, dailyWord]);
 
@@ -783,8 +826,33 @@ function App() {
 
   const startPracticeMode = useCallback(() => {
     setGameMode('practice');
-    resetGame();
-  }, [resetGame]);
+    
+    // Check if there's a practice game in progress
+    const practiceProgress = loadPracticeProgress();
+    if (practiceProgress && !practiceProgress.isGameOver) {
+      // Resume existing practice game
+      setTargetWord(practiceProgress.word);
+      setGuesses(practiceProgress.guesses);
+      setUsedKeys(practiceProgress.usedKeys);
+      setIsGameOver(practiceProgress.isGameOver);
+      setIsCorrect(practiceProgress.isWinner);
+      setMessage('');
+    } else {
+      // Start a new practice game
+      const newTargetWord = getRandomWord();
+      setTargetWord(newTargetWord);
+      setGuess('');
+      setGuesses([]);
+      setMessage('');
+      setIsCorrect(false);
+      setIsGameOver(false);
+      setUsedKeys({});
+      setValidatedWord('');
+      
+      // Save the new practice game state
+      savePracticeProgress(newTargetWord, [], {}, false, false);
+    }
+  }, []);
 
   const showDailyStatsModal = useCallback(() => {
     setShowDailyStats(true);
@@ -901,12 +969,6 @@ function App() {
         >
           Daily Word #{dayNumber}
         </button>
-        <button 
-          className={`mode-button ${gameMode === 'practice' ? 'active' : ''}`}
-          onClick={startPracticeMode}
-        >
-          Practice
-        </button>
         {gameMode === 'daily' && (
           <button className="stats-button" onClick={showDailyStatsModal}>
             📊 Stats
@@ -922,10 +984,7 @@ function App() {
           </div>
           {dailyCompleted && (
             <div className="daily-completed">
-              ✅ Completed! 
-              <button onClick={startPracticeMode} className="continue-button">
-                Continue Playing
-              </button>
+              ✅ Completed!
             </div>
           )}
         </div>
