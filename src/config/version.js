@@ -2,7 +2,7 @@
 // This is the SINGLE source of truth for version information
 
 export const VERSION_CONFIG = {
-  version: '3.6.1',
+  version: '3.7.0',
   buildId: 'enhanced_new_game_daily_logic',
   buildDate: new Date().toISOString(),
   
