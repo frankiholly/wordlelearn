@@ -5,6 +5,7 @@ import { getDailyWord, getDayString, getDayNumber } from './utils/dailyWord';
 import { saveDailyProgress, loadDailyProgress, isDailyWordCompleted, getCurrentDailyProgress, shouldStartNewDaily } from './utils/dailyProgress';
 import { savePracticeProgress, loadPracticeProgress, isPracticeGameInProgress, canStartNewPracticeGame, clearPracticeProgress } from './utils/practiceProgress';
 import DailyStatsModal from './components/DailyStatsModal';
+import ExtremeWinCelebration from './components/ExtremeWinCelebration';
 import VERSION_CONFIG from './config/version';
 import './App.css';
 
@@ -196,6 +197,9 @@ function App() {
   
   // State for Extreme mode
   const [extremeMode, setExtremeMode] = useState(false);
+  
+  // State for extreme win celebration
+  const [showExtremeCelebration, setShowExtremeCelebration] = useState(false);
 
   // Load stats and game state from localStorage on initial render
   useEffect(() => {
@@ -402,6 +406,12 @@ function App() {
     const correct = validatedWord === targetWord;
     if (correct) {
       setIsCorrect(true);
+      
+      // Trigger extreme win celebration if in extreme mode
+      if (extremeMode) {
+        setShowExtremeCelebration(true);
+      }
+      
       // Update stats for win
       setStats(prev => ({
         ...prev,
@@ -1253,6 +1263,11 @@ function App() {
         <DailyStatsModal onClose={() => setShowDailyStats(false)} />
       )}
 
+      {/* Extreme Win Celebration */}
+      <ExtremeWinCelebration
+        isVisible={showExtremeCelebration}
+        onComplete={() => setShowExtremeCelebration(false)}
+      />
       
       {/* Hidden live region for screen reader announcements */}
       <div 
