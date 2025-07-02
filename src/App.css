@@ -3,6 +3,23 @@
   max-width: 500px;
   margin: 0 auto;
   padding: 20px;
+  /* Mobile keyboard accommodation */
+  padding-bottom: max(
+    env(keyboard-inset-height, 20px),  /* Dynamic keyboard height */
+    env(safe-area-inset-bottom, 20px), /* Safe area for notched phones */
+    20px                               /* Minimum fallback */
+  );
+}
+
+/* Extra mobile-specific spacing for keyboard overlap prevention */
+@media (max-width: 768px) {
+  .App {
+    padding-bottom: max(
+      env(keyboard-inset-height, 120px),
+      env(safe-area-inset-bottom, 120px),
+      120px
+    );
+  }
 }
 
 .title {

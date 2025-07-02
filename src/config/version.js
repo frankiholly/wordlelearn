@@ -2,8 +2,8 @@
 // This is the SINGLE source of truth for version information
 
 export const VERSION_CONFIG = {
-  version: '3.7.0',
-  buildId: 'enhanced_new_game_daily_logic',
+  version: '3.7.1',
+  buildId: 'mobile_keyboard_fix',
   buildDate: new Date().toISOString(),
   
   // Helper methods
