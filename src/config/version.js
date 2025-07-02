@@ -3,7 +3,7 @@
 
 export const VERSION_CONFIG = {
   version: '3.8.0',
-  buildId: 'extreme_win_celebration_visual',
+  buildId: 'extreme_win_celebration_complete',
   buildDate: new Date().toISOString(),
   
   // Helper methods

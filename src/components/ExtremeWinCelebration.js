@@ -1,11 +1,26 @@
 import React, { useEffect, useState } from 'react';
+import { celebrationAudio } from '../utils/celebrationAudio';
+import { CelebrationSettings } from '../utils/celebrationSettings';
 import './ExtremeWinCelebration.css';
 
 const ExtremeWinCelebration = ({ isVisible, onComplete }) => {
   const [animationPhase, setAnimationPhase] = useState('enter');
+  const [settings, setSettings] = useState(CelebrationSettings.load());
 
   useEffect(() => {
     if (!isVisible) return;
+
+    // Load user preferences
+    const currentSettings = CelebrationSettings.load();
+    setSettings(currentSettings);
+    
+    // Play soothing melody if audio is enabled
+    if (currentSettings.audioEnabled) {
+      celebrationAudio.setVolume(currentSettings.volume);
+      celebrationAudio.playExtremeCelebrationMelody().catch(error => {
+        console.warn('Audio playback failed:', error);
+      });
+    }
 
     const phases = [
       { phase: 'enter', duration: 500 },
@@ -33,7 +48,7 @@ const ExtremeWinCelebration = ({ isVisible, onComplete }) => {
     runPhase();
   }, [isVisible, onComplete]);
 
-  if (!isVisible) return null;
+  if (!isVisible || !settings.visualEnabled) return null;
 
   // Generate floating particles
   const particles = Array.from({ length: 12 }, (_, i) => (
