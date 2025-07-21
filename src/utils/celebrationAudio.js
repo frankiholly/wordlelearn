@@ -101,7 +101,7 @@ export class CelebrationAudio {
     return baseFreq * octaveMultiplier;
   }
 
-  // Play the soothing melody (inspired by Moonlight Sonata but upbeat)
+  // Play the extended soothing melody (inspired by Moonlight Sonata but upbeat)
   async playExtremeCelebrationMelody() {
     if (this.isPlaying) return;
     
@@ -110,50 +110,122 @@ export class CelebrationAudio {
 
     this.isPlaying = true;
     const startTime = this.audioContext.currentTime + 0.1;
-    const beatDuration = 0.4; // 120 BPM feel
+    const beatDuration = 0.45; // Slightly slower for expressiveness
 
-    // Melody inspired by classical piano but more upbeat and shorter
-    const melody = [
-      { note: 'E', octave: 4, duration: beatDuration * 0.8, volume: 0.6 },
-      { note: 'G', octave: 4, duration: beatDuration * 0.6, volume: 0.5 },
+    // Extended melody with multiple phrases - A-B-A form with bridge
+    // Phrase A: Opening melody (gentle and welcoming)
+    const phraseA = [
+      { note: 'E', octave: 4, duration: beatDuration * 0.8, volume: 0.5 },
+      { note: 'G', octave: 4, duration: beatDuration * 0.6, volume: 0.6 },
       { note: 'B', octave: 4, duration: beatDuration * 0.8, volume: 0.7 },
       { note: 'C', octave: 5, duration: beatDuration * 1.2, volume: 0.8 },
-      { note: 'B', octave: 4, duration: beatDuration * 0.6, volume: 0.6 },
-      { note: 'A', octave: 4, duration: beatDuration * 0.8, volume: 0.7 },
-      { note: 'G', octave: 4, duration: beatDuration * 1.0, volume: 0.8 },
-      { note: 'E', octave: 4, duration: beatDuration * 1.5, volume: 0.9 }
+      { note: 'B', octave: 4, duration: beatDuration * 0.6, volume: 0.7 },
+      { note: 'A', octave: 4, duration: beatDuration * 0.8, volume: 0.8 },
+      { note: 'G', octave: 4, duration: beatDuration * 1.5, volume: 0.9 }
     ];
 
-    // Bass accompaniment for richness
-    const bass = [
-      { note: 'C', octave: 3, duration: beatDuration * 2, volume: 0.3 },
+    // Phrase B: Development with harmony (richer and more complex)
+    const phraseB = [
+      { note: 'C', octave: 5, duration: beatDuration * 0.7, volume: 0.8 },
+      { note: 'D', octave: 5, duration: beatDuration * 0.5, volume: 0.9 },
+      { note: 'E', octave: 5, duration: beatDuration * 0.8, volume: 1.0 },
+      { note: 'D', octave: 5, duration: beatDuration * 0.6, volume: 0.8 },
+      { note: 'C', octave: 5, duration: beatDuration * 0.8, volume: 0.9 },
+      { note: 'B', octave: 4, duration: beatDuration * 0.7, volume: 0.8 },
+      { note: 'A', octave: 4, duration: beatDuration * 1.0, volume: 0.9 },
+      { note: 'G', octave: 4, duration: beatDuration * 1.2, volume: 0.8 }
+    ];
+
+    // Bridge: Modulation and resolution
+    const bridge = [
+      { note: 'F', octave: 4, duration: beatDuration * 0.9, volume: 0.7 },
+      { note: 'A', octave: 4, duration: beatDuration * 0.7, volume: 0.8 },
+      { note: 'C', octave: 5, duration: beatDuration * 1.0, volume: 0.9 },
+      { note: 'B', octave: 4, duration: beatDuration * 0.8, volume: 0.8 },
+      { note: 'G', octave: 4, duration: beatDuration * 1.5, volume: 0.9 }
+    ];
+
+    // Final phrase A (return with resolution)
+    const phraseAFinal = [
+      { note: 'E', octave: 4, duration: beatDuration * 1.0, volume: 0.8 },
+      { note: 'G', octave: 4, duration: beatDuration * 0.8, volume: 0.9 },
+      { note: 'C', octave: 5, duration: beatDuration * 1.5, volume: 1.0 },
+      { note: 'G', octave: 4, duration: beatDuration * 2.0, volume: 0.7 } // Final resolution
+    ];
+
+    // Enhanced bass with more movement
+    const bassProgression = [
+      // Supporting phrase A
+      { note: 'C', octave: 3, duration: beatDuration * 3, volume: 0.3 },
       { note: 'G', octave: 2, duration: beatDuration * 2, volume: 0.3 },
       { note: 'A', octave: 2, duration: beatDuration * 2, volume: 0.3 },
-      { note: 'C', octave: 3, duration: beatDuration * 2, volume: 0.3 }
+      
+      // Supporting phrase B  
+      { note: 'F', octave: 2, duration: beatDuration * 2.5, volume: 0.35 },
+      { note: 'C', octave: 3, duration: beatDuration * 2.5, volume: 0.35 },
+      { note: 'G', octave: 2, duration: beatDuration * 2, volume: 0.3 },
+      
+      // Supporting bridge
+      { note: 'F', octave: 2, duration: beatDuration * 2, volume: 0.3 },
+      { note: 'G', octave: 2, duration: beatDuration * 2.5, volume: 0.32 },
+      
+      // Final resolution
+      { note: 'C', octave: 3, duration: beatDuration * 4, volume: 0.25 }
     ];
 
     let currentTime = startTime;
 
-    // Play melody
-    melody.forEach((note, index) => {
+    // Play the complete extended composition
+    const fullMelody = [...phraseA, ...phraseB, ...bridge, ...phraseAFinal];
+    
+    fullMelody.forEach((note, index) => {
       const frequency = this.getNoteFrequency(note.note, note.octave);
-      this.createPianoTone(frequency, note.duration, currentTime, note.volume);
-      currentTime += note.duration * 0.9; // Slight overlap for legato feel
+      // Add subtle volume crescendo and diminuendo
+      let adjustedVolume = note.volume;
+      const totalNotes = fullMelody.length;
+      if (index < totalNotes * 0.3) {
+        adjustedVolume *= (0.7 + (index / (totalNotes * 0.3)) * 0.3); // Gentle crescendo
+      } else if (index > totalNotes * 0.7) {
+        const fadePosition = (index - totalNotes * 0.7) / (totalNotes * 0.3);
+        adjustedVolume *= (1.0 - fadePosition * 0.4); // Gentle diminuendo
+      }
+      
+      this.createPianoTone(frequency, note.duration, currentTime, adjustedVolume);
+      currentTime += note.duration * 0.85; // Legato connection
     });
 
     // Play bass (starting slightly delayed for depth)
-    let bassTime = startTime + beatDuration * 0.5;
-    bass.forEach((note) => {
+    let bassTime = startTime + beatDuration * 0.3;
+    bassProgression.forEach((note) => {
       const frequency = this.getNoteFrequency(note.note, note.octave);
       this.createPianoTone(frequency, note.duration, bassTime, note.volume);
-      bassTime += note.duration;
+      bassTime += note.duration * 0.9;
     });
 
+    // Store total duration for external access
+    this.totalDuration = currentTime - startTime + beatDuration;
+    
     // Reset playing state after melody completes
-    const totalDuration = currentTime - startTime + beatDuration;
     setTimeout(() => {
       this.isPlaying = false;
-    }, totalDuration * 1000);
+    }, this.totalDuration * 1000);
+    
+    return this.totalDuration;
+  }
+
+  // Method to stop playback early
+  stop() {
+    if (this.audioContext && this.isPlaying) {
+      // Note: Web Audio API doesn't easily allow stopping scheduled notes
+      // But we can set a flag and create a quick fade-out
+      this.isPlaying = false;
+      
+      // Create a quick fade-out effect by lowering the context gain
+      const fadeGain = this.audioContext.createGain();
+      fadeGain.connect(this.audioContext.destination);
+      fadeGain.gain.setValueAtTime(1, this.audioContext.currentTime);
+      fadeGain.gain.linearRampToValueAtTime(0, this.audioContext.currentTime + 0.3);
+    }
   }
 
   // Set volume (0-1)
