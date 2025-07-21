@@ -105,81 +105,120 @@ const ExtremeWinCelebration = ({ isVisible, onComplete }) => {
       {/* Main character */}
       <div className="celebration-character">
         <div className="kitten-container">
-          {/* Enhanced animated kitten SVG */}
+          {/* Enhanced animated cosmic galaxy kitten SVG */}
           <svg viewBox="0 0 100 100" className="kitten-svg">
-            {/* Kitten body */}
-            <ellipse cx="50" cy="70" rx="25" ry="20" fill="#FFE4B5" />
+            {/* Galaxy body */}
+            <ellipse cx="50" cy="73" rx="25" ry="19" fill="#191970" />
+            <ellipse cx="52" cy="71" rx="20" ry="15" fill="#4B0082" opacity="0.8" />
+            <ellipse cx="48" cy="75" rx="15" ry="12" fill="#9400D3" opacity="0.6" />
             
-            {/* Kitten head */}
-            <circle cx="50" cy="35" r="20" fill="#FFE4B5" />
+            {/* Galaxy head */}
+            <circle cx="50" cy="35" r="21" fill="#191970" />
+            <circle cx="52" cy="33" r="18" fill="#4B0082" opacity="0.8" />
+            <circle cx="48" cy="37" r="15" ry="12" fill="#9400D3" opacity="0.6" />
             
-            {/* Ears */}
-            <path d="M35 25 L40 15 L45 25 Z" fill="#FFE4B5" />
-            <path d="M55 25 L60 15 L65 25 Z" fill="#FFE4B5" />
-            <path d="M37 23 L40 18 L43 23 Z" fill="#FFB6C1" />
-            <path d="M57 23 L60 18 L63 23 Z" fill="#FFB6C1" />
+            {/* Starry ears */}
+            <path d="M35 20 L38 8 L45 22 Z" fill="#191970" />
+            <path d="M55 22 L62 8 L65 20 Z" fill="#191970" />
+            <path d="M37 18 L38 12 L42 19 Z" fill="#4B0082" />
+            <path d="M58 19 L62 12 L63 18 Z" fill="#4B0082" />
             
-            {/* Animated eyes based on expression */}
+            {/* Animated cosmic eyes based on expression */}
             <g className={`cat-eyes expression-${catExpression}`}>
               {catExpression === 'sleepy' || catExpression === 'peaceful' ? (
                 // Closed/sleepy eyes
                 <>
-                  <path d="M40 32 Q43 30 46 32" stroke="#000" strokeWidth="2" fill="none" className="sleepy-eye" />
-                  <path d="M54 32 Q57 30 60 32" stroke="#000" strokeWidth="2" fill="none" className="sleepy-eye" />
+                  <path d="M40 32 Q43 30 46 32" stroke="#00FFFF" strokeWidth="2" fill="none" className="sleepy-eye" />
+                  <path d="M54 32 Q57 30 60 32" stroke="#00FFFF" strokeWidth="2" fill="none" className="sleepy-eye" />
                 </>
               ) : (
-                // Open eyes with blinking
+                // Large cosmic eyes with blinking
                 <>
-                  <circle cx="43" cy="32" r="3" fill="#000" className="cat-eye-left" />
-                  <circle cx="57" cy="32" r="3" fill="#000" className="cat-eye-right" />
-                  <circle cx="44" cy="31" r="1" fill="#FFF" className="eye-shine-left" />
-                  <circle cx="58" cy="31" r="1" fill="#FFF" className="eye-shine-right" />
+                  <circle cx="42" cy="32" r="6" fill="#00FFFF" className="cat-eye-left" />
+                  <circle cx="58" cy="32" r="6" fill="#00FFFF" className="cat-eye-right" />
+                  {/* Starlight in eyes */}
+                  <circle cx="44" cy="29" r="2" fill="#FFF" className="eye-shine-left" />
+                  <circle cx="60" cy="29" r="2" fill="#FFF" className="eye-shine-right" />
+                  <circle cx="40" cy="35" r="1" fill="#FFD700" opacity="0.9" />
+                  <circle cx="56" cy="35" r="1" fill="#FFD700" opacity="0.9" />
                 </>
               )}
             </g>
             
             {/* Nose */}
-            <path d="M48 38 L50 35 L52 38 Z" fill="#FFB6C1" />
+            <circle cx="50" cy="41" r="1.5" fill="#FF69B4" />
             
             {/* Animated mouth based on expression */}
             <g className={`cat-mouth expression-${catExpression}`}>
               {catExpression === 'happy' && (
                 <>
-                  <path d="M50 38 Q45 42 40 40" stroke="#000" strokeWidth="1" fill="none" />
-                  <path d="M50 38 Q55 42 60 40" stroke="#000" strokeWidth="1" fill="none" />
+                  <path d="M47 45 Q50 47 53 45" stroke="#FFF" strokeWidth="1" fill="none" />
                 </>
               )}
               {catExpression === 'content' && (
                 <>
-                  <path d="M50 38 Q47 40 44 39" stroke="#000" strokeWidth="1" fill="none" />
-                  <path d="M50 38 Q53 40 56 39" stroke="#000" strokeWidth="1" fill="none" />
+                  <path d="M47 45 Q50 47 53 45" stroke="#FFF" strokeWidth="1" fill="none" />
                 </>
               )}
               {(catExpression === 'sleepy' || catExpression === 'peaceful') && (
-                <ellipse cx="50" cy="40" rx="2" ry="1" fill="#FFB6C1" />
+                <ellipse cx="50" cy="46" rx="2" ry="1" fill="#FF69B4" />
               )}
             </g>
             
-            {/* Animated whiskers */}
+            {/* Cosmic whiskers */}
             <g className="cat-whiskers">
-              <line x1="30" y1="35" x2="40" y2="37" stroke="#000" strokeWidth="1" className="whisker-left-1" />
-              <line x1="30" y1="40" x2="40" y2="40" stroke="#000" strokeWidth="1" className="whisker-left-2" />
-              <line x1="60" y1="37" x2="70" y2="35" stroke="#000" strokeWidth="1" className="whisker-right-1" />
-              <line x1="60" y1="40" x2="70" y2="40" stroke="#000" strokeWidth="1" className="whisker-right-2" />
+              <line x1="28" y1="36" x2="38" y2="37" stroke="#00FFFF" strokeWidth="1" className="whisker-left-1" />
+              <line x1="28" y1="40" x2="38" y2="40" stroke="#00FFFF" strokeWidth="1" className="whisker-left-2" />
+              <line x1="62" y1="37" x2="72" y2="36" stroke="#00FFFF" strokeWidth="1" className="whisker-right-1" />
+              <line x1="62" y1="40" x2="72" y2="40" stroke="#00FFFF" strokeWidth="1" className="whisker-right-2" />
             </g>
             
-            {/* Paws */}
-            <circle cx="38" cy="85" r="4" fill="#FFE4B5" />
-            <circle cx="62" cy="85" r="4" fill="#FFE4B5" />
+            {/* Cosmic paws */}
+            <circle cx="41" cy="87" r="4" fill="#191970" />
+            <circle cx="59" cy="87" r="4" fill="#191970" />
             
-            {/* Animated tail */}
+            {/* Galaxy tail */}
             <path 
-              d="M25 75 Q15 60 20 45" 
-              stroke="#FFE4B5" 
-              strokeWidth="8" 
+              d="M25 75 Q12 50 20 25" 
+              stroke="#191970" 
+              strokeWidth="10" 
               fill="none" 
               className="cat-tail"
             />
+            <path 
+              d="M27 73 Q14 52 22 30" 
+              stroke="#4B0082" 
+              strokeWidth="6" 
+              fill="none" 
+              className="cat-tail"
+            />
+            <path 
+              d="M29 71 Q16 54 24 35" 
+              stroke="#9400D3" 
+              strokeWidth="3" 
+              fill="none" 
+              className="cat-tail"
+            />
+            
+            {/* Stars scattered on body */}
+            <circle cx="35" cy="65" r="0.5" fill="#FFF" className="star-1">
+              <animate attributeName="opacity" values="0.3;1;0.3" dur="2s" repeatCount="indefinite" />
+            </circle>
+            <circle cx="65" cy="70" r="0.5" fill="#FFD700" className="star-2">
+              <animate attributeName="opacity" values="0.5;1;0.5" dur="3s" repeatCount="indefinite" />
+            </circle>
+            <circle cx="55" cy="78" r="0.5" fill="#00FFFF" className="star-3">
+              <animate attributeName="opacity" values="0.4;1;0.4" dur="2.5s" repeatCount="indefinite" />
+            </circle>
+            <circle cx="30" cy="30" r="0.5" fill="#FFF" className="star-4">
+              <animate attributeName="opacity" values="0.6;1;0.6" dur="1.8s" repeatCount="indefinite" />
+            </circle>
+            <circle cx="68" cy="35" r="0.5" fill="#FFD700" className="star-5">
+              <animate attributeName="opacity" values="0.3;1;0.3" dur="2.2s" repeatCount="indefinite" />
+            </circle>
+            <circle cx="45" cy="25" r="0.5" fill="#00FFFF" className="star-6">
+              <animate attributeName="opacity" values="0.5;1;0.5" dur="2.8s" repeatCount="indefinite" />
+            </circle>
           </svg>
         </div>
       </div>

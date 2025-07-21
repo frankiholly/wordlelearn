@@ -2,8 +2,8 @@
 // This is the SINGLE source of truth for version information
 
 export const VERSION_CONFIG = {
-  version: '3.8.1',
-  buildId: 'extreme_celebration_enhanced',
+  version: '3.9.0',
+  buildId: 'cosmic_galaxy_cat',
   buildDate: new Date().toISOString(),
   
   // Helper methods

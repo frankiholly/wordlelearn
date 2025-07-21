@@ -1,0 +1,917 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cat Design Options</title>
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            margin: 0;
+        }
+        h1 {
+            color: white;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .cats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .cat-option {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 20px;
+            text-align: center;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+        .cat-option h3 {
+            color: white;
+            margin-top: 0;
+        }
+        .cat-description {
+            color: #f0f0f0;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+        .kitten-svg {
+            width: 200px;
+            height: 200px;
+            margin: 20px auto;
+            display: block;
+        }
+        
+        /* Animation styles */
+        @keyframes gentle-bounce {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        @keyframes tail-sway {
+            0%, 100% { transform: rotate(0deg); }
+            50% { transform: rotate(-15deg); }
+        }
+        
+        @keyframes whisker-twitch {
+            0%, 90%, 100% { transform: rotate(0deg); }
+            45% { transform: rotate(2deg); }
+        }
+        
+        .kitten-svg {
+            animation: gentle-bounce 2s ease-in-out infinite;
+        }
+        
+        .cat-tail {
+            transform-origin: 75% 75%;
+            animation: tail-sway 3s ease-in-out infinite;
+        }
+        
+        .cat-whiskers line {
+            transform-origin: center;
+            animation: whisker-twitch 4s ease-in-out infinite;
+        }
+        
+        .cat-whiskers line:nth-child(2) {
+            animation-delay: 0.5s;
+        }
+        
+        .cat-whiskers line:nth-child(3) {
+            animation-delay: 1s;
+        }
+        
+        .cat-whiskers line:nth-child(4) {
+            animation-delay: 1.5s;
+        }
+        
+        /* Eye sparkle animation */
+        @keyframes sparkle {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+        
+        .eye-shine-left, .eye-shine-right {
+            animation: sparkle 2s ease-in-out infinite;
+        }
+    </style>
+</head>
+<body>
+    <h1>🎉 Choose Your Cat Design 🎉</h1>
+    
+    <div class="cats-container">
+        <!-- Option 1: Kawaii Chibi Cat -->
+        <div class="cat-option">
+            <h3>Option 1: Kawaii Chibi 🌸</h3>
+            <p class="cat-description">Super cute Japanese-style with huge sparkly eyes, round chubby cheeks, tiny features</p>
+            <svg viewBox="0 0 100 100" class="kitten-svg">
+                <!-- Body (rounder and chubbier) -->
+                <ellipse cx="50" cy="72" rx="28" ry="22" fill="#FFF8DC" stroke="#F0E68C" stroke-width="1"/>
+                
+                <!-- Head (much bigger and rounder) -->
+                <circle cx="50" cy="35" r="24" fill="#FFF8DC" stroke="#F0E68C" stroke-width="1"/>
+                
+                <!-- Chubby cheeks -->
+                <circle cx="35" cy="40" r="8" fill="#FFE4E1" opacity="0.6"/>
+                <circle cx="65" cy="40" r="8" fill="#FFE4E1" opacity="0.6"/>
+                
+                <!-- Smaller, rounder ears -->
+                <circle cx="38" cy="18" r="8" fill="#FFF8DC" stroke="#F0E68C" stroke-width="0.5"/>
+                <circle cx="62" cy="18" r="8" fill="#FFF8DC" stroke="#F0E68C" stroke-width="0.5"/>
+                <circle cx="38" cy="20" r="4" fill="#FFB6C1"/>
+                <circle cx="62" cy="20" r="4" fill="#FFB6C1"/>
+                
+                <!-- HUGE kawaii eyes -->
+                <circle cx="42" cy="32" r="7" fill="#000"/>
+                <circle cx="58" cy="32" r="7" fill="#000"/>
+                <!-- Multiple eye shines for sparkly effect -->
+                <circle cx="44" cy="29" r="2.5" fill="#FFF" class="eye-shine-left"/>
+                <circle cx="60" cy="29" r="2.5" fill="#FFF" class="eye-shine-right"/>
+                <circle cx="40" cy="35" r="1" fill="#FFF" opacity="0.8"/>
+                <circle cx="56" cy="35" r="1" fill="#FFF" opacity="0.8"/>
+                
+                <!-- Tiny button nose -->
+                <circle cx="50" cy="42" r="2" fill="#FF69B4"/>
+                
+                <!-- Cat smile (simple curve) -->
+                <path d="M46 46 Q50 50 54 46" stroke="#FF69B4" stroke-width="2" fill="none"/>
+                
+                <!-- Short whiskers -->
+                <g class="cat-whiskers">
+                    <line x1="32" y1="38" x2="38" y2="39" stroke="#000" stroke-width="1"/>
+                    <line x1="32" y1="42" x2="38" y2="42" stroke="#000" stroke-width="1"/>
+                    <line x1="62" y1="39" x2="68" y2="38" stroke="#000" stroke-width="1"/>
+                    <line x1="62" y1="42" x2="68" y2="42" stroke="#000" stroke-width="1"/>
+                </g>
+                
+                <!-- Small paws -->
+                <circle cx="40" cy="88" r="3" fill="#FFF8DC"/>
+                <circle cx="60" cy="88" r="3" fill="#FFF8DC"/>
+                <!-- Toe beans -->
+                <circle cx="40" cy="88" r="1" fill="#FFB6C1"/>
+                <circle cx="60" cy="88" r="1" fill="#FFB6C1"/>
+                
+                <!-- Fluffy tail -->
+                <path d="M22 75 Q12 55 18 35" stroke="#FFF8DC" stroke-width="12" fill="none" class="cat-tail"/>
+            </svg>
+        </div>
+
+        <!-- Option 2: Anime Cat Girl Style -->
+        <div class="cat-option">
+            <h3>Option 2: Anime Neko 🎀</h3>
+            <p class="cat-description">Anime-inspired with expressive eyes, heart-shaped face, elegant proportions</p>
+            <svg viewBox="0 0 100 100" class="kitten-svg">
+                <!-- Body (more elegant shape) -->
+                <ellipse cx="50" cy="73" rx="22" ry="18" fill="#F5F5DC"/>
+                
+                <!-- Heart-shaped face -->
+                <path d="M30 35 Q30 15 50 25 Q70 15 70 35 Q70 50 50 55 Q30 50 30 35 Z" fill="#F5F5DC" stroke="#DDD" stroke-width="0.5"/>
+                
+                <!-- Pointed cat ears -->
+                <path d="M35 20 L38 5 L45 22 Z" fill="#F5F5DC" stroke="#DDD" stroke-width="0.5"/>
+                <path d="M55 22 L62 5 L65 20 Z" fill="#F5F5DC" stroke="#DDD" stroke-width="0.5"/>
+                <path d="M37 18 L38 10 L42 19 Z" fill="#FFB6C1"/>
+                <path d="M58 19 L62 10 L63 18 Z" fill="#FFB6C1"/>
+                
+                <!-- Large anime eyes -->
+                <ellipse cx="42" cy="32" rx="6" ry="8" fill="#4169E1"/>
+                <ellipse cx="58" cy="32" rx="6" ry="8" fill="#4169E1"/>
+                <!-- Complex eye reflections -->
+                <ellipse cx="44" cy="28" rx="2" ry="3" fill="#FFF" class="eye-shine-left"/>
+                <ellipse cx="60" cy="28" rx="2" ry="3" fill="#FFF" class="eye-shine-right"/>
+                <circle cx="40" cy="35" r="1" fill="#87CEEB" opacity="0.7"/>
+                <circle cx="56" cy="35" r="1" fill="#87CEEB" opacity="0.7"/>
+                
+                <!-- Small refined nose -->
+                <ellipse cx="50" cy="40" rx="1.5" ry="1" fill="#FF69B4"/>
+                
+                <!-- Subtle smile -->
+                <path d="M47 44 Q50 46 53 44" stroke="#FF1493" stroke-width="1.5" fill="none"/>
+                
+                <!-- Elegant whiskers -->
+                <g class="cat-whiskers">
+                    <line x1="28" y1="36" x2="36" y2="37" stroke="#000" stroke-width="0.8"/>
+                    <line x1="28" y1="40" x2="36" y2="40" stroke="#000" stroke-width="0.8"/>
+                    <line x1="64" y1="37" x2="72" y2="36" stroke="#000" stroke-width="0.8"/>
+                    <line x1="64" y1="40" x2="72" y2="40" stroke="#000" stroke-width="0.8"/>
+                </g>
+                
+                <!-- Delicate paws -->
+                <ellipse cx="42" cy="87" rx="3" ry="2" fill="#F5F5DC"/>
+                <ellipse cx="58" cy="87" rx="3" ry="2" fill="#F5F5DC"/>
+                
+                <!-- Graceful tail -->
+                <path d="M28 75 Q15 50 25 30" stroke="#F5F5DC" stroke-width="6" fill="none" class="cat-tail"/>
+                
+                <!-- Optional bow accessory -->
+                <path d="M48 12 Q50 8 52 12 Q50 16 48 12 Z" fill="#FF69B4"/>
+                <circle cx="50" cy="12" r="1" fill="#FFB6C1"/>
+            </svg>
+        </div>
+
+        <!-- Option 3: Chonky Loaf Cat -->
+        <div class="cat-option">
+            <h3>Option 3: Chonky Loaf 🍞</h3>
+            <p class="cat-description">Adorably chubby "loaf" style, squished features, ultimate comfort cat</p>
+            <svg viewBox="0 0 100 100" class="kitten-svg">
+                <!-- Super chubby body (bread loaf shape) -->
+                <ellipse cx="50" cy="75" rx="35" ry="20" fill="#D2B48C"/>
+                
+                <!-- Round squishy head -->
+                <ellipse cx="50" cy="35" rx="28" ry="25" fill="#D2B48C"/>
+                
+                <!-- Tiny ears almost hidden in chub -->
+                <ellipse cx="40" cy="18" rx="6" ry="8" fill="#D2B48C"/>
+                <ellipse cx="60" cy="18" rx="6" ry="8" fill="#D2B48C"/>
+                <ellipse cx="40" cy="20" rx="3" ry="4" fill="#DDA0DD"/>
+                <ellipse cx="60" cy="20" rx="3" ry="4" fill="#DDA0DD"/>
+                
+                <!-- Big sleepy eyes -->
+                <ellipse cx="42" cy="35" rx="5" ry="4" fill="#000"/>
+                <ellipse cx="58" cy="35" rx="5" ry="4" fill="#000"/>
+                <!-- Sleepy highlights -->
+                <ellipse cx="44" cy="33" rx="1.5" ry="1" fill="#FFF" class="eye-shine-left"/>
+                <ellipse cx="60" cy="33" rx="1.5" ry="1" fill="#FFF" class="eye-shine-right"/>
+                
+                <!-- Tiny button nose -->
+                <circle cx="50" cy="42" r="1.5" fill="#FFB6C1"/>
+                
+                <!-- Content little mouth -->
+                <path d="M48 46 Q50 48 52 46" stroke="#000" stroke-width="1" fill="none"/>
+                
+                <!-- Short whiskers -->
+                <g class="cat-whiskers">
+                    <line x1="25" y1="40" x2="35" y2="41" stroke="#000" stroke-width="0.8"/>
+                    <line x1="25" y1="44" x2="35" y2="44" stroke="#000" stroke-width="0.8"/>
+                    <line x1="65" y1="41" x2="75" y2="40" stroke="#000" stroke-width="0.8"/>
+                    <line x1="65" y1="44" x2="75" y2="44" stroke="#000" stroke-width="0.8"/>
+                </g>
+                
+                <!-- Chubby paws barely visible -->
+                <ellipse cx="38" cy="92" rx="4" ry="2" fill="#D2B48C"/>
+                <ellipse cx="62" cy="92" rx="4" ry="2" fill="#D2B48C"/>
+                
+                <!-- Short stubby tail -->
+                <ellipse cx="20" cy="78" rx="8" ry="5" fill="#D2B48C" class="cat-tail"/>
+                
+                <!-- Chubby cheeks -->
+                <ellipse cx="30" cy="45" rx="8" ry="6" fill="#F0E68C" opacity="0.4"/>
+                <ellipse cx="70" cy="45" rx="8" ry="6" fill="#F0E68C" opacity="0.4"/>
+            </svg>
+        </div>
+
+        <!-- Option 4: Pixel Art Retro Cat -->
+        <div class="cat-option">
+            <h3>Option 4: Pixel Purr 🎮</h3>
+            <p class="cat-description">Retro 8-bit style with blocky charm, nostalgic gaming vibes</p>
+            <svg viewBox="0 0 100 100" class="kitten-svg">
+                <!-- Body (pixelated rectangles) -->
+                <rect x="32" y="65" width="36" height="25" fill="#98FB98"/>
+                <rect x="36" y="60" width="28" height="5" fill="#98FB98"/>
+                
+                <!-- Head (square-ish) -->
+                <rect x="35" y="20" width="30" height="30" fill="#98FB98"/>
+                <rect x="38" y="17" width="24" height="3" fill="#98FB98"/>
+                
+                <!-- Pixel ears -->
+                <rect x="40" y="10" width="6" height="12" fill="#98FB98"/>
+                <rect x="54" y="10" width="6" height="12" fill="#98FB98"/>
+                <rect x="42" y="12" width="2" height="6" fill="#FFB6C1"/>
+                <rect x="56" y="12" width="2" height="6" fill="#FFB6C1"/>
+                
+                <!-- Large pixel eyes -->
+                <rect x="40" y="28" width="6" height="8" fill="#000"/>
+                <rect x="54" y="28" width="6" height="8" fill="#000"/>
+                <!-- Eye highlights -->
+                <rect x="42" y="30" width="2" height="3" fill="#FFF" class="eye-shine-left"/>
+                <rect x="56" y="30" width="2" height="3" fill="#FFF" class="eye-shine-right"/>
+                
+                <!-- Pixel nose -->
+                <rect x="48" y="38" width="4" height="3" fill="#FF69B4"/>
+                
+                <!-- Pixel mouth -->
+                <rect x="46" y="42" width="2" height="2" fill="#000"/>
+                <rect x="52" y="42" width="2" height="2" fill="#000"/>
+                <rect x="48" y="44" width="4" height="2" fill="#000"/>
+                
+                <!-- Blocky whiskers -->
+                <g class="cat-whiskers">
+                    <rect x="28" y="32" width="8" height="1" fill="#000"/>
+                    <rect x="28" y="36" width="8" height="1" fill="#000"/>
+                    <rect x="64" y="32" width="8" height="1" fill="#000"/>
+                    <rect x="64" y="36" width="8" height="1" fill="#000"/>
+                </g>
+                
+                <!-- Pixel paws -->
+                <rect x="38" y="88" width="6" height="4" fill="#98FB98"/>
+                <rect x="56" y="88" width="6" height="4" fill="#98FB98"/>
+                
+                <!-- Blocky tail -->
+                <rect x="20" y="70" width="12" height="6" fill="#98FB98" class="cat-tail"/>
+                <rect x="16" y="64" width="8" height="6" fill="#98FB98" class="cat-tail"/>
+                <rect x="20" y="58" width="6" height="6" fill="#98FB98" class="cat-tail"/>
+            </svg>
+        </div>
+
+        <!-- Option 5: Minimalist Geometric Cat -->
+        <div class="cat-option">
+            <h3>Option 5: Zen Minimal 🧘</h3>
+            <p class="cat-description">Clean geometric design, zen-like simplicity, modern aesthetic</p>
+            <svg viewBox="0 0 100 100" class="kitten-svg">
+                <!-- Simple circular body -->
+                <circle cx="50" cy="75" r="20" fill="#E6E6FA" stroke="#D8BFD8" stroke-width="2"/>
+                
+                <!-- Clean circular head -->
+                <circle cx="50" cy="35" r="22" fill="#E6E6FA" stroke="#D8BFD8" stroke-width="2"/>
+                
+                <!-- Triangular ears -->
+                <path d="M35 20 L40 8 L45 20 Z" fill="#E6E6FA" stroke="#D8BFD8" stroke-width="1.5"/>
+                <path d="M55 20 L60 8 L65 20 Z" fill="#E6E6FA" stroke="#D8BFD8" stroke-width="1.5"/>
+                
+                <!-- Minimalist eyes (perfect circles) -->
+                <circle cx="42" cy="32" r="6" fill="#4B0082"/>
+                <circle cx="58" cy="32" r="6" fill="#4B0082"/>
+                <!-- Simple highlights -->
+                <circle cx="44" cy="29" r="2" fill="#FFF" class="eye-shine-left"/>
+                <circle cx="60" cy="29" r="2" fill="#FFF" class="eye-shine-right"/>
+                
+                <!-- Geometric nose -->
+                <path d="M48 42 L50 39 L52 42 Z" fill="#9370DB"/>
+                
+                <!-- Simple curved mouth -->
+                <path d="M46 46 Q50 49 54 46" stroke="#4B0082" stroke-width="2" fill="none"/>
+                
+                <!-- Clean whiskers -->
+                <g class="cat-whiskers">
+                    <line x1="25" y1="35" x2="38" y2="36" stroke="#9370DB" stroke-width="2"/>
+                    <line x1="25" y1="40" x2="38" y2="40" stroke="#9370DB" stroke-width="2"/>
+                    <line x1="62" y1="36" x2="75" y2="35" stroke="#9370DB" stroke-width="2"/>
+                    <line x1="62" y1="40" x2="75" y2="40" stroke="#9370DB" stroke-width="2"/>
+                </g>
+                
+                <!-- Simple paws -->
+                <circle cx="40" cy="90" r="3" fill="#E6E6FA" stroke="#D8BFD8" stroke-width="1"/>
+                <circle cx="60" cy="90" r="3" fill="#E6E6FA" stroke="#D8BFD8" stroke-width="1"/>
+                
+                <!-- Curved tail -->
+                <path d="M30 75 Q18 55 25 35" stroke="#E6E6FA" stroke-width="10" fill="none" class="cat-tail"/>
+                <path d="M30 75 Q18 55 25 35" stroke="#D8BFD8" stroke-width="2" fill="none" class="cat-tail"/>
+            </svg>
+        </div>
+
+        <!-- Option 6: Watercolor Dreamy Cat -->
+        <div class="cat-option">
+            <h3>Option 6: Dreamy Watercolor 🎨</h3>
+            <p class="cat-description">Soft watercolor effect, dreamy pastels, artistic and ethereal</p>
+            <svg viewBox="0 0 100 100" class="kitten-svg">
+                <!-- Watercolor body with soft edges -->
+                <ellipse cx="50" cy="74" rx="26" ry="21" fill="#FFE4E6" opacity="0.8"/>
+                <ellipse cx="52" cy="72" rx="23" ry="18" fill="#FFF0F5" opacity="0.6"/>
+                
+                <!-- Dreamy soft head -->
+                <circle cx="50" cy="36" r="23" fill="#FFE4E6" opacity="0.8"/>
+                <circle cx="48" cy="34" r="20" fill="#FFF0F5" opacity="0.6"/>
+                
+                <!-- Soft cloud-like ears -->
+                <ellipse cx="38" cy="18" rx="9" ry="12" fill="#FFE4E6" opacity="0.7"/>
+                <ellipse cx="62" cy="18" rx="9" ry="12" fill="#FFE4E6" opacity="0.7"/>
+                <ellipse cx="38" cy="20" rx="5" ry="7" fill="#FFB6C1" opacity="0.5"/>
+                <ellipse cx="62" cy="20" rx="5" ry="7" fill="#FFB6C1" opacity="0.5"/>
+                
+                <!-- Dreamy large eyes -->
+                <circle cx="43" cy="33" r="6" fill="#9370DB" opacity="0.8"/>
+                <circle cx="57" cy="33" r="6" fill="#9370DB" opacity="0.8"/>
+                <!-- Starry eye highlights -->
+                <circle cx="45" cy="30" r="2" fill="#FFF" class="eye-shine-left"/>
+                <circle cx="59" cy="30" r="2" fill="#FFF" class="eye-shine-right"/>
+                <circle cx="41" cy="36" r="1" fill="#E6E6FA" opacity="0.9"/>
+                <circle cx="55" cy="36" r="1" fill="#E6E6FA" opacity="0.9"/>
+                
+                <!-- Soft nose -->
+                <ellipse cx="50" cy="41" rx="2" ry="1.5" fill="#DDA0DD" opacity="0.7"/>
+                
+                <!-- Gentle smile -->
+                <path d="M46 45 Q50 48 54 45" stroke="#9370DB" stroke-width="1.5" fill="none" opacity="0.6"/>
+                
+                <!-- Flowing whiskers -->
+                <g class="cat-whiskers">
+                    <path d="M30 36 Q35 37 40 38" stroke="#9370DB" stroke-width="1" fill="none" opacity="0.5"/>
+                    <path d="M30 40 Q35 40 40 41" stroke="#9370DB" stroke-width="1" fill="none" opacity="0.5"/>
+                    <path d="M60 38 Q65 37 70 36" stroke="#9370DB" stroke-width="1" fill="none" opacity="0.5"/>
+                    <path d="M60 41 Q65 40 70 40" stroke="#9370DB" stroke-width="1" fill="none" opacity="0.5"/>
+                </g>
+                
+                <!-- Soft paws -->
+                <ellipse cx="41" cy="89" rx="4" ry="3" fill="#FFE4E6" opacity="0.6"/>
+                <ellipse cx="59" cy="89" rx="4" ry="3" fill="#FFE4E6" opacity="0.6"/>
+                
+                <!-- Flowing tail -->
+                <path d="M24 75 Q10 50 20 25" stroke="#FFE4E6" stroke-width="12" fill="none" class="cat-tail" opacity="0.6"/>
+                <path d="M26 73 Q12 52 22 30" stroke="#FFF0F5" stroke-width="8" fill="none" class="cat-tail" opacity="0.4"/>
+            </svg>
+        </div>
+
+        <!-- Option 7: Chibi Demon/Devil Cat -->
+        <div class="cat-option">
+            <h3>Option 7: Mischief Devil 😈</h3>
+            <p class="cat-description">Playfully devilish with horns, mischievous grin, cute but naughty</p>
+            <svg viewBox="0 0 100 100" class="kitten-svg">
+                <!-- Round devilish body -->
+                <ellipse cx="50" cy="73" rx="26" ry="20" fill="#8B0000"/>
+                
+                <!-- Round head -->
+                <circle cx="50" cy="35" r="22" fill="#8B0000"/>
+                
+                <!-- Devil horns instead of ears -->
+                <path d="M38 15 Q35 5 40 8 Q42 12 38 20" fill="#000"/>
+                <path d="M62 20 Q58 12 60 8 Q65 5 62 15" fill="#000"/>
+                
+                <!-- Large mischievous eyes -->
+                <circle cx="42" cy="32" r="6" fill="#FF4500"/>
+                <circle cx="58" cy="32" r="6" fill="#FF4500"/>
+                <!-- Glowing eye highlights -->
+                <circle cx="44" cy="29" r="2" fill="#FFF" class="eye-shine-left"/>
+                <circle cx="60" cy="29" r="2" fill="#FFF" class="eye-shine-right"/>
+                <circle cx="40" cy="35" r="1" fill="#FFD700" opacity="0.8"/>
+                <circle cx="56" cy="35" r="1" fill="#FFD700" opacity="0.8"/>
+                
+                <!-- Small nose -->
+                <circle cx="50" cy="41" r="1.5" fill="#000"/>
+                
+                <!-- Mischievous grin -->
+                <path d="M44 46 Q50 52 56 46" stroke="#000" stroke-width="2" fill="none"/>
+                <!-- Small fangs -->
+                <path d="M47 48 L48 51 L49 48 Z" fill="#FFF"/>
+                <path d="M51 48 L52 51 L53 48 Z" fill="#FFF"/>
+                
+                <!-- Whiskers -->
+                <g class="cat-whiskers">
+                    <line x1="28" y1="36" x2="38" y2="37" stroke="#000" stroke-width="1"/>
+                    <line x1="28" y1="41" x2="38" y2="41" stroke="#000" stroke-width="1"/>
+                    <line x1="62" y1="37" x2="72" y2="36" stroke="#000" stroke-width="1"/>
+                    <line x1="62" y1="41" x2="72" y2="41" stroke="#000" stroke-width="1"/>
+                </g>
+                
+                <!-- Paws -->
+                <circle cx="41" cy="88" r="4" fill="#8B0000"/>
+                <circle cx="59" cy="88" r="4" fill="#8B0000"/>
+                
+                <!-- Spaded devil tail -->
+                <path d="M24 75 Q12 55 18 35" stroke="#8B0000" stroke-width="8" fill="none" class="cat-tail"/>
+                <path d="M18 35 L15 32 L18 29 L21 32 Z" fill="#8B0000"/>
+            </svg>
+        </div>
+
+        <!-- Option 8: Fluffy Persian Style -->
+        <div class="cat-option">
+            <h3>Option 8: Fluffy Persian 👑</h3>
+            <p class="cat-description">Ultra fluffy with pushed-in face, regal appearance, cloud-like fur</p>
+            <svg viewBox="0 0 100 100" class="kitten-svg">
+                <!-- Extra fluffy body -->
+                <ellipse cx="50" cy="74" rx="32" ry="22" fill="#F8F8FF"/>
+                <ellipse cx="50" cy="72" rx="28" ry="18" fill="#FFF" opacity="0.8"/>
+                
+                <!-- Round flat-faced head -->
+                <circle cx="50" cy="36" r="26" fill="#F8F8FF"/>
+                <circle cx="50" cy="34" r="22" fill="#FFF" opacity="0.8"/>
+                
+                <!-- Small hidden ears in fluff -->
+                <ellipse cx="38" cy="16" rx="8" ry="6" fill="#F8F8FF"/>
+                <ellipse cx="62" cy="16" rx="8" ry="6" fill="#F8F8FF"/>
+                <ellipse cx="38" cy="18" rx="4" ry="3" fill="#FFB6C1"/>
+                <ellipse cx="62" cy="18" rx="4" ry="3" fill="#FFB6C1"/>
+                
+                <!-- Large round eyes -->
+                <circle cx="42" cy="34" r="7" fill="#4169E1"/>
+                <circle cx="58" cy="34" r="7" fill="#4169E1"/>
+                <!-- Eye highlights -->
+                <circle cx="44" cy="31" r="2.5" fill="#FFF" class="eye-shine-left"/>
+                <circle cx="60" cy="31" r="2.5" fill="#FFF" class="eye-shine-right"/>
+                
+                <!-- Tiny pushed-in nose -->
+                <ellipse cx="50" cy="42" rx="1" ry="0.8" fill="#FFB6C1"/>
+                
+                <!-- Small mouth -->
+                <path d="M48 46 Q50 47 52 46" stroke="#000" stroke-width="1" fill="none"/>
+                
+                <!-- Short whiskers (barely visible in fluff) -->
+                <g class="cat-whiskers">
+                    <line x1="32" y1="38" x2="38" y2="39" stroke="#000" stroke-width="0.5"/>
+                    <line x1="32" y1="42" x2="38" y2="42" stroke="#000" stroke-width="0.5"/>
+                    <line x1="62" y1="39" x2="68" y2="38" stroke="#000" stroke-width="0.5"/>
+                    <line x1="62" y1="42" x2="68" y2="42" stroke="#000" stroke-width="0.5"/>
+                </g>
+                
+                <!-- Fluffy paws barely visible -->
+                <ellipse cx="40" cy="91" rx="5" ry="3" fill="#F8F8FF"/>
+                <ellipse cx="60" cy="91" rx="5" ry="3" fill="#F8F8FF"/>
+                
+                <!-- Ultra fluffy tail -->
+                <path d="M20 75 Q8 50 15 25" stroke="#F8F8FF" stroke-width="16" fill="none" class="cat-tail"/>
+                <path d="M22 73 Q10 52 17 30" stroke="#FFF" stroke-width="12" fill="none" class="cat-tail" opacity="0.8"/>
+            </svg>
+        </div>
+
+        <!-- Option 9: Steampunk Mechanical Cat -->
+        <div class="cat-option">
+            <h3>Option 9: Steampunk Mech 🔧</h3>
+            <p class="cat-description">Mechanical steampunk style with gears, brass details, robotic charm</p>
+            <svg viewBox="0 0 100 100" class="kitten-svg">
+                <!-- Mechanical body -->
+                <ellipse cx="50" cy="73" rx="24" ry="18" fill="#CD7F32" stroke="#8B4513" stroke-width="2"/>
+                <!-- Body panels -->
+                <rect x="35" y="65" width="30" height="3" fill="#8B4513"/>
+                <rect x="35" y="75" width="30" height="3" fill="#8B4513"/>
+                
+                <!-- Mechanical head -->
+                <circle cx="50" cy="35" r="20" fill="#CD7F32" stroke="#8B4513" stroke-width="2"/>
+                <!-- Head panels -->
+                <path d="M35 25 Q50 20 65 25" stroke="#8B4513" stroke-width="2" fill="none"/>
+                <path d="M35 45 Q50 40 65 45" stroke="#8B4513" stroke-width="2" fill="none"/>
+                
+                <!-- Mechanical ears with gears -->
+                <circle cx="38" cy="18" r="8" fill="#CD7F32" stroke="#8B4513" stroke-width="1"/>
+                <circle cx="62" cy="18" r="8" fill="#CD7F32" stroke="#8B4513" stroke-width="1"/>
+                <circle cx="38" cy="18" r="4" fill="#8B4513"/>
+                <circle cx="62" cy="18" r="4" fill="#8B4513"/>
+                <!-- Gear teeth -->
+                <circle cx="38" cy="18" r="2" fill="#FFD700"/>
+                <circle cx="62" cy="18" r="2" fill="#FFD700"/>
+                
+                <!-- Glowing mechanical eyes -->
+                <circle cx="42" cy="32" r="5" fill="#00FF00"/>
+                <circle cx="58" cy="32" r="5" fill="#00FF00"/>
+                <!-- Eye glow -->
+                <circle cx="42" cy="32" r="3" fill="#32CD32" opacity="0.8"/>
+                <circle cx="58" cy="32" r="3" fill="#32CD32" opacity="0.8"/>
+                <circle cx="44" cy="30" r="1" fill="#FFF" class="eye-shine-left"/>
+                <circle cx="60" cy="30" r="1" fill="#FFF" class="eye-shine-right"/>
+                
+                <!-- Mechanical nose -->
+                <rect x="48" y="38" width="4" height="4" fill="#8B4513"/>
+                <circle cx="50" cy="40" r="1" fill="#FFD700"/>
+                
+                <!-- Speaker grille mouth -->
+                <rect x="45" y="44" width="10" height="6" fill="#8B4513"/>
+                <line x1="46" y1="45" x2="54" y2="45" stroke="#CD7F32" stroke-width="0.5"/>
+                <line x1="46" y1="47" x2="54" y2="47" stroke="#CD7F32" stroke-width="0.5"/>
+                <line x1="46" y1="49" x2="54" y2="49" stroke="#CD7F32" stroke-width="0.5"/>
+                
+                <!-- Antenna whiskers -->
+                <g class="cat-whiskers">
+                    <line x1="25" y1="35" x2="35" y2="36" stroke="#8B4513" stroke-width="2"/>
+                    <line x1="25" y1="40" x2="35" y2="40" stroke="#8B4513" stroke-width="2"/>
+                    <line x1="65" y1="36" x2="75" y2="35" stroke="#8B4513" stroke-width="2"/>
+                    <line x1="65" y1="40" x2="75" y2="40" stroke="#8B4513" stroke-width="2"/>
+                    <circle cx="25" cy="35" r="1" fill="#FFD700"/>
+                    <circle cx="25" cy="40" r="1" fill="#FFD700"/>
+                    <circle cx="75" cy="35" r="1" fill="#FFD700"/>
+                    <circle cx="75" cy="40" r="1" fill="#FFD700"/>
+                </g>
+                
+                <!-- Mechanical paws -->
+                <rect x="37" y="86" width="6" height="6" fill="#CD7F32"/>
+                <rect x="57" y="86" width="6" height="6" fill="#CD7F32"/>
+                <circle cx="40" cy="89" r="1" fill="#FFD700"/>
+                <circle cx="60" cy="89" r="1" fill="#FFD700"/>
+                
+                <!-- Segmented tail -->
+                <rect x="20" y="72" width="8" height="6" fill="#CD7F32" class="cat-tail"/>
+                <rect x="15" y="66" width="8" height="6" fill="#CD7F32" class="cat-tail"/>
+                <rect x="18" y="60" width="6" height="6" fill="#CD7F32" class="cat-tail"/>
+                <circle cx="21" cy="57" r="2" fill="#FFD700"/>
+            </svg>
+        </div>
+
+        <!-- Option 10: Cosmic Galaxy Cat -->
+        <div class="cat-option">
+            <h3>Option 10: Cosmic Galaxy 🌌</h3>
+            <p class="cat-description">Space-themed with starry fur, galaxy colors, cosmic mystical vibes</p>
+            <svg viewBox="0 0 100 100" class="kitten-svg">
+                <!-- Galaxy body -->
+                <ellipse cx="50" cy="73" rx="25" ry="19" fill="#191970"/>
+                <ellipse cx="52" cy="71" rx="20" ry="15" fill="#4B0082" opacity="0.8"/>
+                <ellipse cx="48" cy="75" rx="15" ry="12" fill="#9400D3" opacity="0.6"/>
+                
+                <!-- Galaxy head -->
+                <circle cx="50" cy="35" r="21" fill="#191970"/>
+                <circle cx="52" cy="33" r="18" fill="#4B0082" opacity="0.8"/>
+                <circle cx="48" cy="37" r="15" ry="12" fill="#9400D3" opacity="0.6"/>
+                
+                <!-- Starry ears -->
+                <path d="M35 20 L38 8 L45 22 Z" fill="#191970"/>
+                <path d="M55 22 L62 8 L65 20 Z" fill="#191970"/>
+                <path d="M37 18 L38 12 L42 19 Z" fill="#4B0082"/>
+                <path d="M58 19 L62 12 L63 18 Z" fill="#4B0082"/>
+                
+                <!-- Large cosmic eyes -->
+                <circle cx="42" cy="32" r="6" fill="#00FFFF"/>
+                <circle cx="58" cy="32" r="6" fill="#00FFFF"/>
+                <!-- Starlight in eyes -->
+                <circle cx="44" cy="29" r="2" fill="#FFF" class="eye-shine-left"/>
+                <circle cx="60" cy="29" r="2" fill="#FFF" class="eye-shine-right"/>
+                <circle cx="40" cy="35" r="1" fill="#FFD700" opacity="0.9"/>
+                <circle cx="56" cy="35" r="1" fill="#FFD700" opacity="0.9"/>
+                
+                <!-- Small nose -->
+                <circle cx="50" cy="41" r="1.5" fill="#FF69B4"/>
+                
+                <!-- Simple smile -->
+                <path d="M47 45 Q50 47 53 45" stroke="#FFF" stroke-width="1" fill="none"/>
+                
+                <!-- Whiskers -->
+                <g class="cat-whiskers">
+                    <line x1="28" y1="36" x2="38" y2="37" stroke="#00FFFF" stroke-width="1"/>
+                    <line x1="28" y1="40" x2="38" y2="40" stroke="#00FFFF" stroke-width="1"/>
+                    <line x1="62" y1="37" x2="72" y2="36" stroke="#00FFFF" stroke-width="1"/>
+                    <line x1="62" y1="40" x2="72" y2="40" stroke="#00FFFF" stroke-width="1"/>
+                </g>
+                
+                <!-- Cosmic paws -->
+                <circle cx="41" cy="87" r="4" fill="#191970"/>
+                <circle cx="59" cy="87" r="4" fill="#191970"/>
+                
+                <!-- Galaxy tail -->
+                <path d="M25 75 Q12 50 20 25" stroke="#191970" stroke-width="10" fill="none" class="cat-tail"/>
+                <path d="M27 73 Q14 52 22 30" stroke="#4B0082" stroke-width="6" fill="none" class="cat-tail"/>
+                <path d="M29 71 Q16 54 24 35" stroke="#9400D3" stroke-width="3" fill="none" class="cat-tail"/>
+                
+                <!-- Stars scattered on body -->
+                <circle cx="35" cy="65" r="0.5" fill="#FFF"/>
+                <circle cx="65" cy="70" r="0.5" fill="#FFD700"/>
+                <circle cx="55" cy="78" r="0.5" fill="#00FFFF"/>
+                <circle cx="30" cy="30" r="0.5" fill="#FFF"/>
+                <circle cx="68" cy="35" r="0.5" fill="#FFD700"/>
+                <circle cx="45" cy="25" r="0.5" fill="#00FFFF"/>
+            </svg>
+        </div>
+        <!-- Option 1: Kawaii Chibi Cat -->
+        <div class="cat-option">
+            <h3>Option 1: Kawaii Chibi 🌸</h3>
+            <p class="cat-description">Super cute Japanese-style with huge sparkly eyes, round chubby cheeks, tiny features</p>
+            <svg viewBox="0 0 100 100" class="kitten-svg">
+                <!-- Body (rounder and chubbier) -->
+                <ellipse cx="50" cy="72" rx="28" ry="22" fill="#FFF8DC" stroke="#F0E68C" stroke-width="1"/>
+                
+                <!-- Head (much bigger and rounder) -->
+                <circle cx="50" cy="35" r="24" fill="#FFF8DC" stroke="#F0E68C" stroke-width="1"/>
+                
+                <!-- Chubby cheeks -->
+                <circle cx="35" cy="40" r="8" fill="#FFE4E1" opacity="0.6"/>
+                <circle cx="65" cy="40" r="8" fill="#FFE4E1" opacity="0.6"/>
+                
+                <!-- Smaller, rounder ears -->
+                <circle cx="38" cy="18" r="8" fill="#FFF8DC" stroke="#F0E68C" stroke-width="0.5"/>
+                <circle cx="62" cy="18" r="8" fill="#FFF8DC" stroke="#F0E68C" stroke-width="0.5"/>
+                <circle cx="38" cy="20" r="4" fill="#FFB6C1"/>
+                <circle cx="62" cy="20" r="4" fill="#FFB6C1"/>
+                
+                <!-- HUGE kawaii eyes -->
+                <circle cx="42" cy="32" r="7" fill="#000"/>
+                <circle cx="58" cy="32" r="7" fill="#000"/>
+                <!-- Multiple eye shines for sparkly effect -->
+                <circle cx="44" cy="29" r="2.5" fill="#FFF" class="eye-shine-left"/>
+                <circle cx="60" cy="29" r="2.5" fill="#FFF" class="eye-shine-right"/>
+                <circle cx="40" cy="35" r="1" fill="#FFF" opacity="0.8"/>
+                <circle cx="56" cy="35" r="1" fill="#FFF" opacity="0.8"/>
+                
+                <!-- Tiny button nose -->
+                <circle cx="50" cy="42" r="2" fill="#FF69B4"/>
+                
+                <!-- Cat smile (simple curve) -->
+                <path d="M46 46 Q50 50 54 46" stroke="#FF69B4" stroke-width="2" fill="none"/>
+                
+                <!-- Short whiskers -->
+                <g class="cat-whiskers">
+                    <line x1="32" y1="38" x2="38" y2="39" stroke="#000" stroke-width="1"/>
+                    <line x1="32" y1="42" x2="38" y2="42" stroke="#000" stroke-width="1"/>
+                    <line x1="62" y1="39" x2="68" y2="38" stroke="#000" stroke-width="1"/>
+                    <line x1="62" y1="42" x2="68" y2="42" stroke="#000" stroke-width="1"/>
+                </g>
+                
+                <!-- Small paws -->
+                <circle cx="40" cy="88" r="3" fill="#FFF8DC"/>
+                <circle cx="60" cy="88" r="3" fill="#FFF8DC"/>
+                <!-- Toe beans -->
+                <circle cx="40" cy="88" r="1" fill="#FFB6C1"/>
+                <circle cx="60" cy="88" r="1" fill="#FFB6C1"/>
+                
+                <!-- Fluffy tail -->
+                <path d="M22 75 Q12 55 18 35" stroke="#FFF8DC" stroke-width="12" fill="none" class="cat-tail"/>
+            </svg>
+        </div>
+
+        <!-- Option 2: Anime Cat Girl Style -->
+        <div class="cat-option">
+            <h3>Option 2: Anime Neko 🎀</h3>
+            <p class="cat-description">Anime-inspired with expressive eyes, heart-shaped face, elegant proportions</p>
+            <svg viewBox="0 0 100 100" class="kitten-svg">
+                <!-- Body (more elegant shape) -->
+                <ellipse cx="50" cy="73" rx="22" ry="18" fill="#F5F5DC"/>
+                
+                <!-- Heart-shaped face -->
+                <path d="M30 35 Q30 15 50 25 Q70 15 70 35 Q70 50 50 55 Q30 50 30 35 Z" fill="#F5F5DC" stroke="#DDD" stroke-width="0.5"/>
+                
+                <!-- Pointed cat ears -->
+                <path d="M35 20 L38 5 L45 22 Z" fill="#F5F5DC" stroke="#DDD" stroke-width="0.5"/>
+                <path d="M55 22 L62 5 L65 20 Z" fill="#F5F5DC" stroke="#DDD" stroke-width="0.5"/>
+                <path d="M37 18 L38 10 L42 19 Z" fill="#FFB6C1"/>
+                <path d="M58 19 L62 10 L63 18 Z" fill="#FFB6C1"/>
+                
+                <!-- Large anime eyes -->
+                <ellipse cx="42" cy="32" rx="6" ry="8" fill="#4169E1"/>
+                <ellipse cx="58" cy="32" rx="6" ry="8" fill="#4169E1"/>
+                <!-- Complex eye reflections -->
+                <ellipse cx="44" cy="28" rx="2" ry="3" fill="#FFF" class="eye-shine-left"/>
+                <ellipse cx="60" cy="28" rx="2" ry="3" fill="#FFF" class="eye-shine-right"/>
+                <circle cx="40" cy="35" r="1" fill="#87CEEB" opacity="0.7"/>
+                <circle cx="56" cy="35" r="1" fill="#87CEEB" opacity="0.7"/>
+                
+                <!-- Small refined nose -->
+                <ellipse cx="50" cy="40" rx="1.5" ry="1" fill="#FF69B4"/>
+                
+                <!-- Subtle smile -->
+                <path d="M47 44 Q50 46 53 44" stroke="#FF1493" stroke-width="1.5" fill="none"/>
+                
+                <!-- Elegant whiskers -->
+                <g class="cat-whiskers">
+                    <line x1="28" y1="36" x2="36" y2="37" stroke="#000" stroke-width="0.8"/>
+                    <line x1="28" y1="40" x2="36" y2="40" stroke="#000" stroke-width="0.8"/>
+                    <line x1="64" y1="37" x2="72" y2="36" stroke="#000" stroke-width="0.8"/>
+                    <line x1="64" y1="40" x2="72" y2="40" stroke="#000" stroke-width="0.8"/>
+                </g>
+                
+                <!-- Delicate paws -->
+                <ellipse cx="42" cy="87" rx="3" ry="2" fill="#F5F5DC"/>
+                <ellipse cx="58" cy="87" rx="3" ry="2" fill="#F5F5DC"/>
+                
+                <!-- Graceful tail -->
+                <path d="M28 75 Q15 50 25 30" stroke="#F5F5DC" stroke-width="6" fill="none" class="cat-tail"/>
+                
+                <!-- Optional bow accessory -->
+                <path d="M48 12 Q50 8 52 12 Q50 16 48 12 Z" fill="#FF69B4"/>
+                <circle cx="50" cy="12" r="1" fill="#FFB6C1"/>
+            </svg>
+        </div>
+
+        <!-- Option 3: Cartoon Chonky Cat -->
+        <div class="cat-option">
+            <h3>Option 3: Chonky Loaf 🍞</h3>
+            <p class="cat-description">Adorably chubby "loaf" style, squished features, ultimate comfort cat</p>
+            <svg viewBox="0 0 100 100" class="kitten-svg">
+                <!-- Super chubby body (bread loaf shape) -->
+                <ellipse cx="50" cy="75" rx="35" ry="20" fill="#D2B48C"/>
+                
+                <!-- Round squishy head -->
+                <ellipse cx="50" cy="35" rx="28" ry="25" fill="#D2B48C"/>
+                
+                <!-- Tiny ears almost hidden in chub -->
+                <ellipse cx="40" cy="18" rx="6" ry="8" fill="#D2B48C"/>
+                <ellipse cx="60" cy="18" rx="6" ry="8" fill="#D2B48C"/>
+                <ellipse cx="40" cy="20" rx="3" ry="4" fill="#DDA0DD"/>
+                <ellipse cx="60" cy="20" rx="3" ry="4" fill="#DDA0DD"/>
+                
+                <!-- Big sleepy eyes -->
+                <ellipse cx="42" cy="35" rx="5" ry="4" fill="#000"/>
+                <ellipse cx="58" cy="35" rx="5" ry="4" fill="#000"/>
+                <!-- Sleepy highlights -->
+                <ellipse cx="44" cy="33" rx="1.5" ry="1" fill="#FFF" class="eye-shine-left"/>
+                <ellipse cx="60" cy="33" rx="1.5" ry="1" fill="#FFF" class="eye-shine-right"/>
+                
+                <!-- Tiny button nose -->
+                <circle cx="50" cy="42" r="1.5" fill="#FFB6C1"/>
+                
+                <!-- Content little mouth -->
+                <path d="M48 46 Q50 48 52 46" stroke="#000" stroke-width="1" fill="none"/>
+                
+                <!-- Short whiskers -->
+                <g class="cat-whiskers">
+                    <line x1="25" y1="40" x2="35" y2="41" stroke="#000" stroke-width="0.8"/>
+                    <line x1="25" y1="44" x2="35" y2="44" stroke="#000" stroke-width="0.8"/>
+                    <line x1="65" y1="41" x2="75" y2="40" stroke="#000" stroke-width="0.8"/>
+                    <line x1="65" y1="44" x2="75" y2="44" stroke="#000" stroke-width="0.8"/>
+                </g>
+                
+                <!-- Chubby paws barely visible -->
+                <ellipse cx="38" cy="92" rx="4" ry="2" fill="#D2B48C"/>
+                <ellipse cx="62" cy="92" rx="4" ry="2" fill="#D2B48C"/>
+                
+                <!-- Short stubby tail -->
+                <ellipse cx="20" cy="78" rx="8" ry="5" fill="#D2B48C" class="cat-tail"/>
+                
+                <!-- Chubby cheeks -->
+                <ellipse cx="30" cy="45" rx="8" ry="6" fill="#F0E68C" opacity="0.4"/>
+                <ellipse cx="70" cy="45" rx="8" ry="6" fill="#F0E68C" opacity="0.4"/>
+            </svg>
+        </div>
+
+        <!-- Option 4: Pixel Art Retro Cat -->
+        <div class="cat-option">
+            <h3>Option 4: Pixel Purr 🎮</h3>
+            <p class="cat-description">Retro 8-bit style with blocky charm, nostalgic gaming vibes</p>
+            <svg viewBox="0 0 100 100" class="kitten-svg">
+                <!-- Body (pixelated rectangles) -->
+                <rect x="32" y="65" width="36" height="25" fill="#98FB98"/>
+                <rect x="36" y="60" width="28" height="5" fill="#98FB98"/>
+                
+                <!-- Head (square-ish) -->
+                <rect x="35" y="20" width="30" height="30" fill="#98FB98"/>
+                <rect x="38" y="17" width="24" height="3" fill="#98FB98"/>
+                
+                <!-- Pixel ears -->
+                <rect x="40" y="10" width="6" height="12" fill="#98FB98"/>
+                <rect x="54" y="10" width="6" height="12" fill="#98FB98"/>
+                <rect x="42" y="12" width="2" height="6" fill="#FFB6C1"/>
+                <rect x="56" y="12" width="2" height="6" fill="#FFB6C1"/>
+                
+                <!-- Large pixel eyes -->
+                <rect x="40" y="28" width="6" height="8" fill="#000"/>
+                <rect x="54" y="28" width="6" height="8" fill="#000"/>
+                <!-- Eye highlights -->
+                <rect x="42" y="30" width="2" height="3" fill="#FFF" class="eye-shine-left"/>
+                <rect x="56" y="30" width="2" height="3" fill="#FFF" class="eye-shine-right"/>
+                
+                <!-- Pixel nose -->
+                <rect x="48" y="38" width="4" height="3" fill="#FF69B4"/>
+                
+                <!-- Pixel mouth -->
+                <rect x="46" y="42" width="2" height="2" fill="#000"/>
+                <rect x="52" y="42" width="2" height="2" fill="#000"/>
+                <rect x="48" y="44" width="4" height="2" fill="#000"/>
+                
+                <!-- Blocky whiskers -->
+                <g class="cat-whiskers">
+                    <rect x="28" y="32" width="8" height="1" fill="#000"/>
+                    <rect x="28" y="36" width="8" height="1" fill="#000"/>
+                    <rect x="64" y="32" width="8" height="1" fill="#000"/>
+                    <rect x="64" y="36" width="8" height="1" fill="#000"/>
+                </g>
+                
+                <!-- Pixel paws -->
+                <rect x="38" y="88" width="6" height="4" fill="#98FB98"/>
+                <rect x="56" y="88" width="6" height="4" fill="#98FB98"/>
+                
+                <!-- Blocky tail -->
+                <rect x="20" y="70" width="12" height="6" fill="#98FB98" class="cat-tail"/>
+                <rect x="16" y="64" width="8" height="6" fill="#98FB98" class="cat-tail"/>
+                <rect x="20" y="58" width="6" height="6" fill="#98FB98" class="cat-tail"/>
+            </svg>
+        </div>
+
+        <!-- Option 5: Minimalist Geometric Cat -->
+        <div class="cat-option">
+            <h3>Option 5: Zen Minimal 🧘</h3>
+            <p class="cat-description">Clean geometric design, zen-like simplicity, modern aesthetic</p>
+            <svg viewBox="0 0 100 100" class="kitten-svg">
+                <!-- Simple circular body -->
+                <circle cx="50" cy="75" r="20" fill="#E6E6FA" stroke="#D8BFD8" stroke-width="2"/>
+                
+                <!-- Clean circular head -->
+                <circle cx="50" cy="35" r="22" fill="#E6E6FA" stroke="#D8BFD8" stroke-width="2"/>
+                
+                <!-- Triangular ears -->
+                <path d="M35 20 L40 8 L45 20 Z" fill="#E6E6FA" stroke="#D8BFD8" stroke-width="1.5"/>
+                <path d="M55 20 L60 8 L65 20 Z" fill="#E6E6FA" stroke="#D8BFD8" stroke-width="1.5"/>
+                
+                <!-- Minimalist eyes (perfect circles) -->
+                <circle cx="42" cy="32" r="6" fill="#4B0082"/>
+                <circle cx="58" cy="32" r="6" fill="#4B0082"/>
+                <!-- Simple highlights -->
+                <circle cx="44" cy="29" r="2" fill="#FFF" class="eye-shine-left"/>
+                <circle cx="60" cy="29" r="2" fill="#FFF" class="eye-shine-right"/>
+                
+                <!-- Geometric nose -->
+                <path d="M48 42 L50 39 L52 42 Z" fill="#9370DB"/>
+                
+                <!-- Simple curved mouth -->
+                <path d="M46 46 Q50 49 54 46" stroke="#4B0082" stroke-width="2" fill="none"/>
+                
+                <!-- Clean whiskers -->
+                <g class="cat-whiskers">
+                    <line x1="25" y1="35" x2="38" y2="36" stroke="#9370DB" stroke-width="2"/>
+                    <line x1="25" y1="40" x2="38" y2="40" stroke="#9370DB" stroke-width="2"/>
+                    <line x1="62" y1="36" x2="75" y2="35" stroke="#9370DB" stroke-width="2"/>
+                    <line x1="62" y1="40" x2="75" y2="40" stroke="#9370DB" stroke-width="2"/>
+                </g>
+                
+                <!-- Simple paws -->
+                <circle cx="40" cy="90" r="3" fill="#E6E6FA" stroke="#D8BFD8" stroke-width="1"/>
+                <circle cx="60" cy="90" r="3" fill="#E6E6FA" stroke="#D8BFD8" stroke-width="1"/>
+                
+                <!-- Curved tail -->
+                <path d="M30 75 Q18 55 25 35" stroke="#E6E6FA" stroke-width="10" fill="none" class="cat-tail"/>
+                <path d="M30 75 Q18 55 25 35" stroke="#D8BFD8" stroke-width="2" fill="none" class="cat-tail"/>
+            </svg>
+        </div>
+    </div>
+    
+    <div style="text-align: center; margin: 40px 0; color: white;">
+        <p>All cats include the same animations: gentle bouncing, tail swaying, whisker twitching, and expression changes!</p>
+        <p><strong>Tell GitHub Copilot which option you prefer, and I'll implement it! 🐱</strong></p>
+    </div>
+</body>
+</html>

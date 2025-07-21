@@ -47,11 +47,11 @@
   backdrop-filter: blur(2px);
 }
 
-/* Main character container with extended timing */
+/* Main character container */
 .celebration-character {
   position: relative;
   z-index: 10;
-  animation: gentleFloat 4s ease-in-out infinite;
+  animation: gentleFloat 3s ease-in-out infinite;
 }
 
 .kitten-container {
@@ -63,137 +63,33 @@
 .kitten-svg {
   width: 100%;
   height: 100%;
-  animation: subtleBob 3s ease-in-out infinite;
+  animation: subtleBob 2s ease-in-out infinite;
 }
 
-/* Enhanced floating animation for the character */
+/* Gentle floating animation for the character */
 @keyframes gentleFloat {
   0%, 100% {
     transform: translateY(0px) rotate(0deg);
   }
-  25% {
-    transform: translateY(-8px) rotate(0.5deg);
+  33% {
+    transform: translateY(-10px) rotate(1deg);
   }
-  50% {
-    transform: translateY(-12px) rotate(1deg);
-  }
-  75% {
-    transform: translateY(-6px) rotate(-0.5deg);
+  66% {
+    transform: translateY(-5px) rotate(-1deg);
   }
 }
 
-/* Enhanced bobbing for the kitten */
+/* Subtle bobbing for the kitten */
 @keyframes subtleBob {
   0%, 100% {
     transform: scale(1) rotate(0deg);
   }
-  33% {
-    transform: scale(1.02) rotate(1deg);
-  }
-  66% {
-    transform: scale(1.05) rotate(-1deg);
-  }
-}
-
-/* Cat-specific animations */
-.cat-eyes {
-  animation-fill-mode: both;
-}
-
-/* Blinking animation for open eyes */
-.cat-eye-left,
-.cat-eye-right {
-  animation: catBlink 3s ease-in-out infinite;
-}
-
-.eye-shine-left,
-.eye-shine-right {
-  animation: catBlink 3s ease-in-out infinite;
-}
-
-@keyframes catBlink {
-  0%, 90%, 100% {
-    opacity: 1;
-    transform: scaleY(1);
-  }
-  92%, 98% {
-    opacity: 0.1;
-    transform: scaleY(0.1);
-  }
-}
-
-/* Sleepy eyes animation */
-.sleepy-eye {
-  animation: sleepyBreathe 4s ease-in-out infinite;
-}
-
-@keyframes sleepyBreathe {
-  0%, 100% {
-    opacity: 0.8;
-  }
   50% {
-    opacity: 1;
+    transform: scale(1.05) rotate(2deg);
   }
 }
 
-/* Expression-based eye positions */
-.expression-happy .cat-eye-left,
-.expression-happy .cat-eye-right {
-  animation-duration: 2.5s;
-}
-
-.expression-content .cat-eye-left,
-.expression-content .cat-eye-right {
-  animation-duration: 4s;
-}
-
-.expression-sleepy .sleepy-eye {
-  opacity: 0.7;
-}
-
-.expression-peaceful .sleepy-eye {
-  opacity: 0.5;
-}
-
-/* Whisker twitching animation */
-.cat-whiskers {
-  animation: whiskerTwitch 5s ease-in-out infinite;
-}
-
-@keyframes whiskerTwitch {
-  0%, 95%, 100% {
-    transform: rotate(0deg);
-  }
-  2%, 4% {
-    transform: rotate(0.5deg);
-  }
-  50%, 52% {
-    transform: rotate(-0.3deg);
-  }
-}
-
-/* Tail swaying animation */
-.cat-tail {
-  transform-origin: 25px 75px;
-  animation: tailSway 6s ease-in-out infinite;
-}
-
-@keyframes tailSway {
-  0%, 100% {
-    transform: rotate(0deg);
-  }
-  25% {
-    transform: rotate(-5deg);
-  }
-  50% {
-    transform: rotate(3deg);
-  }
-  75% {
-    transform: rotate(-2deg);
-  }
-}
-
-/* Floating particles with extended timing */
+/* Floating particles */
 .particles-container {
   position: absolute;
   top: 0;
@@ -207,7 +103,7 @@
 .particle {
   position: absolute;
   font-size: 24px;
-  animation: floatUp 8s ease-out infinite;
+  animation: floatUp 4s ease-out infinite;
   opacity: 0;
 }
 
@@ -216,11 +112,11 @@
     opacity: 0;
     transform: translateY(100vh) scale(0) rotate(0deg);
   }
-  8% {
+  10% {
     opacity: 1;
     transform: translateY(90vh) scale(1) rotate(45deg);
   }
-  85% {
+  90% {
     opacity: 1;
     transform: translateY(10vh) scale(1.2) rotate(360deg);
   }
@@ -230,19 +126,19 @@
   }
 }
 
-/* Extended stagger pattern for longer celebration */
+/* Stagger particle animations */
 .particle-1 { animation-delay: 0s; }
-.particle-2 { animation-delay: 0.4s; }
-.particle-3 { animation-delay: 0.8s; }
-.particle-4 { animation-delay: 1.2s; }
-.particle-5 { animation-delay: 1.6s; }
-.particle-6 { animation-delay: 2.0s; }
-.particle-7 { animation-delay: 2.4s; }
-.particle-8 { animation-delay: 2.8s; }
-.particle-9 { animation-delay: 3.2s; }
-.particle-10 { animation-delay: 3.6s; }
-.particle-11 { animation-delay: 4.0s; }
-.particle-12 { animation-delay: 4.4s; }
+.particle-2 { animation-delay: 0.3s; }
+.particle-3 { animation-delay: 0.6s; }
+.particle-4 { animation-delay: 0.9s; }
+.particle-5 { animation-delay: 1.2s; }
+.particle-6 { animation-delay: 1.5s; }
+.particle-7 { animation-delay: 1.8s; }
+.particle-8 { animation-delay: 2.1s; }
+.particle-9 { animation-delay: 2.4s; }
+.particle-10 { animation-delay: 2.7s; }
+.particle-11 { animation-delay: 3.0s; }
+.particle-12 { animation-delay: 3.3s; }
 
 /* Celebration text */
 .celebration-text {
@@ -278,24 +174,6 @@
   margin: 10px 0 0 0;
   opacity: 0.9;
   font-weight: 500;
-}
-
-.skip-hint {
-  font-size: 0.9rem;
-  color: #666;
-  margin: 15px 0 0 0;
-  opacity: 0.7;
-  font-style: italic;
-  animation: gentlePulse 2s ease-in-out infinite;
-}
-
-@keyframes gentlePulse {
-  0%, 100% {
-    opacity: 0.5;
-  }
-  50% {
-    opacity: 0.8;
-  }
 }
 
 @keyframes gentleShimmer {
@@ -383,10 +261,6 @@
     font-size: 1rem;
   }
   
-  .skip-hint {
-    font-size: 0.8rem;
-  }
-  
   .kitten-container {
     width: 100px;
     height: 100px;
@@ -404,10 +278,6 @@
   
   .celebration-subtitle {
     font-size: 0.9rem;
-  }
-  
-  .skip-hint {
-    font-size: 0.7rem;
   }
   
   .kitten-container {
@@ -433,9 +303,5 @@
   
   .celebration-subtitle {
     color: #DDA0DD;
-  }
-  
-  .skip-hint {
-    color: #AAA;
   }
 }
