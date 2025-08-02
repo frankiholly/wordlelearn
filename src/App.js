@@ -413,9 +413,13 @@ function App() {
     if (correct) {
       setIsCorrect(true);
       
-      // Trigger extreme win celebration if in extreme mode
+      // Trigger extreme win celebration if in extreme mode (with delay to let word reveal complete)
       if (extremeMode) {
-        setShowExtremeCelebration(true);
+        console.log('[EXTREME WIN] Triggering extreme celebration with 3-second delay');
+        // Add a 3-second delay to ensure word reveal animation completes fully
+        setTimeout(() => {
+          setShowExtremeCelebration(true);
+        }, 3000);
       }
       
       // Update stats for win
