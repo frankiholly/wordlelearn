@@ -1,5 +1,5 @@
 // Practice game progress storage and management
-export function savePracticeProgress(word, guesses, usedKeys, isGameOver, isWinner) {
+export function savePracticeProgress(word, guesses, usedKeys, isGameOver, isWinner, extremeMode = false) {
   const progressKey = 'wordle-practice-current';
   const progressData = {
     word,
@@ -8,12 +8,13 @@ export function savePracticeProgress(word, guesses, usedKeys, isGameOver, isWinn
     isWinner,
     startedAt: new Date().toISOString(),
     completedAt: isGameOver ? new Date().toISOString() : null,
-    usedKeys
+    usedKeys,
+    extremeMode // Add extreme mode to saved data
   };
   
   try {
     localStorage.setItem(progressKey, JSON.stringify(progressData));
-    console.log('Practice progress saved');
+    console.log('Practice progress saved with extremeMode:', extremeMode);
   } catch (error) {
     console.error('Failed to save practice progress:', error);
   }

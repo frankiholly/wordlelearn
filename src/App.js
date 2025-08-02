@@ -238,6 +238,12 @@ function App() {
           setUsedKeys(practiceProgress.usedKeys);
           setIsGameOver(practiceProgress.isGameOver);
           setIsCorrect(practiceProgress.isWinner);
+          
+          // Restore extreme mode setting if it exists
+          if (practiceProgress && practiceProgress.extremeMode !== undefined) {
+            setExtremeMode(practiceProgress.extremeMode);
+          }
+          
           if (practiceProgress.isGameOver) {
             setMessage(practiceProgress.isWinner ? 'Correct! You guessed the word!' : `Game over! The word was ${practiceProgress.word}.`);
           }
@@ -329,7 +335,7 @@ function App() {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(gameData));
       } else if (gameMode === 'practice') {
         // Save practice game progress
-        savePracticeProgress(targetWord, guesses, usedKeys, isGameOver, isCorrect);
+        savePracticeProgress(targetWord, guesses, usedKeys, isGameOver, isCorrect, extremeMode);
         
         // Also save stats for practice mode
         const gameData = {
@@ -769,8 +775,8 @@ function App() {
     setUsedKeys({});
     setValidatedWord('');
     
-    // Save the new practice game state
-    savePracticeProgress(newTargetWord, [], {}, false, false);
+    // Save the new practice game state (preserving extreme mode setting)
+    savePracticeProgress(newTargetWord, [], {}, false, false, extremeMode);
     
     // Announce to screen readers
     const announcement = document.createElement('div');
@@ -780,7 +786,7 @@ function App() {
     document.body.appendChild(announcement);
     setTimeout(() => document.body.removeChild(announcement), 1000);
 
-  }, [isGameOver, targetWord, isCorrect, guesses.length, updateStats]);
+  }, [isGameOver, targetWord, isCorrect, guesses.length, updateStats, extremeMode]);
 
   // Game mode switching functions
   const startDailyMode = useCallback(() => {
@@ -833,6 +839,12 @@ function App() {
       setUsedKeys(practiceProgress.usedKeys);
       setIsGameOver(practiceProgress.isGameOver);
       setIsCorrect(practiceProgress.isWinner);
+      
+      // Restore extreme mode setting if it exists
+      if (practiceProgress && practiceProgress.extremeMode !== undefined) {
+        setExtremeMode(practiceProgress.extremeMode);
+      }
+      
       setMessage('');
     } else {
       // Start a new practice game
@@ -847,9 +859,9 @@ function App() {
       setValidatedWord('');
       
       // Save the new practice game state
-      savePracticeProgress(newTargetWord, [], {}, false, false);
+      savePracticeProgress(newTargetWord, [], {}, false, false, extremeMode);
     }
-  }, []);
+  }, [extremeMode]);
 
   const showDailyStatsModal = useCallback(() => {
     setShowDailyStats(true);
