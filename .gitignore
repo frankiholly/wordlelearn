@@ -21,7 +21,3 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-
-# Large audio files (use compressed versions for web)
-src/assets/audio/*.mp3
-!src/assets/audio/*-compressed.mp3
