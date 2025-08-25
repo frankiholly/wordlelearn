@@ -21,13 +21,36 @@ const ExtremeWinCelebration = ({ isVisible, onComplete }) => {
     // Load custom audio file on first use
     const loadCustomAudio = async () => {
       try {
+        console.log('[Celebration] Loading custom audio...');
         await celebrationAudio.loadAudioFile(celebrateMusic);
+        console.log('[Celebration] Custom audio loaded successfully');
       } catch (error) {
         console.warn('[Celebration] Failed to load custom music, will use synthesized fallback');
       }
     };
 
-    loadCustomAudio();
+    // Load audio and then play celebration music
+    const initializeAudio = async () => {
+      await loadCustomAudio();
+      
+      // Play celebration music (custom file or synthesized fallback) if audio is enabled
+      if (currentSettings.audioEnabled) {
+        console.log('[Celebration] Audio enabled, starting playback...');
+        celebrationAudio.setVolume(currentSettings.volume);
+        celebrationAudio.playCelebrationMusic().then(duration => {
+          if (duration) {
+            totalMusicDuration = duration;
+            console.log(`[Celebration] Music duration: ${duration.toFixed(2)}s`);
+          }
+        }).catch(error => {
+          console.warn('Audio playback failed:', error);
+        });
+      } else {
+        console.log('[Celebration] Audio disabled in settings');
+      }
+    };
+
+    initializeAudio();
     
     // Handle key press to stop animation
     const handleKeyPress = (event) => {
@@ -39,19 +62,6 @@ const ExtremeWinCelebration = ({ isVisible, onComplete }) => {
     document.addEventListener('keydown', handleKeyPress);
     
     let totalMusicDuration = 8; // Default extended duration
-    
-    // Play celebration music (custom file or synthesized fallback) if audio is enabled
-    if (currentSettings.audioEnabled) {
-      celebrationAudio.setVolume(currentSettings.volume);
-      celebrationAudio.playCelebrationMusic().then(duration => {
-        if (duration) {
-          totalMusicDuration = duration;
-          console.log(`[Celebration] Music duration: ${duration.toFixed(2)}s`);
-        }
-      }).catch(error => {
-        console.warn('Audio playback failed:', error);
-      });
-    }
 
     // Extended phases for longer celebration
     const phases = [
