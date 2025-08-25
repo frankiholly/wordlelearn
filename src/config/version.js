@@ -2,8 +2,8 @@
 // This is the SINGLE source of truth for version information
 
 export const VERSION_CONFIG = {
-  version: '3.10.1',
-  buildId: 'extreme_celebration_timing',
+  version: '3.11.0',
+  buildId: 'custom_celebration_music',
   buildDate: new Date().toISOString(),
   
   // Helper methods

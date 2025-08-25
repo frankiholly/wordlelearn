@@ -1,9 +1,95 @@
-// Soothing audio system for extreme win celebration
+// Enhanced audio system for extreme win celebration
+// Supports both custom audio files and synthesized fallback music
 export class CelebrationAudio {
   constructor() {
     this.audioContext = null;
     this.isPlaying = false;
     this.masterVolume = 0.3; // Evening-appropriate volume
+    this.audioBuffer = null; // For storing loaded audio file
+    this.audioSource = null; // Current audio source
+    this.useSynthesizedFallback = false; // Flag for fallback mode
+  }
+
+  // Load custom audio file (your celebrate.mp3)
+  async loadAudioFile(audioPath) {
+    try {
+      await this.initAudio();
+      if (!this.audioContext) {
+        this.useSynthesizedFallback = true;
+        return false;
+      }
+      
+      console.log('[Audio] Loading custom celebration music:', audioPath);
+      const response = await fetch(audioPath);
+      
+      if (!response.ok) {
+        throw new Error(`Failed to fetch audio: ${response.status}`);
+      }
+      
+      const arrayBuffer = await response.arrayBuffer();
+      this.audioBuffer = await this.audioContext.decodeAudioData(arrayBuffer);
+      console.log('[Audio] Custom celebration music loaded successfully');
+      this.useSynthesizedFallback = false;
+      return true;
+    } catch (error) {
+      console.warn('[Audio] Failed to load custom audio file, using synthesized fallback:', error);
+      this.useSynthesizedFallback = true;
+      this.audioBuffer = null;
+      return false;
+    }
+  }
+
+  // Enhanced play method that tries custom audio first, then falls back to synthesized
+  async playCelebrationMusic() {
+    if (this.isPlaying) return;
+    
+    await this.initAudio();
+    if (!this.audioContext) return;
+
+    this.isPlaying = true;
+
+    // Try to play custom audio file first
+    if (this.audioBuffer && !this.useSynthesizedFallback) {
+      try {
+        console.log('[Audio] Playing custom celebration music');
+        return await this.playCustomAudio();
+      } catch (error) {
+        console.warn('[Audio] Custom audio playback failed, falling back to synthesized:', error);
+        this.useSynthesizedFallback = true;
+      }
+    }
+    
+    // Fallback to synthesized music
+    console.log('[Audio] Playing synthesized celebration music');
+    return await this.playExtremeCelebrationMelody();
+  }
+
+  // Play the custom audio file
+  async playCustomAudio() {
+    if (!this.audioBuffer) throw new Error('No audio buffer loaded');
+
+    this.audioSource = this.audioContext.createBufferSource();
+    this.audioSource.buffer = this.audioBuffer;
+    
+    // Create gain node for volume control
+    const gainNode = this.audioContext.createGain();
+    gainNode.gain.setValueAtTime(this.masterVolume, this.audioContext.currentTime);
+    
+    // Connect audio graph
+    this.audioSource.connect(gainNode);
+    gainNode.connect(this.audioContext.destination);
+    
+    // Start playback
+    this.audioSource.start();
+    
+    // Handle playback completion
+    this.audioSource.onended = () => {
+      this.isPlaying = false;
+      this.audioSource = null;
+      console.log('[Audio] Custom celebration music finished');
+    };
+    
+    return this.audioBuffer.duration;
   }
 
   // Initialize Web Audio API
@@ -213,19 +299,33 @@ export class CelebrationAudio {
     return this.totalDuration;
   }
 
-  // Method to stop playback early
+  // Enhanced stop method for both custom and synthesized audio
   stop() {
-    if (this.audioContext && this.isPlaying) {
-      // Note: Web Audio API doesn't easily allow stopping scheduled notes
-      // But we can set a flag and create a quick fade-out
-      this.isPlaying = false;
-      
-      // Create a quick fade-out effect by lowering the context gain
-      const fadeGain = this.audioContext.createGain();
-      fadeGain.connect(this.audioContext.destination);
-      fadeGain.gain.setValueAtTime(1, this.audioContext.currentTime);
-      fadeGain.gain.linearRampToValueAtTime(0, this.audioContext.currentTime + 0.3);
+    // Stop custom audio if playing
+    if (this.audioSource) {
+      try {
+        this.audioSource.stop();
+        this.audioSource.disconnect();
+      } catch (error) {
+        console.warn('[Audio] Error stopping custom audio:', error);
+      }
+      this.audioSource = null;
     }
+    
+    // Stop synthesized audio if playing
+    if (this.audioContext && this.isPlaying) {
+      // Create a quick fade-out effect by lowering the context gain
+      try {
+        const fadeGain = this.audioContext.createGain();
+        fadeGain.connect(this.audioContext.destination);
+        fadeGain.gain.setValueAtTime(1, this.audioContext.currentTime);
+        fadeGain.gain.linearRampToValueAtTime(0, this.audioContext.currentTime + 0.3);
+      } catch (error) {
+        console.warn('[Audio] Error creating fade-out:', error);
+      }
+    }
+    
+    this.isPlaying = false;
   }
 
   // Set volume (0-1)

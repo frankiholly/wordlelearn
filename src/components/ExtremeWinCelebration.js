@@ -3,6 +3,9 @@ import { celebrationAudio } from '../utils/celebrationAudio';
 import { CelebrationSettings } from '../utils/celebrationSettings';
 import './ExtremeWinCelebration.css';
 
+// Import the custom celebration music
+import celebrateMusic from '../assets/audio/celebrate.mp3';
+
 const ExtremeWinCelebration = ({ isVisible, onComplete }) => {
   const [animationPhase, setAnimationPhase] = useState('enter');
   const [settings, setSettings] = useState(CelebrationSettings.load());
@@ -15,6 +18,17 @@ const ExtremeWinCelebration = ({ isVisible, onComplete }) => {
     const currentSettings = CelebrationSettings.load();
     setSettings(currentSettings);
     
+    // Load custom audio file on first use
+    const loadCustomAudio = async () => {
+      try {
+        await celebrationAudio.loadAudioFile(celebrateMusic);
+      } catch (error) {
+        console.warn('[Celebration] Failed to load custom music, will use synthesized fallback');
+      }
+    };
+
+    loadCustomAudio();
+    
     // Handle key press to stop animation
     const handleKeyPress = (event) => {
       celebrationAudio.stop();
@@ -26,11 +40,14 @@ const ExtremeWinCelebration = ({ isVisible, onComplete }) => {
     
     let totalMusicDuration = 8; // Default extended duration
     
-    // Play soothing melody if audio is enabled
+    // Play celebration music (custom file or synthesized fallback) if audio is enabled
     if (currentSettings.audioEnabled) {
       celebrationAudio.setVolume(currentSettings.volume);
-      celebrationAudio.playExtremeCelebrationMelody().then(duration => {
-        if (duration) totalMusicDuration = duration;
+      celebrationAudio.playCelebrationMusic().then(duration => {
+        if (duration) {
+          totalMusicDuration = duration;
+          console.log(`[Celebration] Music duration: ${duration.toFixed(2)}s`);
+        }
       }).catch(error => {
         console.warn('Audio playback failed:', error);
       });

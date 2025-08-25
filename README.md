@@ -101,9 +101,13 @@ You don't have to ever use `eject`. The curated feature set is suitable for smal
 
 This Wordle clone is developed in stages, with each stage adding new features and teaching new React concepts.
 
-### Current Version: v3.4.4
+### Current Version: v3.11.0
 
 **Key Features:**
+- Custom celebration music support (GarageBand/Suno AI integration)
+- Enhanced extreme mode with 3-second timing for word reveal completion
+- Expanded practice word list (430+ validated words)
+- Fixed extreme mode persistence across game resets
 - Online dictionary validation (no local word lists)
 - 5-letter word guessing game with 6 attempts
 - Real-time feedback with colored tiles
@@ -111,6 +115,12 @@ This Wordle clone is developed in stages, with each stage adding new features an
 - Game statistics and persistence
 - Responsive design and accessibility features
 - Animations and polish
+
+**Latest Updates (v3.11.0):**
+- 🎵 **Custom Celebration Music**: Support for MP3 audio files with synthesized fallback
+- ⏱️ **Improved Timing**: 3-second delay ensures word reveal animation completes before extreme celebration
+- 🔧 **Enhanced Audio System**: Dual-mode audio supporting both custom files and synthesized music
+- 🎯 **Better User Experience**: Smoother animation sequencing and audio integration
 
 **Live Demo:** [https://frankiholly.github.io/wordlelearn](https://frankiholly.github.io/wordlelearn)
 
@@ -225,6 +235,30 @@ wordlelearn/
 - Improved error handling and debug logging
 
 All word validation now works correctly with the online dictionary API.
+
+## Version History
+
+### v3.11.0 (2025-08-25) - Custom Celebration Music
+- 🎵 Added support for custom MP3 celebration music (GarageBand/Suno AI integration)
+- ⏱️ Improved extreme celebration timing (3-second delay for word reveal completion)
+- 🔧 Enhanced audio system with dual-mode support (custom files + synthesized fallback)
+- 🎯 Better animation sequencing and user experience
+
+### v3.10.1 (2025-08-25) - Extreme Celebration Timing
+- ⏱️ Fixed extreme celebration timing to wait for word reveal animation
+- 🎬 Improved animation flow and user experience
+- 📦 Version management improvements
+
+### v3.10.0 (2025-08-25) - Expanded Practice Words  
+- 📚 Expanded practice word list from ~430 to 1000+ words
+- 🧹 Cleaned up invalid/made-up words from practice list
+- 🔧 Fixed extreme mode persistence across game resets
+- 🎯 Improved practice mode word selection algorithm
+
+### v3.4.4 (Previous) - Dictionary API Fixes
+- 🔧 Fixed valid words like "PIANO" not being accepted
+- 🧪 Added comprehensive test suite
+- 📡 Improved online dictionary validation
 
 ## Troubleshooting
 
