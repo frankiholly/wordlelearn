@@ -14,10 +14,12 @@ const ExtremeWinCelebration = ({ isVisible, onComplete }) => {
   useEffect(() => {
     if (!isVisible) return;
 
+    console.log('[Celebration] Starting extreme celebration');
+
     // Load user preferences
     const currentSettings = CelebrationSettings.load();
     setSettings(currentSettings);
-    
+
     // Load custom audio file on first use
     const loadCustomAudio = async () => {
       try {
@@ -29,83 +31,103 @@ const ExtremeWinCelebration = ({ isVisible, onComplete }) => {
       }
     };
 
+    // Handle user interaction to stop animation
+    const handleStop = () => {
+      console.log('[Celebration] User requested stop');
+      celebrationAudio.stop();
+      onComplete();
+    };
+
     // Load audio and then play celebration music
     const initializeAudio = async () => {
       await loadCustomAudio();
+      
+      let actualMusicDuration = 8; // Default fallback duration
       
       // Play celebration music (custom file or synthesized fallback) if audio is enabled
       if (currentSettings.audioEnabled) {
         console.log('[Celebration] Audio enabled, starting playback...');
         celebrationAudio.setVolume(currentSettings.volume);
-        celebrationAudio.playCelebrationMusic().then(duration => {
+        try {
+          const duration = await celebrationAudio.playCelebrationMusic();
           if (duration) {
-            totalMusicDuration = duration;
+            actualMusicDuration = duration;
             console.log(`[Celebration] Music duration: ${duration.toFixed(2)}s`);
           }
-        }).catch(error => {
+        } catch (error) {
           console.warn('Audio playback failed:', error);
-        });
+        }
       } else {
         console.log('[Celebration] Audio disabled in settings');
       }
+
+      // Now set up animation phases based on actual music duration
+      const phases = [
+        { phase: 'enter', duration: 800 },
+        { phase: 'celebrate', duration: Math.max(6000, actualMusicDuration * 1000 - 2000) }, // Match music duration
+        { phase: 'exit', duration: 1200 }
+      ];
+
+      // Cat expression timeline based on music duration
+      const expressionTimeline = [
+        { time: 1000, expression: 'happy' },
+        { time: Math.min(3000, actualMusicDuration * 1000 * 0.3), expression: 'content' },
+        { time: Math.min(5000, actualMusicDuration * 1000 * 0.6), expression: 'sleepy' },
+        { time: Math.min(7000, actualMusicDuration * 1000 * 0.8), expression: 'peaceful' }
+      ];
+
+      let currentPhaseIndex = 0;
+      const runPhase = () => {
+        if (currentPhaseIndex < phases.length) {
+          const { phase, duration } = phases[currentPhaseIndex];
+          setAnimationPhase(phase);
+          console.log(`[Celebration] Phase: ${phase}, Duration: ${duration}ms`);
+          
+          setTimeout(() => {
+            currentPhaseIndex++;
+            runPhase();
+          }, duration);
+        } else {
+          // Animation completed, finish celebration
+          console.log('[Celebration] Animation sequence completed');
+          handleStop();
+        }
+      };
+
+      // Start the animation sequence
+      runPhase();
+
+      // Set up expression changes
+      expressionTimeline.forEach(({ time, expression }) => {
+        setTimeout(() => {
+          if (currentPhaseIndex < phases.length) { // Only change if still celebrating
+            setCatExpression(expression);
+            console.log(`[Celebration] Cat expression: ${expression}`);
+          }
+        }, time);
+      });
     };
 
     initializeAudio();
     
-    // Handle key press to stop animation
+    // Add global event listeners for both keyboard and mouse
     const handleKeyPress = (event) => {
-      celebrationAudio.stop();
-      onComplete();
+      console.log('[Celebration] Key pressed:', event.key);
+      handleStop();
     };
 
-    // Add global key listener
+    const handleMouseClick = (event) => {
+      console.log('[Celebration] Mouse clicked');
+      handleStop();
+    };
+
     document.addEventListener('keydown', handleKeyPress);
-    
-    let totalMusicDuration = 8; // Default extended duration
-
-    // Extended phases for longer celebration
-    const phases = [
-      { phase: 'enter', duration: 800 },
-      { phase: 'celebrate', duration: Math.max(6000, totalMusicDuration * 1000 - 2000) }, // Match music duration
-      { phase: 'exit', duration: 1200 }
-    ];
-
-    // Cat expression timeline
-    const expressionTimeline = [
-      { time: 1000, expression: 'happy' },
-      { time: 3000, expression: 'content' },
-      { time: 5000, expression: 'sleepy' },
-      { time: 7000, expression: 'peaceful' }
-    ];
-
-    let currentPhaseIndex = 0;
-    const runPhase = () => {
-      if (currentPhaseIndex < phases.length) {
-        const { phase, duration } = phases[currentPhaseIndex];
-        setAnimationPhase(phase);
-        
-        setTimeout(() => {
-          currentPhaseIndex++;
-          if (currentPhaseIndex < phases.length) {
-            runPhase();
-          } else {
-            document.removeEventListener('keydown', handleKeyPress);
-            onComplete();
-          }
-        }, duration);
-      }
-    };
-
-    // Schedule cat expression changes
-    expressionTimeline.forEach(({ time, expression }) => {
-      setTimeout(() => setCatExpression(expression), time);
-    });
-
-    runPhase();
+    document.addEventListener('click', handleMouseClick);
 
     // Cleanup function
     return () => {
       document.removeEventListener('keydown', handleKeyPress);
+      document.removeEventListener('click', handleMouseClick);
     };
   }, [isVisible, onComplete]);
 
