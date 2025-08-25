@@ -25,7 +25,7 @@ jobs:
           
       - name: Install and Build 🔧
         run: |
-          npm ci
+          npm install
           # Add a build timestamp
           echo "BUILD_TIMESTAMP=$(date)" >> $GITHUB_ENV
           echo "CACHE_BUSTER=$(date +%s)" >> $GITHUB_ENV
