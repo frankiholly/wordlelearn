@@ -28,33 +28,45 @@ async function checkSingleAPI(word, api) {
     clearTimeout(timeoutId);
     
     if (response.ok) {
-      // For Wordnik API, check if we got actual definitions with text
+      const data = await response.json();
+      
+      // For Wordnik API, check if we got valid definition objects
       if (api.name === 'Wordnik') {
-        const data = await response.json();
         if (Array.isArray(data) && data.length > 0) {
-          // Check if any definition has actual text content
-          const hasValidDefinition = data.some(def => def && def.text && def.text.trim().length > 0);
+          // Check if we have valid definition objects with proper structure
+          const hasValidDefinition = data.some(def => 
+            def && 
+            typeof def === 'object' && 
+            def.word && 
+            def.partOfSpeech &&
+            (def.text || def.id) // Accept if has text OR has valid id (Wordnik structure)
+          );
           if (hasValidDefinition) {
             console.log(`${api.name} API check for '${word}': Valid (${data.length} definitions)`);
             return true;
           } else {
-            console.log(`${api.name} API check for '${word}': Invalid (no text definitions)`);
-            return false;
+            console.log(`${api.name} API check for '${word}': Invalid (no valid definitions)`);
+            return null; // Try next API instead of rejecting
           }
         } else {
-          console.log(`${api.name} API check for '${word}': Invalid (no definitions)`);
-          return false;
+          console.log(`${api.name} API check for '${word}': Invalid (no definitions array)`);
+          return null; // Try next API instead of rejecting
         }
       } else {
-        // For DictionaryAPI, any 200 response means valid
-        console.log(`${api.name} API check for '${word}': Valid (${response.status})`);
-        return true;
+        // For DictionaryAPI, any 200 response with proper structure means valid
+        if (Array.isArray(data) && data.length > 0 && data[0].word) {
+          console.log(`${api.name} API check for '${word}': Valid (${response.status})`);
+          return true;
+        } else {
+          console.log(`${api.name} API check for '${word}': Invalid response structure`);
+          return null; // Try next API
+        }
       }
     }
     
     if (response.status === 404) {
-      console.log(`${api.name} API check for '${word}': Invalid (404)`);
-      return false;
+      console.log(`${api.name} API check for '${word}': Not found (404)`);
+      return null; // Try next API instead of definitively rejecting
     }
     
     console.log(`${api.name} API returned status ${response.status} for word '${word}'`);
@@ -102,16 +114,16 @@ export async function checkWordOnline(word) {
       }
       
       if (result === false) {
-        console.log(`Word '${word}' rejected by ${api.name}`);
+        console.log(`Word '${word}' definitively rejected by ${api.name}`);
         return false;
       }
       
-      // result === null means API error, try next one
-      console.log(`${api.name} API error, trying next endpoint...`);
+      // result === null means API error or inconclusive, try next one
+      console.log(`${api.name} API inconclusive for '${word}', trying next endpoint...`);
     }
     
-    // If all APIs failed/errored, reject the word
-    console.log(`All API endpoints failed for word '${word}' - rejecting`);
+    // If all APIs failed/errored or were inconclusive, reject the word
+    console.log(`All API endpoints failed or were inconclusive for word '${word}' - rejecting`);
     return false;
     
   } catch (error) {
