@@ -4,8 +4,72 @@
 export const dictionary = [];
 
 /**
+ * Check a single API endpoint for word validation
+ * @param {string} word - The word to check
+ * @param {object} api - API configuration object
+ * @returns {Promise<boolean|null>} - true/false for valid/invalid, null for error
+ */
+async function checkSingleAPI(word, api) {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => {
+    console.log(`${api.name} API timeout for word: ${word}`);
+    controller.abort();
+  }, 2000); // Fast 2-second timeout per API
+  
+  try {
+    const response = await fetch(api.url, {
+      signal: controller.signal,
+      headers: {
+        'Accept': 'application/json',
+        'User-Agent': 'Wordle-Game/1.0'
+      }
+    });
+    
+    clearTimeout(timeoutId);
+    
+    if (response.ok) {
+      // For Wordnik API, check if we got actual definitions with text
+      if (api.name === 'Wordnik') {
+        const data = await response.json();
+        if (Array.isArray(data) && data.length > 0) {
+          // Check if any definition has actual text content
+          const hasValidDefinition = data.some(def => def && def.text && def.text.trim().length > 0);
+          if (hasValidDefinition) {
+            console.log(`${api.name} API check for '${word}': Valid (${data.length} definitions)`);
+            return true;
+          } else {
+            console.log(`${api.name} API check for '${word}': Invalid (no text definitions)`);
+            return false;
+          }
+        } else {
+          console.log(`${api.name} API check for '${word}': Invalid (no definitions)`);
+          return false;
+        }
+      } else {
+        // For DictionaryAPI, any 200 response means valid
+        console.log(`${api.name} API check for '${word}': Valid (${response.status})`);
+        return true;
+      }
+    }
+    
+    if (response.status === 404) {
+      console.log(`${api.name} API check for '${word}': Invalid (404)`);
+      return false;
+    }
+    
+    console.log(`${api.name} API returned status ${response.status} for word '${word}'`);
+    return null; // Error state - try next API
+    
+  } catch (fetchError) {
+    clearTimeout(timeoutId);
+    console.log(`${api.name} API failed for '${word}':`, fetchError.message);
+    return null; // Error state - try next API
+  }
+}
+
+/**
  * Check if a word is in the online dictionary.
- * This is the only method for validating words - purely online.
+ * Uses multiple APIs for redundancy with quick failover.
  * 
  * @param {string} word - The word to check
  * @returns {Promise<boolean>} - Whether the word is valid
@@ -14,54 +78,44 @@ export async function checkWordOnline(word) {
   try {
     console.log(`Checking online dictionary for word: ${word}`);
     
-    // Try the Free Dictionary API with a simple timeout
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => {
-      console.log(`API fetch timeout triggered for word: ${word}`);
-      controller.abort();
-    }, 3000); // 3-second timeout
+    const lowerWord = word.toLowerCase();
     
-    try {
-      const response = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${word.toLowerCase()}`, {
-        signal: controller.signal
-      });
+    // API endpoints for redundancy (Wordnik first since DictionaryAPI seems unreliable)
+    const apis = [
+      {
+        url: `https://api.wordnik.com/v4/word.json/${lowerWord}/definitions?limit=1&includeRelated=false&useCanonical=false&includeTags=false&api_key=a2a73e7b926c924fad7001ca3111acd55af2ffabf50eb4ae5`,
+        name: 'Wordnik'
+      },
+      {
+        url: `https://api.dictionaryapi.dev/api/v2/entries/en/${lowerWord}`,
+        name: 'DictionaryAPI'
+      }
+    ];
+    
+    // Try each API in sequence until we get a definitive answer
+    for (const api of apis) {
+      const result = await checkSingleAPI(word, api);
       
-      clearTimeout(timeoutId);
-      
-      // If the response is OK (200-299), the word exists
-      if (response.ok) {
-        console.log(`Online dictionary API check for '${word}': Valid`);
+      if (result === true) {
+        console.log(`Word '${word}' validated by ${api.name}`);
         return true;
       }
       
-      // If we get a 404, the word doesn't exist in the dictionary
-      if (response.status === 404) {
-        console.log(`Online dictionary API check for '${word}': Invalid`);
+      if (result === false) {
+        console.log(`Word '${word}' rejected by ${api.name}`);
         return false;
       }
       
-      // For other status codes, log and return false
-      console.log(`API check failed with status ${response.status} for word '${word}'`);
-      return false;
-      
-    } catch (fetchError) {
-      clearTimeout(timeoutId);
-      console.log('Fetch operation failed or timed out:', fetchError);
-      
-      // If the fetch fails with AbortError, it's likely a timeout issue
-      if (fetchError.name === 'AbortError') {
-        console.log(`Fetch operation timed out for word '${word}' - rejecting word`);
-        return false;
-      }
-      
-      // For other errors, also reject the word
-      console.log(`Fetch operation failed for word '${word}' - rejecting word`);
-      return false;
+      // result === null means API error, try next one
+      console.log(`${api.name} API error, trying next endpoint...`);
     }
+    
+    // If all APIs failed/errored, reject the word
+    console.log(`All API endpoints failed for word '${word}' - rejecting`);
+    return false;
     
   } catch (error) {
     console.error('Unexpected error in dictionary check:', error);
-    // In case of unexpected errors, reject the word to be safe
     return false;
   }
 }

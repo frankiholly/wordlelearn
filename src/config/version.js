@@ -2,8 +2,8 @@
 // This is the SINGLE source of truth for version information
 
 export const VERSION_CONFIG = {
-  version: '3.12.0',
-  buildId: 'animation_music_sync',
+  version: '3.13.0',
+  buildId: 'dual_api_dictionary',
   buildDate: new Date().toISOString(),
   
   // Helper methods
