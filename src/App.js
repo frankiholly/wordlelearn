@@ -204,6 +204,16 @@ function App() {
     word: ''
   });
   
+  // Floating error dialog for dictionary errors (shows above active guess)
+  const [floatingDictionaryError, setFloatingDictionaryError] = useState({
+    show: false,
+    message: '',
+    word: ''
+  });
+  
+  // Shake animation for invalid words
+  const [shakeInvalid, setShakeInvalid] = useState(false);
+  
   // State for Extreme mode
   const [extremeMode, setExtremeMode] = useState(false);
   
@@ -545,6 +555,17 @@ function App() {
       console.log(`SAFETY TIMEOUT: Online check taking too long for ${upperCaseWord} - rejecting word`);
       setIsCheckingOnline(false);
       setMessage('Dictionary check timed out');
+      
+      // Show floating error dialog for timeout
+      setFloatingDictionaryError({
+        show: true,
+        message: 'Dictionary timeout - try again',
+        word: upperCaseWord
+      });
+      
+      // Start shake animation
+      setShakeInvalid(true);
+      
       setDictionaryStatus({
         type: 'timeout',
         message: 'Dictionary check timed out',
@@ -554,6 +575,15 @@ function App() {
       setTimeout(() => {
         animateInvalid(false);
         setMessage('');
+        
+        // Stop shake animation
+        setShakeInvalid(false);
+        
+        // Hide floating error dialog after animation
+        setTimeout(() => {
+          setFloatingDictionaryError({ show: false, message: '', word: '' });
+        }, 300);
+        
         // Clear dictionary status after a longer delay to give user time to read
         setTimeout(() => {
           setDictionaryStatus({ type: '', message: '', word: '' });
@@ -596,6 +626,17 @@ function App() {
           // Word is invalid online
           console.log(`[isValidWord ASYNC] Word is invalid, showing error message`);
           setMessage('Not in dictionary');
+          
+          // Show floating error dialog above the current guess
+          setFloatingDictionaryError({
+            show: true,
+            message: `"${upperCaseWord}" not found`,
+            word: upperCaseWord
+          });
+          
+          // Start shake animation
+          setShakeInvalid(true);
+          
           setDictionaryStatus({
             type: 'invalid',
             message: `"${upperCaseWord}" not found in dictionary`,
@@ -605,6 +646,15 @@ function App() {
           setTimeout(() => {
             animateInvalid(false);
             setMessage('');
+            
+            // Stop shake animation
+            setShakeInvalid(false);
+            
+            // Hide floating error dialog after animation
+            setTimeout(() => {
+              setFloatingDictionaryError({ show: false, message: '', word: '' });
+            }, 300);
+            
             // Keep dictionary status longer for invalid words so user can read it
             setTimeout(() => {
               setDictionaryStatus({ type: '', message: '', word: '' });
@@ -617,6 +667,17 @@ function App() {
         console.error('Error in online check:', error);
         setIsCheckingOnline(false);
         setMessage('Dictionary check failed');
+        
+        // Show floating error dialog for error
+        setFloatingDictionaryError({
+          show: true,
+          message: 'Dictionary error - try again',
+          word: upperCaseWord
+        });
+        
+        // Start shake animation
+        setShakeInvalid(true);
+        
         setDictionaryStatus({
           type: 'error',
           message: 'Dictionary check failed - please try again',
@@ -626,6 +687,15 @@ function App() {
         setTimeout(() => {
           animateInvalid(false);
           setMessage('');
+          
+          // Stop shake animation
+          setShakeInvalid(false);
+          
+          // Hide floating error dialog after animation
+          setTimeout(() => {
+            setFloatingDictionaryError({ show: false, message: '', word: '' });
+          }, 300);
+          
           // Keep error status longer so user can read it
           setTimeout(() => {
             setDictionaryStatus({ type: '', message: '', word: '' });
@@ -1250,7 +1320,7 @@ function App() {
         {/* Current guess row */}
         {!isGameOver && guesses.length < MAX_ATTEMPTS && (
           <div 
-            className="guess-row"
+            className={`guess-row ${floatingDictionaryError.show ? 'has-floating-error' : ''} ${shakeInvalid ? 'shake-invalid' : ''}`}
             role="row"
             aria-label={`Current guess, attempt ${guesses.length + 1}`}
           >
@@ -1264,6 +1334,12 @@ function App() {
                 isActive={true}
               />
             ))}
+            {/* Floating Dictionary Error Dialog */}
+            {floatingDictionaryError.show && (
+              <div className="floating-dictionary-error">
+                {floatingDictionaryError.message}
+              </div>
+            )}
           </div>
         )}
         
