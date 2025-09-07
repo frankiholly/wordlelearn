@@ -197,6 +197,13 @@ function App() {
   const [dictionaryCheckTimer, setDictionaryCheckTimer] = useState(0);
   const [validatedWord, setValidatedWord] = useState('');
   
+  // Dictionary status display (persistent space for user feedback)
+  const [dictionaryStatus, setDictionaryStatus] = useState({
+    type: '', // 'checking', 'valid', 'invalid', 'timeout', 'error'
+    message: '',
+    word: ''
+  });
+  
   // State for Extreme mode
   const [extremeMode, setExtremeMode] = useState(false);
   
@@ -527,16 +534,30 @@ function App() {
     // Set checking flag and start asynchronous check
     setIsCheckingOnline(true);
     setMessage('Checking dictionary...');
+    setDictionaryStatus({
+      type: 'checking',
+      message: 'Checking dictionary...',
+      word: upperCaseWord
+    });
     
     // Single safety timeout to ensure UI never gets stuck
     const safetyTimeoutId = setTimeout(() => {
       console.log(`SAFETY TIMEOUT: Online check taking too long for ${upperCaseWord} - rejecting word`);
       setIsCheckingOnline(false);
       setMessage('Dictionary check timed out');
+      setDictionaryStatus({
+        type: 'timeout',
+        message: 'Dictionary check timed out',
+        word: upperCaseWord
+      });
       animateInvalid(true);
       setTimeout(() => {
         animateInvalid(false);
         setMessage('');
+        // Clear dictionary status after a longer delay to give user time to read
+        setTimeout(() => {
+          setDictionaryStatus({ type: '', message: '', word: '' });
+        }, 2000);
       }, 1000);
     }, 5000); // 5-second safety timeout
     
@@ -557,18 +578,37 @@ function App() {
           // Word is valid online, accept it as a guess
           console.log(`[isValidWord ASYNC] Word is valid, will call handleSubmitValidatedGuess with: ${upperCaseWord}`);
           setMessage('');
+          setDictionaryStatus({
+            type: 'valid',
+            message: `"${upperCaseWord}" is valid`,
+            word: upperCaseWord
+          });
           
           // Set the validated word state to trigger submission
           setValidatedWord(upperCaseWord);
+          
+          // Clear the status after a shorter delay for valid words
+          setTimeout(() => {
+            setDictionaryStatus({ type: '', message: '', word: '' });
+          }, 1500);
           
         } else {
           // Word is invalid online
           console.log(`[isValidWord ASYNC] Word is invalid, showing error message`);
           setMessage('Not in dictionary');
+          setDictionaryStatus({
+            type: 'invalid',
+            message: `"${upperCaseWord}" not found in dictionary`,
+            word: upperCaseWord
+          });
           animateInvalid(true);
           setTimeout(() => {
             animateInvalid(false);
             setMessage('');
+            // Keep dictionary status longer for invalid words so user can read it
+            setTimeout(() => {
+              setDictionaryStatus({ type: '', message: '', word: '' });
+            }, 3000);
           }, 1000);
         }
       })
@@ -577,10 +617,19 @@ function App() {
         console.error('Error in online check:', error);
         setIsCheckingOnline(false);
         setMessage('Dictionary check failed');
+        setDictionaryStatus({
+          type: 'error',
+          message: 'Dictionary check failed - please try again',
+          word: upperCaseWord
+        });
         animateInvalid(true);
         setTimeout(() => {
           animateInvalid(false);
           setMessage('');
+          // Keep error status longer so user can read it
+          setTimeout(() => {
+            setDictionaryStatus({ type: '', message: '', word: '' });
+          }, 3000);
         }, 1000);
       });
     
@@ -1028,19 +1077,33 @@ function App() {
         </div>
       )}
       
-      {/* Online Dictionary Status */}
-      <div className="dictionary-status">
-        {isCheckingOnline && (
-          <span className="loading-spinner">
-            Checking Dictionary
-            <span className="dots" style={{display: 'inline-block', width: '24px', textAlign: 'left'}}>
-              <span className="dot-animation">...</span>
+      {/* Enhanced Dictionary Status - Always visible space for feedback */}
+      <div className="dictionary-status-container">
+        <div className="dictionary-status">
+          {isCheckingOnline && (
+            <span className="loading-spinner">
+              Checking Dictionary
+              <span className="dots" style={{display: 'inline-block', width: '24px', textAlign: 'left'}}>
+                <span className="dot-animation">...</span>
+              </span>
+              <span className="dictionary-timer" style={{fontSize: '0.7rem', opacity: '0.7', marginLeft: '5px'}}>
+                (<span className="timer-count">{dictionaryCheckTimer}s</span>)
+              </span>
             </span>
-            <span className="dictionary-timer" style={{fontSize: '0.7rem', opacity: '0.7', marginLeft: '5px'}}>
-              (<span className="timer-count">{dictionaryCheckTimer}s</span>)
-            </span>
-          </span>
-        )}
+          )}
+          {dictionaryStatus.type && !isCheckingOnline && (
+            <div className={`dictionary-feedback ${dictionaryStatus.type}`}>
+              <span className="dictionary-message">
+                {dictionaryStatus.message}
+              </span>
+            </div>
+          )}
+          {!isCheckingOnline && !dictionaryStatus.type && (
+            <div className="dictionary-placeholder">
+              Dictionary validation will appear here
+            </div>
+          )}
+        </div>
       </div>
       
       {/* Game Mode Toggle */}

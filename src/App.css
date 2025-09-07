@@ -1038,3 +1038,58 @@ button:disabled {
     opacity: 1;
   }
 }
+
+/* Enhanced Dictionary Status Area */
+.dictionary-status-container {
+  min-height: 50px;
+  margin: 15px 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #3a3a3c;
+  border-radius: 6px;
+  background-color: #1a1a1b;
+  padding: 8px 12px;
+}
+
+.dictionary-status {
+  width: 100%;
+  text-align: center;
+}
+
+.dictionary-feedback {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.dictionary-feedback.valid {
+  background-color: rgba(83, 141, 78, 0.2);
+  color: #6aaa64;
+  border: 1px solid rgba(83, 141, 78, 0.4);
+}
+
+.dictionary-feedback.invalid {
+  background-color: rgba(58, 58, 60, 0.3);
+  color: #f5c842;
+  border: 1px solid rgba(245, 200, 66, 0.4);
+}
+
+.dictionary-feedback.timeout,
+.dictionary-feedback.error {
+  background-color: rgba(58, 58, 60, 0.3);
+  color: #ff6b6b;
+  border: 1px solid rgba(255, 107, 107, 0.4);
+}
+
+.dictionary-placeholder {
+  color: #666;
+  font-size: 0.8rem;
+  font-style: italic;
+  opacity: 0.7;
+}
+
+.dictionary-message {
+  display: block;
+}

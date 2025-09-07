@@ -2,8 +2,8 @@
 // This is the SINGLE source of truth for version information
 
 export const VERSION_CONFIG = {
-  version: '3.13.6',
-  buildId: 'fix_double_click_new_game',
+  version: '3.13.7',
+  buildId: 'persistent_dictionary_status',
   buildDate: new Date().toISOString(),
   
   // Helper methods
