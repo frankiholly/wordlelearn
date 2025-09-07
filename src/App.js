@@ -217,6 +217,11 @@ function App() {
   // State for Extreme mode
   const [extremeMode, setExtremeMode] = useState(false);
   
+  // Debug extreme mode changes
+  useEffect(() => {
+    console.log(`[DEBUG] Extreme mode changed to: ${extremeMode}`);
+  }, [extremeMode]);
+  
   // State for extreme win celebration
   const [showExtremeCelebration, setShowExtremeCelebration] = useState(false);
 
@@ -1156,7 +1161,10 @@ function App() {
       <div className="game-mode-toggle">
         <button 
           className={`mode-toggle-button ${extremeMode ? 'extreme' : 'normal'}`}
-          onClick={() => setExtremeMode(!extremeMode)}
+          onClick={() => {
+            console.log(`[DEBUG] Extreme mode toggle clicked. Current: ${extremeMode}, setting to: ${!extremeMode}`);
+            setExtremeMode(!extremeMode);
+          }}
           aria-pressed={extremeMode}
           aria-label={`Switch to ${extremeMode ? 'normal' : 'extreme'} mode`}
         >
