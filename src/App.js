@@ -4,9 +4,11 @@ import { isInDictionary, checkWordOnline, dictionary } from './data/dictionary';
 import { getDailyWord, getDayString, getDayNumber } from './utils/dailyWord';
 import { saveDailyProgress, loadDailyProgress, isDailyWordCompleted, getCurrentDailyProgress, shouldStartNewDaily } from './utils/dailyProgress';
 import { savePracticeProgress, loadPracticeProgress, isPracticeGameInProgress, canStartNewPracticeGame, clearPracticeProgress } from './utils/practiceProgress';
+import { celebrationAudio } from './utils/celebrationAudio';
 import DailyStatsModal from './components/DailyStatsModal';
 import ExtremeWinCelebration from './components/ExtremeWinCelebration';
 import VERSION_CONFIG from './config/version';
+import celebrateMusic from './assets/audio/celebrate.mp3';
 import './App.css';
 
 // Component for displaying game statistics
@@ -479,6 +481,24 @@ function App() {
     }
   }, [validatedWord, isRevealing, isGameOver, handleSubmitValidatedGuess]);
 
+  // Preload celebration music when extreme mode is enabled
+  useEffect(() => {
+    if (extremeMode) {
+      console.log('[EXTREME MODE] Preloading celebration music...');
+      celebrationAudio.loadAudioFile(celebrateMusic)
+        .then((success) => {
+          if (success) {
+            console.log('[EXTREME MODE] Celebration music preloaded successfully');
+          } else {
+            console.log('[EXTREME MODE] Using synthesized fallback music');
+          }
+        })
+        .catch((error) => {
+          console.warn('[EXTREME MODE] Failed to preload celebration music:', error);
+        });
+    }
+  }, [extremeMode]);
+
   // Function to check if the word is valid (in our word list)
   const isValidWord = useCallback((word) => {
     // Make sure word is 5 letters
@@ -762,15 +782,10 @@ function App() {
       localStorage.setItem(`${STORAGE_KEY}_finalized_${targetWord}`, 'true');
     }
     
-    // Always create a practice game with a random word (regardless of current mode)
-    setGameMode('practice');
-    
-    // Clear any existing practice progress
+    // Clear any existing practice progress first
     clearPracticeProgress();
     
-    // Generate a new random word for practice
-    const newTargetWord = getRandomWord();
-    setTargetWord(newTargetWord);
+    // Reset all game state immediately
     setGuess('');
     setGuesses([]);
     setMessage('');
@@ -778,6 +793,16 @@ function App() {
     setIsGameOver(false);
     setUsedKeys({});
     setValidatedWord('');
+    setIsRevealing(false);
+    setIsCheckingOnline(false);
+    setDailyCompleted(false); // Important: Reset daily completion state
+    
+    // Generate a new random word for practice
+    const newTargetWord = getRandomWord();
+    setTargetWord(newTargetWord);
+    
+    // Switch to practice mode (this will trigger useEffect cleanup)
+    setGameMode('practice');
     
     // Save the new practice game state (preserving extreme mode setting)
     savePracticeProgress(newTargetWord, [], {}, false, false, extremeMode);

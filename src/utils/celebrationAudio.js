@@ -337,6 +337,15 @@ export class CelebrationAudio {
   getVolume() {
     return this.masterVolume;
   }
+  // Check if custom audio is already loaded
+  isAudioLoaded() {
+    return this.audioBuffer !== null && !this.useSynthesizedFallback;
+  }
+
+  // Get the duration of loaded audio (if available)
+  getLoadedDuration() {
+    return this.audioBuffer ? this.audioBuffer.duration : null;
+  }
 }
 
 // Create singleton instance

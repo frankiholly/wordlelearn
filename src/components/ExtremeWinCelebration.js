@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { celebrationAudio } from '../utils/celebrationAudio';
 import { CelebrationSettings } from '../utils/celebrationSettings';
 import './ExtremeWinCelebration.css';
@@ -10,6 +10,7 @@ const ExtremeWinCelebration = ({ isVisible, onComplete }) => {
   const [animationPhase, setAnimationPhase] = useState('enter');
   const [settings, setSettings] = useState(CelebrationSettings.load());
   const [catExpression, setCatExpression] = useState('happy');
+  const expressionIntervalRef = useRef(null);
 
   useEffect(() => {
     if (!isVisible) return;
@@ -20,8 +21,14 @@ const ExtremeWinCelebration = ({ isVisible, onComplete }) => {
     const currentSettings = CelebrationSettings.load();
     setSettings(currentSettings);
 
-    // Load custom audio file on first use
+    // Load custom audio file on first use (skip if already preloaded)
     const loadCustomAudio = async () => {
+      // Check if audio is already preloaded (from extreme mode selection)
+      if (celebrationAudio.isAudioLoaded()) {
+        console.log('[Celebration] Audio already preloaded, skipping load');
+        return;
+      }
+      
       try {
         console.log('[Celebration] Loading custom audio...');
         await celebrationAudio.loadAudioFile(celebrateMusic);
@@ -34,6 +41,10 @@ const ExtremeWinCelebration = ({ isVisible, onComplete }) => {
     // Handle user interaction to stop animation
     const handleStop = () => {
       console.log('[Celebration] User requested stop');
+      if (expressionIntervalRef.current) {
+        clearTimeout(expressionIntervalRef.current);
+        expressionIntervalRef.current = null;
+      }
       celebrationAudio.stop();
       onComplete();
     };
@@ -44,13 +55,20 @@ const ExtremeWinCelebration = ({ isVisible, onComplete }) => {
       
       let actualMusicDuration = 8; // Default fallback duration
       
+      // Check if we already know the duration from preloading
+      const preloadedDuration = celebrationAudio.getLoadedDuration();
+      if (preloadedDuration) {
+        actualMusicDuration = preloadedDuration;
+        console.log(`[Celebration] Using preloaded music duration: ${actualMusicDuration.toFixed(2)}s`);
+      }
+      
       // Play celebration music (custom file or synthesized fallback) if audio is enabled
       if (currentSettings.audioEnabled) {
         console.log('[Celebration] Audio enabled, starting playback...');
         celebrationAudio.setVolume(currentSettings.volume);
         try {
           const duration = await celebrationAudio.playCelebrationMusic();
-          if (duration) {
+          if (duration && !preloadedDuration) {
             actualMusicDuration = duration;
             console.log(`[Celebration] Music duration: ${duration.toFixed(2)}s`);
           }
@@ -68,13 +86,11 @@ const ExtremeWinCelebration = ({ isVisible, onComplete }) => {
         { phase: 'exit', duration: 1200 }
       ];
 
-      // Cat expression timeline based on music duration
-      const expressionTimeline = [
-        { time: 1000, expression: 'happy' },
-        { time: Math.min(3000, actualMusicDuration * 1000 * 0.3), expression: 'content' },
-        { time: Math.min(5000, actualMusicDuration * 1000 * 0.6), expression: 'sleepy' },
-        { time: Math.min(7000, actualMusicDuration * 1000 * 0.8), expression: 'peaceful' }
-      ];
+      // Cat expression cycling system - continuously loop through emotions
+      const expressionCycle = ['happy', 'content', 'sleepy', 'peaceful'];
+      
+      // Function to get random interval between 0.5 and 5 seconds
+      const getRandomInterval = () => Math.random() * 4500 + 500; // 500ms to 5000ms
 
       let currentPhaseIndex = 0;
       const runPhase = () => {
@@ -97,15 +113,29 @@ const ExtremeWinCelebration = ({ isVisible, onComplete }) => {
       // Start the animation sequence
       runPhase();
 
-      // Set up expression changes
-      expressionTimeline.forEach(({ time, expression }) => {
-        setTimeout(() => {
-          if (currentPhaseIndex < phases.length) { // Only change if still celebrating
-            setCatExpression(expression);
-            console.log(`[Celebration] Cat expression: ${expression}`);
+      // Start cycling cat expressions with random intervals
+      let currentExpressionIndex = 0;
+      setCatExpression(expressionCycle[0]); // Start with first expression
+      console.log(`[Celebration] Cat expression: ${expressionCycle[0]}`);
+      
+      const scheduleNextExpression = () => {
+        const nextInterval = getRandomInterval();
+        console.log(`[Celebration] Next expression change in ${(nextInterval/1000).toFixed(1)}s`);
+        
+        expressionIntervalRef.current = setTimeout(() => {
+          if (currentPhaseIndex < phases.length) { // Only cycle if still celebrating
+            currentExpressionIndex = (currentExpressionIndex + 1) % expressionCycle.length;
+            setCatExpression(expressionCycle[currentExpressionIndex]);
+            console.log(`[Celebration] Cat expression: ${expressionCycle[currentExpressionIndex]} (cycle ${Math.floor(currentExpressionIndex / expressionCycle.length + 1)})`);
+            scheduleNextExpression(); // Schedule the next random change
+          } else {
+            expressionIntervalRef.current = null;
           }
-        }, time);
-      });
+        }, nextInterval);
+      };
+      
+      // Start the random cycling
+      scheduleNextExpression();
     };
 
     initializeAudio();
@@ -280,7 +310,6 @@ const ExtremeWinCelebration = ({ isVisible, onComplete }) => {
       {/* Celebration text */}
       <div className="celebration-text">
         <h2 className="celebration-title">Extreme Champion!</h2>
-        <p className="celebration-subtitle">Masterful performance! 🎉</p>
         <p className="skip-hint">Press any key to continue</p>
       </div>
 
