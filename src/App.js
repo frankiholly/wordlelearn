@@ -1147,30 +1147,6 @@ function App() {
         </div>
       )}
       
-      {/* Enhanced Dictionary Status - Always visible space for feedback */}
-      <div className="dictionary-status-container">
-        <div className="dictionary-status">
-          {isCheckingOnline && (
-            <span className="loading-spinner">
-              Checking Dictionary
-              <span className="dots" style={{display: 'inline-block', width: '24px', textAlign: 'left'}}>
-                <span className="dot-animation">...</span>
-              </span>
-              <span className="dictionary-timer" style={{fontSize: '0.7rem', opacity: '0.7', marginLeft: '5px'}}>
-                (<span className="timer-count">{dictionaryCheckTimer}s</span>)
-              </span>
-            </span>
-          )}
-          {dictionaryStatus.type && !isCheckingOnline && (
-            <div className={`dictionary-feedback ${dictionaryStatus.type}`}>
-              <span className="dictionary-message">
-                {dictionaryStatus.message}
-              </span>
-            </div>
-          )}
-        </div>
-      </div>
-      
       {/* Game Mode Toggle */}
       <div className="game-mode-toggle">
         <button 
