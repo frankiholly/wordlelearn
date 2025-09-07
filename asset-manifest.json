@@ -1,16 +1,16 @@
 {
   "files": {
-    "main.css": "/wordlelearn/static/css/main.d9d09a50.css",
-    "main.js": "/wordlelearn/static/js/main.ef61c934.js",
+    "main.css": "/wordlelearn/static/css/main.11a32988.css",
+    "main.js": "/wordlelearn/static/js/main.15c0fc55.js",
     "static/js/453.667c40c9.chunk.js": "/wordlelearn/static/js/453.667c40c9.chunk.js",
     "static/media/celebrate.mp3": "/wordlelearn/static/media/celebrate.df7e60be4e47c34805e6.mp3",
     "index.html": "/wordlelearn/index.html",
-    "main.d9d09a50.css.map": "/wordlelearn/static/css/main.d9d09a50.css.map",
-    "main.ef61c934.js.map": "/wordlelearn/static/js/main.ef61c934.js.map",
+    "main.11a32988.css.map": "/wordlelearn/static/css/main.11a32988.css.map",
+    "main.15c0fc55.js.map": "/wordlelearn/static/js/main.15c0fc55.js.map",
     "453.667c40c9.chunk.js.map": "/wordlelearn/static/js/453.667c40c9.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.d9d09a50.css",
-    "static/js/main.ef61c934.js"
+    "static/css/main.11a32988.css",
+    "static/js/main.15c0fc55.js"
   ]
 }
