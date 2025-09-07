@@ -1168,11 +1168,6 @@ function App() {
               </span>
             </div>
           )}
-          {!isCheckingOnline && !dictionaryStatus.type && (
-            <div className="dictionary-placeholder">
-              Dictionary validation will appear here
-            </div>
-          )}
         </div>
       </div>
       
