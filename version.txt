@@ -1,4 +1,4 @@
-Version: 3.14.0
-Timestamp: 2025-09-06T20:30:00.000Z
-Commit: 5c03700
-removed_dictionary_placeholder
+Version: 3.14.2
+Timestamp: 2025-09-06T21:00:00.000Z
+Commit: 9c8cb48
+removed_dictionary_css_completely
