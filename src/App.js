@@ -219,7 +219,9 @@ function App() {
   
   // Debug extreme mode changes
   useEffect(() => {
+    const stack = new Error().stack;
     console.log(`[DEBUG] Extreme mode changed to: ${extremeMode}`);
+    console.log('[DEBUG] Stack trace:', stack?.split('\n').slice(1, 4).join('\n'));
   }, [extremeMode]);
   
   // State for extreme win celebration
@@ -303,6 +305,12 @@ function App() {
       setUsedKeys(currentProgress.usedKeys);
       setIsGameOver(currentProgress.isGameOver);
       setIsCorrect(currentProgress.isWinner);
+      
+      // Restore extreme mode setting if it exists
+      if (currentProgress.extremeMode !== undefined) {
+        setExtremeMode(currentProgress.extremeMode);
+      }
+      
       if (currentProgress.isGameOver) {
         setMessage(currentProgress.isWinner ? 'Congratulations!' : `The word was ${currentProgress.word}`);
       }
@@ -330,14 +338,15 @@ function App() {
         guesses,
         isGameOver,
         isWinner: isCorrect,
-        usedKeys
+        usedKeys,
+        extremeMode
       });
       
       if (isGameOver && !dailyCompleted) {
         setDailyCompleted(true);
       }
     }
-  }, [gameMode, targetWord, dailyWord, dayString, guesses, isGameOver, isCorrect, usedKeys, dailyCompleted]);
+  }, [gameMode, targetWord, dailyWord, dayString, guesses, isGameOver, isCorrect, usedKeys, dailyCompleted, extremeMode]);
 
   // Save game state to localStorage whenever it changes
   useEffect(() => {
@@ -961,6 +970,11 @@ function App() {
       setIsGameOver(currentProgress.isGameOver);
       setIsCorrect(currentProgress.isWinner);
       setDailyCompleted(currentProgress.isGameOver);
+      
+      // Restore extreme mode setting if it exists
+      if (currentProgress.extremeMode !== undefined) {
+        setExtremeMode(currentProgress.extremeMode);
+      }
       
       if (currentProgress.isGameOver) {
         // Show completion message for finished daily game

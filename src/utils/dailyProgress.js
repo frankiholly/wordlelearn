@@ -8,7 +8,8 @@ export function saveDailyProgress(dayString, gameState) {
     isGameOver: gameState.isGameOver,
     isWinner: gameState.isWinner,
     completedAt: gameState.isGameOver ? new Date().toISOString() : null,
-    usedKeys: gameState.usedKeys
+    usedKeys: gameState.usedKeys,
+    extremeMode: gameState.extremeMode || false // Add extreme mode support
   };
   
   try {
