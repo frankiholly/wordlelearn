@@ -144,6 +144,24 @@ const FixedPositionLetter = ({ letter, position }) => {
   );
 };
 
+// Component for absent letters in extreme mode
+const AbsentLetter = ({ letter }) => {
+  return (
+    <span className="absent-letter-badge" aria-label={`Forbidden letter: ${letter}`}>
+      {letter}
+    </span>
+  );
+};
+
+// Component for wrong position letters in extreme mode
+const WrongPositionLetter = ({ letter, positions }) => {
+  return (
+    <span className="wrong-position-badge" aria-label={`Letter ${letter} cannot be in positions ${positions.join(', ')}`}>
+      {letter}:❌{positions.join(',')}
+    </span>
+  );
+};
+
 function App() {
   // Stage 5: Polish, Animations & Accessibility
   const MAX_ATTEMPTS = 6;
@@ -732,39 +750,73 @@ function App() {
     // If there are no previous guesses, no constraints yet
     if (guesses.length === 0) return { valid: true };
     
-    // Get the last guess with its evaluated status
-    const lastGuess = guesses[guesses.length - 1];
-    
-    // Check if all found letters (correct and present) are used in the new guess
-    const requiredLetters = [];
+    // Collect all constraints from all previous guesses
+    const requiredLetters = new Set();
     const correctPositions = {};
+    const absentLetters = new Set(); // Letters that are NOT in the target word
+    const wrongPositions = {}; // Letters that cannot be in specific positions
     
-    // Collect required letters and their positions
-    lastGuess.forEach((letterObj, index) => {
-      if (letterObj.status === 'correct') {
-        requiredLetters.push(letterObj.letter);
-        correctPositions[index] = letterObj.letter;
-      } else if (letterObj.status === 'present') {
-        requiredLetters.push(letterObj.letter);
-      }
+    // Process all previous guesses to build constraint sets
+    guesses.forEach((guess) => {
+      guess.forEach((letterObj, index) => {
+        const letter = letterObj.letter;
+        
+        if (letterObj.status === 'correct') {
+          // Letter is in correct position - must be used in same position
+          requiredLetters.add(letter);
+          correctPositions[index] = letter;
+        } else if (letterObj.status === 'present') {
+          // Letter is in word but wrong position - must be used but not in this position
+          requiredLetters.add(letter);
+          if (!wrongPositions[letter]) {
+            wrongPositions[letter] = new Set();
+          }
+          wrongPositions[letter].add(index);
+        } else if (letterObj.status === 'absent') {
+          // Letter is not in the target word at all
+          absentLetters.add(letter);
+        }
+      });
     });
     
-    // Check if all required letters are used
-    for (const letter of requiredLetters) {
-      if (!newGuess.includes(letter)) {
-        return { 
-          valid: false, 
-          message: `Must use the letter ${letter} in your guess` 
+    // NEW RULE 1: Check if any letter in the new guess is absent (gray)
+    for (let i = 0; i < newGuess.length; i++) {
+      const letter = newGuess[i];
+      if (absentLetters.has(letter)) {
+        return {
+          valid: false,
+          message: `Cannot use letter ${letter} - it's not in the target word`
         };
       }
     }
     
-    // Check if correct positions are maintained
+    // NEW RULE 2: Check if present letters are placed in known wrong positions
+    for (let i = 0; i < newGuess.length; i++) {
+      const letter = newGuess[i];
+      if (wrongPositions[letter] && wrongPositions[letter].has(i)) {
+        return {
+          valid: false,
+          message: `Letter ${letter} cannot be in position ${i + 1} - already tried there`
+        };
+      }
+    }
+    
+    // EXISTING RULE 1: Check if all required letters are used
+    for (const letter of requiredLetters) {
+      if (!newGuess.includes(letter)) {
+        return {
+          valid: false,
+          message: `Must use the letter ${letter} in your guess`
+        };
+      }
+    }
+    
+    // EXISTING RULE 2: Check if correct positions are maintained
     for (const [position, letter] of Object.entries(correctPositions)) {
       if (newGuess[position] !== letter) {
-        return { 
-          valid: false, 
-          message: `Letter ${letter} must stay in position ${parseInt(position) + 1}` 
+        return {
+          valid: false,
+          message: `Letter ${letter} must stay in position ${parseInt(position) + 1}`
         };
       }
     }
@@ -774,29 +826,53 @@ function App() {
 
   // Helper function to get required letters for extreme mode
   const getRequiredLettersForExtreme = useCallback(() => {
-    if (guesses.length === 0) return { letters: [], positions: {} };
+    if (guesses.length === 0) return { 
+      letters: [], 
+      positions: {},
+      absentLetters: [],
+      wrongPositions: {}
+    };
     
-    // Get the last guess with evaluated status
-    const lastGuess = guesses[guesses.length - 1];
-    
+    // Collect all constraints from all previous guesses
     const requiredLetters = [];
     const correctPositions = {};
+    const absentLetters = [];
+    const wrongPositions = {};
     
-    // Collect required letters and their positions
-    lastGuess.forEach((letterObj, index) => {
-      if (letterObj.status === 'correct') {
-        if (!requiredLetters.includes(letterObj.letter)) {
-          requiredLetters.push(letterObj.letter);
+    // Process all previous guesses to build constraint sets
+    guesses.forEach((guess) => {
+      guess.forEach((letterObj, index) => {
+        const letter = letterObj.letter;
+        
+        if (letterObj.status === 'correct') {
+          if (!requiredLetters.includes(letter)) {
+            requiredLetters.push(letter);
+          }
+          correctPositions[index] = letter;
+        } else if (letterObj.status === 'present') {
+          if (!requiredLetters.includes(letter)) {
+            requiredLetters.push(letter);
+          }
+          if (!wrongPositions[letter]) {
+            wrongPositions[letter] = [];
+          }
+          if (!wrongPositions[letter].includes(index + 1)) {
+            wrongPositions[letter].push(index + 1); // Store as 1-based position for display
+          }
+        } else if (letterObj.status === 'absent') {
+          if (!absentLetters.includes(letter)) {
+            absentLetters.push(letter);
+          }
         }
-        correctPositions[index] = letterObj.letter;
-      } else if (letterObj.status === 'present') {
-        if (!requiredLetters.includes(letterObj.letter)) {
-          requiredLetters.push(letterObj.letter);
-        }
-      }
+      });
     });
     
-    return { letters: requiredLetters, positions: correctPositions };
+    return { 
+      letters: requiredLetters, 
+      positions: correctPositions,
+      absentLetters: absentLetters,
+      wrongPositions: wrongPositions
+    };
   }, [guesses]);
 
   // Handle guess submission - extracted for reuse
@@ -1190,6 +1266,8 @@ function App() {
             <ul>
               <li>Found letters must be used in next guess</li>
               <li>Correct positions must be maintained</li>
+              <li>Cannot reuse letters marked as absent (gray)</li>
+              <li>Cannot place letters in known wrong positions</li>
             </ul>
             
             {guesses.length > 0 && !isGameOver && (
@@ -1212,6 +1290,29 @@ function App() {
                             key={pos} 
                             letter={letter} 
                             position={parseInt(pos)} 
+                          />
+                        ))
+                    : 'None yet'
+                  }
+                </div>
+                <div className="forbidden-letters">
+                  <strong>Forbidden Letters:</strong>{' '}
+                  {getRequiredLettersForExtreme().absentLetters.length > 0 
+                    ? getRequiredLettersForExtreme().absentLetters.map((letter, index) => (
+                        <AbsentLetter key={index} letter={letter} />
+                      ))
+                    : 'None yet'
+                  }
+                </div>
+                <div className="wrong-positions">
+                  <strong>Wrong Positions:</strong>{' '}
+                  {Object.entries(getRequiredLettersForExtreme().wrongPositions).length > 0 
+                    ? Object.entries(getRequiredLettersForExtreme().wrongPositions)
+                        .map(([letter, positions]) => (
+                          <WrongPositionLetter 
+                            key={letter} 
+                            letter={letter} 
+                            positions={positions} 
                           />
                         ))
                     : 'None yet'

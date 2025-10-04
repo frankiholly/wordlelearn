@@ -539,7 +539,9 @@ button:disabled {
 }
 
 .required-letters,
-.fixed-positions {
+.fixed-positions,
+.forbidden-letters,
+.wrong-positions {
   margin: 4px 0;
   display: flex;
   flex-wrap: wrap;
@@ -548,7 +550,9 @@ button:disabled {
 }
 
 .required-letters strong,
-.fixed-positions strong {
+.fixed-positions strong,
+.forbidden-letters strong,
+.wrong-positions strong {
   color: #f44336;
   margin-right: 4px;
 }
@@ -575,6 +579,31 @@ button:disabled {
   font-weight: bold;
   font-size: 0.75rem;
   margin: 0 2px;
+}
+
+.absent-letter-badge {
+  display: inline-block;
+  background-color: #787c7e;
+  color: white;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: bold;
+  font-size: 0.75rem;
+  margin: 0 2px;
+  text-decoration: line-through;
+  opacity: 0.8;
+}
+
+.wrong-position-badge {
+  display: inline-block;
+  background-color: #c9b458;
+  color: white;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: bold;
+  font-size: 0.7rem;
+  margin: 0 2px;
+  border: 1px solid #b8a147;
 }
 
 .game-buttons {
