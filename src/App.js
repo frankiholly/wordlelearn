@@ -465,14 +465,25 @@ function App() {
       setIsCorrect(true);
       
       console.log(`[DEBUG] Win detected! extremeMode: ${extremeMode}, validatedWord: ${validatedWord}, targetWord: ${targetWord}`);
+      console.log(`[DEBUG] Browser info: ${navigator.userAgent}`);
+      console.log(`[DEBUG] Platform: ${navigator.platform}`);
       
       // Trigger extreme win celebration if in extreme mode (with delay to let word reveal complete)
       if (extremeMode) {
         console.log('[EXTREME WIN] Triggering extreme celebration with 3-second delay');
+        console.log(`[EXTREME WIN] Current showExtremeCelebration state: ${showExtremeCelebration}`);
+        
         // Add a 3-second delay to ensure word reveal animation completes fully
         setTimeout(() => {
-          console.log('[EXTREME WIN] Setting showExtremeCelebration to true');
+          console.log('[EXTREME WIN] Timeout completed, setting showExtremeCelebration to true');
+          console.log(`[EXTREME WIN] Before setState - showExtremeCelebration: ${showExtremeCelebration}`);
           setShowExtremeCelebration(true);
+          console.log('[EXTREME WIN] setState called');
+          
+          // Additional debug after a small delay to confirm state change
+          setTimeout(() => {
+            console.log(`[EXTREME WIN] After setState - showExtremeCelebration should be true`);
+          }, 100);
         }, 3000);
       } else {
         console.log('[DEBUG] Not in extreme mode, skipping extreme celebration');

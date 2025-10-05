@@ -12,10 +12,21 @@ const ExtremeWinCelebration = ({ isVisible, onComplete }) => {
   const [catExpression, setCatExpression] = useState('happy');
   const expressionIntervalRef = useRef(null);
 
+  console.log(`[ExtremeWinCelebration] Render called - isVisible: ${isVisible}`);
+  console.log(`[ExtremeWinCelebration] Settings:`, settings);
+  console.log(`[ExtremeWinCelebration] visualEnabled: ${settings.visualEnabled}`);
+
   useEffect(() => {
-    if (!isVisible) return;
+    console.log(`[ExtremeWinCelebration] useEffect triggered - isVisible: ${isVisible}`);
+    
+    if (!isVisible) {
+      console.log('[ExtremeWinCelebration] Not visible, returning early');
+      return;
+    }
 
     console.log('[Celebration] Starting extreme celebration');
+    console.log(`[Celebration] Browser: ${navigator.userAgent}`);
+    console.log(`[Celebration] Platform: ${navigator.platform}`);
 
     // Load user preferences
     const currentSettings = CelebrationSettings.load();
@@ -161,7 +172,12 @@ const ExtremeWinCelebration = ({ isVisible, onComplete }) => {
     };
   }, [isVisible, onComplete]);
 
-  if (!isVisible || !settings.visualEnabled) return null;
+  if (!isVisible || !settings.visualEnabled) {
+    console.log(`[ExtremeWinCelebration] Not rendering - isVisible: ${isVisible}, visualEnabled: ${settings.visualEnabled}`);
+    return null;
+  }
+
+  console.log('[ExtremeWinCelebration] Rendering celebration component');
 
   // Generate floating particles
   const particles = Array.from({ length: 12 }, (_, i) => (

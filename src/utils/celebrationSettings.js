@@ -2,15 +2,26 @@
 export const CelebrationSettings = {
   // Load settings from localStorage
   load() {
+    console.log('[CelebrationSettings] Loading settings...');
     try {
       const saved = localStorage.getItem('wordle-celebration-settings');
+      console.log('[CelebrationSettings] Raw localStorage value:', saved);
+      
       if (saved) {
-        return { ...this.getDefaults(), ...JSON.parse(saved) };
+        const parsed = JSON.parse(saved);
+        console.log('[CelebrationSettings] Parsed saved settings:', parsed);
+        
+        const merged = { ...this.getDefaults(), ...parsed };
+        console.log('[CelebrationSettings] Final merged settings:', merged);
+        return merged;
       }
     } catch (error) {
       console.warn('Failed to load celebration settings:', error);
     }
-    return this.getDefaults();
+    
+    const defaults = this.getDefaults();
+    console.log('[CelebrationSettings] Using default settings:', defaults);
+    return defaults;
   },
 
   // Save settings to localStorage
