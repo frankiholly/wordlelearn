@@ -764,11 +764,33 @@ function App() {
     // Collect all constraints from all previous guesses
     const requiredLetters = new Set();
     const correctPositions = {};
-    const absentLetters = new Set(); // Letters that are NOT in the target word
+    const forbiddenLetters = new Set(); // Letters that are completely absent from the target word
     const wrongPositions = {}; // Letters that cannot be in specific positions
+    const maxLetterCounts = {}; // Maximum count of each letter that we've confirmed exists
     
     // Process all previous guesses to build constraint sets
     guesses.forEach((guess) => {
+      // First, count how many of each letter are marked green or yellow in this guess
+      const foundLetterCounts = {}; // Counts of letters with correct/present status
+      const absentLetters = new Set(); // Letters marked gray in this guess
+      
+      guess.forEach((letterObj) => {
+        const letter = letterObj.letter;
+        
+        if (letterObj.status === 'correct' || letterObj.status === 'present') {
+          foundLetterCounts[letter] = (foundLetterCounts[letter] || 0) + 1;
+        } else if (letterObj.status === 'absent') {
+          absentLetters.add(letter);
+        }
+      });
+      
+      // Update maxLetterCounts based on what we found in this guess
+      Object.keys(foundLetterCounts).forEach(letter => {
+        const count = foundLetterCounts[letter];
+        maxLetterCounts[letter] = Math.max(maxLetterCounts[letter] || 0, count);
+      });
+      
+      // Now process each letter for position constraints and required letters
       guess.forEach((letterObj, index) => {
         const letter = letterObj.letter;
         
@@ -784,19 +806,38 @@ function App() {
           }
           wrongPositions[letter].add(index);
         } else if (letterObj.status === 'absent') {
-          // Letter is not in the target word at all
-          absentLetters.add(letter);
+          // Only mark as forbidden if we haven't found this letter as green/yellow elsewhere
+          if (!foundLetterCounts[letter]) {
+            forbiddenLetters.add(letter);
+          }
         }
       });
     });
     
-    // NEW RULE 1: Check if any letter in the new guess is absent (gray)
+    // Count letters in the new guess
+    const newGuessLetterCounts = {};
     for (let i = 0; i < newGuess.length; i++) {
       const letter = newGuess[i];
-      if (absentLetters.has(letter)) {
+      newGuessLetterCounts[letter] = (newGuessLetterCounts[letter] || 0) + 1;
+    }
+    
+    // NEW RULE 1: Check if any letter in the new guess is completely forbidden (gray with no green/yellow)
+    for (let i = 0; i < newGuess.length; i++) {
+      const letter = newGuess[i];
+      if (forbiddenLetters.has(letter)) {
         return {
           valid: false,
           message: `Cannot use letter ${letter} - it's not in the target word`
+        };
+      }
+    }
+    
+    // NEW RULE 5: Check if new guess uses more of any letter than we've confirmed exists
+    for (const [letter, count] of Object.entries(newGuessLetterCounts)) {
+      if (maxLetterCounts[letter] !== undefined && count > maxLetterCounts[letter]) {
+        return {
+          valid: false,
+          message: `Can only use ${maxLetterCounts[letter]} '${letter}' (found ${maxLetterCounts[letter]} so far)`
         };
       }
     }
@@ -840,18 +881,41 @@ function App() {
     if (guesses.length === 0) return { 
       letters: [], 
       positions: {},
-      absentLetters: [],
-      wrongPositions: {}
+      forbiddenLetters: [],
+      wrongPositions: {},
+      maxLetterCounts: {}
     };
     
     // Collect all constraints from all previous guesses
     const requiredLetters = [];
     const correctPositions = {};
-    const absentLetters = [];
+    const forbiddenLetters = [];
     const wrongPositions = {};
+    const maxLetterCounts = {};
     
     // Process all previous guesses to build constraint sets
     guesses.forEach((guess) => {
+      // First pass: count letters that are green or yellow in this guess
+      const foundLetterCounts = {};
+      const absentInGuess = new Set();
+      
+      guess.forEach((letterObj) => {
+        const letter = letterObj.letter;
+        
+        if (letterObj.status === 'correct' || letterObj.status === 'present') {
+          foundLetterCounts[letter] = (foundLetterCounts[letter] || 0) + 1;
+        } else if (letterObj.status === 'absent') {
+          absentInGuess.add(letter);
+        }
+      });
+      
+      // Update maxLetterCounts
+      Object.keys(foundLetterCounts).forEach(letter => {
+        const count = foundLetterCounts[letter];
+        maxLetterCounts[letter] = Math.max(maxLetterCounts[letter] || 0, count);
+      });
+      
+      // Second pass: process position constraints
       guess.forEach((letterObj, index) => {
         const letter = letterObj.letter;
         
@@ -871,8 +935,9 @@ function App() {
             wrongPositions[letter].push(index + 1); // Store as 1-based position for display
           }
         } else if (letterObj.status === 'absent') {
-          if (!absentLetters.includes(letter)) {
-            absentLetters.push(letter);
+          // Only mark as forbidden if not found as green/yellow
+          if (!foundLetterCounts[letter] && !forbiddenLetters.includes(letter)) {
+            forbiddenLetters.push(letter);
           }
         }
       });
@@ -881,8 +946,9 @@ function App() {
     return { 
       letters: requiredLetters, 
       positions: correctPositions,
-      absentLetters: absentLetters,
-      wrongPositions: wrongPositions
+      forbiddenLetters: forbiddenLetters,
+      wrongPositions: wrongPositions,
+      maxLetterCounts: maxLetterCounts
     };
   }, [guesses]);
 
@@ -1308,8 +1374,8 @@ function App() {
                 </div>
                 <div className="forbidden-letters">
                   <strong>Forbidden Letters:</strong>{' '}
-                  {getRequiredLettersForExtreme().absentLetters.length > 0 
-                    ? getRequiredLettersForExtreme().absentLetters.map((letter, index) => (
+                  {getRequiredLettersForExtreme().forbiddenLetters.length > 0 
+                    ? getRequiredLettersForExtreme().forbiddenLetters.map((letter, index) => (
                         <AbsentLetter key={index} letter={letter} />
                       ))
                     : 'None yet'
