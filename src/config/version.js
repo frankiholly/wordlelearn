@@ -2,8 +2,8 @@
 // This is the SINGLE source of truth for version information
 
 export const VERSION_CONFIG = {
-  version: '3.14.8',
-  buildId: 'fix_letter_count_limit_extreme_mode',
+  version: '3.14.9',
+  buildId: 'fix_letter_count_only_on_gray_duplicate',
   buildDate: new Date().toISOString(),
   
   // Helper methods

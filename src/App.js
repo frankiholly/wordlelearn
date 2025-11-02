@@ -766,16 +766,18 @@ function App() {
     const correctPositions = {};
     const forbiddenLetters = new Set(); // Letters that are completely absent from the target word
     const wrongPositions = {}; // Letters that cannot be in specific positions
-    const maxLetterCounts = {}; // Maximum count of each letter that we've confirmed exists
+    const maxLetterCounts = {}; // Maximum count of each letter when we've seen a gray duplicate
     
     // Process all previous guesses to build constraint sets
     guesses.forEach((guess) => {
-      // First, count how many of each letter are marked green or yellow in this guess
+      // First, count how many of each letter are in this guess
+      const totalLetterCounts = {};
       const foundLetterCounts = {}; // Counts of letters with correct/present status
       const absentLetters = new Set(); // Letters marked gray in this guess
       
       guess.forEach((letterObj) => {
         const letter = letterObj.letter;
+        totalLetterCounts[letter] = (totalLetterCounts[letter] || 0) + 1;
         
         if (letterObj.status === 'correct' || letterObj.status === 'present') {
           foundLetterCounts[letter] = (foundLetterCounts[letter] || 0) + 1;
@@ -784,10 +786,17 @@ function App() {
         }
       });
       
-      // Update maxLetterCounts based on what we found in this guess
-      Object.keys(foundLetterCounts).forEach(letter => {
-        const count = foundLetterCounts[letter];
-        maxLetterCounts[letter] = Math.max(maxLetterCounts[letter] || 0, count);
+      // CRITICAL: Only set maxLetterCounts when we've seen a gray duplicate
+      // This means we tried more instances than exist in the target
+      Object.keys(totalLetterCounts).forEach(letter => {
+        const total = totalLetterCounts[letter];
+        const found = foundLetterCounts[letter] || 0;
+        
+        // If we found some green/yellow AND some gray of the same letter,
+        // we've discovered the exact limit
+        if (found > 0 && absentLetters.has(letter)) {
+          maxLetterCounts[letter] = found;
+        }
       });
       
       // Now process each letter for position constraints and required letters
@@ -832,7 +841,8 @@ function App() {
       }
     }
     
-    // NEW RULE 5: Check if new guess uses more of any letter than we've confirmed exists
+    // NEW RULE 5: Check if new guess exceeds confirmed letter limits
+    // Only enforced when we've seen a gray duplicate (proven the limit)
     for (const [letter, count] of Object.entries(newGuessLetterCounts)) {
       if (maxLetterCounts[letter] !== undefined && count > maxLetterCounts[letter]) {
         return {
@@ -895,12 +905,14 @@ function App() {
     
     // Process all previous guesses to build constraint sets
     guesses.forEach((guess) => {
-      // First pass: count letters that are green or yellow in this guess
+      // First pass: count all letters and track their statuses
+      const totalLetterCounts = {};
       const foundLetterCounts = {};
       const absentInGuess = new Set();
       
       guess.forEach((letterObj) => {
         const letter = letterObj.letter;
+        totalLetterCounts[letter] = (totalLetterCounts[letter] || 0) + 1;
         
         if (letterObj.status === 'correct' || letterObj.status === 'present') {
           foundLetterCounts[letter] = (foundLetterCounts[letter] || 0) + 1;
@@ -909,10 +921,15 @@ function App() {
         }
       });
       
-      // Update maxLetterCounts
-      Object.keys(foundLetterCounts).forEach(letter => {
-        const count = foundLetterCounts[letter];
-        maxLetterCounts[letter] = Math.max(maxLetterCounts[letter] || 0, count);
+      // Update maxLetterCounts only when we've seen a gray duplicate
+      Object.keys(totalLetterCounts).forEach(letter => {
+        const found = foundLetterCounts[letter] || 0;
+        
+        // If we found some green/yellow AND some gray of the same letter,
+        // we've discovered the exact limit
+        if (found > 0 && absentInGuess.has(letter)) {
+          maxLetterCounts[letter] = found;
+        }
       });
       
       // Second pass: process position constraints
